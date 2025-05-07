@@ -1,4 +1,5 @@
 import type { User } from "@/api/user/userModel";
+import { db } from "@/common/config/database"; 
 
 export const users: User[] = [
 	{
@@ -21,10 +22,15 @@ export const users: User[] = [
 
 export class UserRepository {
 	async findAllAsync(): Promise<User[]> {
-		return users;
+		const rows = await db<User>('users').select('*');
+		return rows as User[];
 	}
 
 	async findByIdAsync(id: number): Promise<User | null> {
-		return users.find((user) => user.id === id) || null;
+		const user = await db<User>('users')
+		  .where({ id })
+		  .first();
+
+		return user ?? null;
 	}
 }
