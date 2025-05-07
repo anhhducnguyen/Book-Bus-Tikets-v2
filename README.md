@@ -1,6 +1,6 @@
-# 🚀 SmartBus Vivutoday 
+# SmartBus Vivutoday 
 
-## 🌟 Introduction
+## Introduction
 
 Vivutoday national bus ticket booking system is developed with specific goals to meet the needs of both customers and bus operators, while promoting the development of the passenger transport industry in Vietnam.
 
@@ -13,11 +13,11 @@ Vivutoday national bus ticket booking system is developed with specific goals to
 - [Nguyen Tuan](https://git.rikkei.edu.vn/tuannguyen2705)
 - [Nguyen Huy](https://git.rikkei.edu.vn/HuyNguyen)
 
-## 🛠️ Getting Started
+## Getting Started
 
 ### Step-by-Step Guide
 
-#### Step 1: 🚀 Initial Setup
+#### Step 1: Initial Setup
 
 - Clone the repository: `git clone https://git.rikkei.edu.vn/ojt-phenikaa/group03/api.git`
 - Navigate: `cd api`
@@ -25,18 +25,18 @@ Vivutoday national bus ticket booking system is developed with specific goals to
 - Check installed version : `pnpm -version`
 - Install dependencies: `pnpm install`
 
-#### Step 2: ⚙️ Environment Configuration
+#### Step 2: Environment Configuration
 
 - Create `.env`: Copy `.env.template` to `.env`
 - Update `.env`: Fill in necessary environment variables
 
-#### Step 3: 🏃‍♂️ Running the Project
+#### Step 3: Running the Project
 
 - Development Mode: `pnpm start:dev`
 - Building: `pnpm build`
 - Production Mode: Set `NODE_ENV="production"` in `.env` then `pnpm build && pnpm start:prod`
 
-## 📁 Folder Structure
+## Folder Structure
 
 ```code
 ├── biome.json
