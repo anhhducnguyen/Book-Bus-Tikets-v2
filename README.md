@@ -4,6 +4,15 @@
 
 Vivutoday national bus ticket booking system is developed with specific goals to meet the needs of both customers and bus operators, while promoting the development of the passenger transport industry in Vietnam.
 
+## Member
+
+- [Nguyen Duc Anh](https://git.rikkei.edu.vn/anhnguyen) (Leader)
+- [Vu Ha Trang](https://git.rikkei.edu.vn/trangvux)
+- [Tran Lan](https://git.rikkei.edu.vn/tranlan149)
+- [Dao Anh Son](https://git.rikkei.edu.vn/daoanhson1998)
+- [Nguyen Tuan](https://git.rikkei.edu.vn/tuannguyen2705)
+- [Nguyen Huy](https://git.rikkei.edu.vn/HuyNguyen)
+
 ## 🛠️ Getting Started
 
 ### Step-by-Step Guide
