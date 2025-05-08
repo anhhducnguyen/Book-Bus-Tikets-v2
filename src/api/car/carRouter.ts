@@ -52,15 +52,17 @@ carRegistry.registerPath({
 	  body: {
 		content: {
 		  "application/json": {
-			schema: CreateCarSchema.shape.body, // chỉ định schema body
+			schema: CreateCarSchema.shape.body, 
 		  },
 		},
 	  },
 	},
 	responses: createApiResponse(CarSchema, "Car created successfully", 201),
-  });
+});
   
-  carRouter.post("/", validateRequest(CreateCarSchema), carController.createCar);
+carRouter.post("/", validateRequest(CreateCarSchema), carController.createCar);
+
+
 
 
 

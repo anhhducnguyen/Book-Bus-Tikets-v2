@@ -27,7 +27,7 @@ class CarController {
 
     public createCar: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const carData = req.body;
-                
+
         try {
           if (!carData) {
             res.status(StatusCodes.BAD_REQUEST).json({ message: "Car data is required." });
@@ -51,9 +51,6 @@ class CarController {
           });
         }
       };
-      
-
-    
 }
 
 export const carController = new CarController();

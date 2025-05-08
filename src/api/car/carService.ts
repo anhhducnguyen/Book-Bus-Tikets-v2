@@ -64,10 +64,7 @@ export class CarService {
 		  logger.error(errorMessage);
 		  return ServiceResponse.failure("An error occurred while creating car.", null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
-	  }
-	  
-	  
-
+	} 
 }
 
 export const carService = new CarService();
