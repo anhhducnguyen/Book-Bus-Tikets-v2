@@ -22,8 +22,9 @@ export const users: User[] = [
 
 export class UserRepository {
 	async findAllAsync(): Promise<User[]> {
-		const rows = await db<User>('users').select('*');
-		return rows as User[];
+		// const rows = await db<User>('users').select('*');
+		// return rows as User[];
+		return users;
 	}
 
 	async findByIdAsync(id: number): Promise<User | null> {

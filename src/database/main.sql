@@ -8,7 +8,7 @@ CREATE TABLE `users` (
   `email` varchar(255),
   `password` varchar(255),
   `phone` varchar(11),
-  `status` enum("ACTIVE","BLOCKED"),
+  `status` enum("BOOKED","CANCELLED"),
   `created_at` datetime,
   `updated_at` datetime
 );
@@ -37,8 +37,8 @@ CREATE TABLE `stations` (
 
 CREATE TABLE `station_bus` (
   `station_id` int,
-  `buse_id` int,
-  PRIMARY KEY (`station_id`, `buse_id`)
+  `bus_id` int,
+  PRIMARY KEY (`station_id`, `bus_id`)
 );
 
 CREATE TABLE `bus_companies` (
@@ -166,7 +166,7 @@ ALTER TABLE `user_role` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 ALTER TABLE `user_role` ADD FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`);
 
-ALTER TABLE `station_bus` ADD FOREIGN KEY (`buse_id`) REFERENCES `buses` (`id`);
+ALTER TABLE `station_bus` ADD FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`);
 
 ALTER TABLE `station_bus` ADD FOREIGN KEY (`station_id`) REFERENCES `stations` (`id`);
 
@@ -192,7 +192,7 @@ ALTER TABLE `payments` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 ALTER TABLE `payments` ADD FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`);
 
-ALTER TABLE `buses` ADD FOREIGN KEY (`capacity`) REFERENCES `bus_companies` (`id`);
+ALTER TABLE `buses` ADD FOREIGN KEY (`company_id`) REFERENCES `bus_companies` (`id`);
 
 ALTER TABLE `seats` ADD FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`);
 
