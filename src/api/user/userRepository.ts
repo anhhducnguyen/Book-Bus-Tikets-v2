@@ -33,4 +33,18 @@ export class UserRepository {
 
 		return user ?? null;
 	}
+
+	async createUserAsync(data: Omit<User, "id" | "createdAt" | "updatedAt">): Promise<User> {
+		const currentTime = new Date();
+
+		const [id] = await db('users').insert({
+			...data,
+			createdAt: currentTime,
+			updatedAt: currentTime,
+			});
+			
+			const [newUser] = await db('users').where({ id }).select('*');
+			
+			return newUser;
+	}
 }

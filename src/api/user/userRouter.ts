@@ -3,7 +3,7 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { GetUserSchema, UserSchema } from "@/api/user/userModel";
+import { GetUserSchema, UserSchema, CreateUserSchema } from "@/api/user/userModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { userController } from "./userController";
 
@@ -31,5 +31,22 @@ userRegistry.registerPath({
 
 userRouter.get("/:id", validateRequest(GetUserSchema), userController.getUser);
 
-
-
+userRegistry.registerPath({
+	method: "post",
+	path: "/users",
+	tags: ["User"],
+	operationId: "createUser",
+	summary: "Create a new user",
+	request: {
+	  body: {
+		content: {
+		  "application/json": {
+			schema: CreateUserSchema.shape.body, // chỉ định schema body
+		  },
+		},
+	  },
+	},
+	responses: createApiResponse(UserSchema, "User created successfully", 201),
+  });
+  
+userRouter.post("/", validateRequest(CreateUserSchema), userController.createUser);

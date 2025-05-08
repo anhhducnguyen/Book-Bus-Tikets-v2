@@ -1,4 +1,5 @@
 import type { Request, RequestHandler, Response } from "express";
+import { StatusCodes } from "http-status-codes";
 
 import { userService } from "@/api/user/userService";
 
@@ -13,6 +14,34 @@ class UserController {
 		const serviceResponse = await userService.findById(id);
 		res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
+
+	public createUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+		const userData = req.body;
+		try {
+		  if (!userData) {
+			res.status(StatusCodes.BAD_REQUEST).json({ message: "User data is required." });
+			return;
+		  }
+	
+		  const response = await userService.createUser(userData);
+		  
+		  if (response.statusCode === StatusCodes.CREATED) {
+			res.status(StatusCodes.CREATED).json({
+				  user: response.responseObject,
+				
+			  message: response.message,
+			});
+		  
+		  } else {
+			res.status(response.statusCode).json({ message: response.message });
+		  }
+		} catch (ex) {
+		  res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			message: "An error occurred while creating user.",
+		  });
+		}
+	};
+	
 }
 
 export const userController = new UserController();
