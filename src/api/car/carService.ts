@@ -52,6 +52,22 @@ export class CarService {
 			return ServiceResponse.failure("An error occurred while deleting Car.", null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	async createCar(data: Omit<Car, "id" | "created_at" | "updated_at">): Promise<ServiceResponse<Car | null>> {
+		try {	  
+		  const newCar = await this.carRepository.createCarAsync(data);
+	  
+		  return ServiceResponse.success<Car>("Car created successfully", newCar, StatusCodes.CREATED);
+		} catch (ex) {
+		  const errorMessage = `Error creating car: ${(ex as Error).message}`;
+		  console.error("Full error object:", ex);
+		  logger.error(errorMessage);
+		  return ServiceResponse.failure("An error occurred while creating car.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+		}
+	  }
+	  
+	  
+
 }
 
 export const carService = new CarService();
