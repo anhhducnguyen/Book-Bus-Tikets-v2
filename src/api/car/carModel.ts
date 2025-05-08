@@ -7,7 +7,7 @@ extendZodWithOpenApi(z);
 
 export type Car = z.infer<typeof CarSchema>;
 export const CarSchema = z.object({
-    id: z.number().int().optional(), // id là trường tự động tăng, có thể không có khi tạo mới
+    id: z.number().int().optional(), 
     name: z.string().min(1, 'Name is required').max(255, 'Name must be less than 255 characters'),
     description: z.string().max(65535, 'Description must be less than 65535 characters').optional(),
     license_plate: z.string().min(1, 'License plate is required').max(20, 'License plate must be less than 20 characters'),

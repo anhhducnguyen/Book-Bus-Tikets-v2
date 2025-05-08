@@ -25,13 +25,59 @@ export const cars: Car[] = [
 ];
 
 export class CarRepository {
-    async findAllAsync(): Promise<Car[]> {
-        // const rows = await db<Car>('users').select('*');
-        // return rows as Car[];
-        return cars;
+
+    async findAll(filter: any, options: { sortBy?: string; limit?: number; page?: number }) {
+        const { sortBy = "id:asc", limit = 10, page = 1 } = options;
+        const [sortField, sortOrder] = sortBy.split(":");
+    
+        const query = db<Car>("buses");
+    
+        if (filter.name) {
+            query.where("name", "like", `%${filter.name}%`);
+        }
+    
+        const offset = (page - 1) * limit;
+    
+        const data = await query.orderBy(sortField, sortOrder).limit(limit).offset(offset);
+    
+        const countResult = await db<Car>("buses")
+            .modify((qb) => {
+                if (filter.name) {
+                    qb.where("name", "like", `%${filter.name}%`);
+                }
+            })
+            .count("id as count");
+    
+        const totalCount = Number((countResult[0] as { count: string }).count);
+    
+        return {
+            results: data,
+            page,
+            limit,
+            total: totalCount,
+            totalPages: Math.ceil(totalCount / limit),
+        };
+    }
+    
+    async findByIdAsync(id: number): Promise<Car | null> {
+        const rows = await db<Car>('buses').select('*').where('id', id);
+        if (rows.length === 0) {
+            return null;
+        }
+        return rows[0] as Car;
     }
 
-    async findByIdAsync(id: number): Promise<Car | null> {
-        return cars.find((car) => car.id === id) || null;
+    async createAsync(car: Car): Promise<Car> {
+        const [id] = await db<Car>('buses').insert(car);
+        const newCar = await db<Car>('buses').where('id', id).first();
+        return newCar as Car;
+    }    
+
+    async deleteAsync(id: number): Promise<Car | null> {
+        const rows = await db<Car>('buses').where('id', id).del().returning('*');
+        if (rows.length === 0) {
+            return null;
+        }
+        return rows[0] as Car;
     }
 }

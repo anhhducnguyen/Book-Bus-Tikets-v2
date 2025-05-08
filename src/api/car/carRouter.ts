@@ -31,5 +31,16 @@ carRegistry.registerPath({
 
 carRouter.get("/:id", validateRequest(GetCarSchema), carController.getUser);
 
+carRegistry.registerPath({
+    method: "delete",
+    path: "/cars/{id}",
+    tags: ["Car"],
+    request: { params: GetCarSchema.shape.params },
+    responses: createApiResponse(GetCarSchema, "Success"),
+});
+
+carRouter.delete("/:id", validateRequest(GetCarSchema), carController.deleteUser);
+
+
 
 

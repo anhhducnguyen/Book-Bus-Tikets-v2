@@ -12,22 +12,12 @@ export class CarService {
 		this.carRepository = repository;
 	}
 
-	// Retrieves all cars from the database
-	async findAll(): Promise<ServiceResponse<Car[] | null>> {
+	async findAll(filter: any, options: any) {
 		try {
-			const cars = await this.carRepository.findAllAsync();
-			if (!cars || cars.length === 0) {
-				return ServiceResponse.failure("No cars found", null, StatusCodes.NOT_FOUND);
-			}
-			return ServiceResponse.success<Car[]>("cars found", cars);
-		} catch (ex) {
-			const errorMessage = `Error finding all cars: $${(ex as Error).message}`;
-			logger.error(errorMessage);
-			return ServiceResponse.failure(
-				"An error occurred while retrieving cars.",
-				null,
-				StatusCodes.INTERNAL_SERVER_ERROR,
-			);
+		  const result = await this.carRepository.findAll(filter, options);
+		  return ServiceResponse.success("Buses fetched successfully", result);
+		} catch (error) {
+		  return ServiceResponse.failure("Failed to fetch buses", null);
 		}
 	}
 
@@ -43,6 +33,23 @@ export class CarService {
 			const errorMessage = `Error finding Car with id ${id}:, ${(ex as Error).message}`;
 			logger.error(errorMessage);
 			return ServiceResponse.failure("An error occurred while finding Car.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	// Deletes a Car by their ID
+	async delete(id: number): Promise<ServiceResponse<Car | null>> {
+		try {
+			const car = await this.carRepository.findByIdAsync(id); 
+			if (!car) {
+				return ServiceResponse.failure("Car not found", null, StatusCodes.NOT_FOUND);
+			}
+
+			await this.carRepository.deleteAsync(id); 
+			return ServiceResponse.success<Car>("Car deleted", car);
+		} catch (ex) {
+			const errorMessage = `Error deleting Car with id ${id}: ${(ex as Error).message}`;
+			logger.error(errorMessage);
+			return ServiceResponse.failure("An error occurred while deleting Car.", null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 }
