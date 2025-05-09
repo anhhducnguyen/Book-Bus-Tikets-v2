@@ -23,6 +23,12 @@ class CarController {
         const serviceResponse = await carService.delete(id);
         res.status(serviceResponse.statusCode).send(serviceResponse);
     };
+
+    public generateSeatByCarId: RequestHandler = async (req: Request, res: Response) => {
+        const busId = Number.parseInt(req.params.id as string, 10);
+        const serviceResponse = await carService.generateSeatByCarId(busId);
+        res.status(serviceResponse.statusCode).send(serviceResponse);
+    }
 }
 
 export const carController = new CarController();

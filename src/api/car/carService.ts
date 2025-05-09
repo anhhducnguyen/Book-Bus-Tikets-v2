@@ -52,6 +52,28 @@ export class CarService {
 			return ServiceResponse.failure("An error occurred while deleting Car.", null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	async generateSeatByCarId(busId: number): Promise<ServiceResponse<Car | null>> {
+		try {
+			// Kiem tra xem xe co ton tai khong
+			const car = await this.carRepository.findByIdAsync(busId); 
+			if (!car) {
+				return ServiceResponse.failure("Car not found", null, StatusCodes.NOT_FOUND);
+			}
+			// Kiem tra xem xe da co ghe chua
+			const existingSeats = await this.carRepository.existingSeats(busId);
+			if (existingSeats) {
+				return ServiceResponse.failure("Seats already exist for this Car", null, StatusCodes.CONFLICT);
+			}
+
+			await this.carRepository.generateSeatByCarId(busId); 
+			return ServiceResponse.success<Car>("Car seats generated", car);
+		} catch (ex) {
+			const errorMessage = `Error generating seats for Car with id ${busId}: ${(ex as Error).message}`;
+			logger.error(errorMessage);
+			return ServiceResponse.failure("An error occurred while generating seats for Car.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+		}
+	}
 }
 
 export const carService = new CarService();
