@@ -66,12 +66,7 @@ export class CarRepository {
         }
         return rows[0] as Car;
     }
-
-    async createAsync(car: Car): Promise<Car> {
-        const [id] = await db<Car>('buses').insert(car);
-        const newCar = await db<Car>('buses').where('id', id).first();
-        return newCar as Car;
-    }    
+ 
 
     async deleteAsync(id: number): Promise<Car | null> {
         const rows = await db<Car>('buses').where('id', id).del().returning('*');
@@ -81,6 +76,20 @@ export class CarRepository {
         return rows[0] as Car;
     }
 
+    async createCarAsync(data: Omit<Car, "id" | "created_at" | "updated_at">): Promise<Car> {
+        const currentTime = new Date();
+      
+        const [id] = await db('buses').insert({
+          ...data,
+          created_at: currentTime,
+          updated_at: currentTime,
+        });
+      
+        const [newCar] = await db('buses').where({ id }).select('*');
+      
+        return newCar;
+    }
+      
     async existingSeats(busId: number): Promise<Car | null> {
         const rows = await db<Car>('seats').select('*').where('bus_id', busId);
         if (rows.length === 0) {

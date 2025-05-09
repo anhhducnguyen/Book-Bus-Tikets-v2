@@ -3,7 +3,7 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { GetCarSchema, CarSchema } from "@/api/car/carModel";
+import { GetCarSchema, CarSchema, CreateCarSchema } from "@/api/car/carModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { carController } from "./carController";
 
@@ -19,7 +19,7 @@ carRegistry.registerPath({
     responses: createApiResponse(z.array(CarSchema), "Success"),
 });
 
-carRouter.get("/", carController.getUsers);
+carRouter.get("/", carController.getCars);
 
 carRegistry.registerPath({
     method: "get",
@@ -29,7 +29,7 @@ carRegistry.registerPath({
     responses: createApiResponse(GetCarSchema, "Success"),
 });
 
-carRouter.get("/:id", validateRequest(GetCarSchema), carController.getUser);
+carRouter.get("/:id", validateRequest(GetCarSchema), carController.getCar);
 
 carRegistry.registerPath({
     method: "delete",
@@ -39,7 +39,31 @@ carRegistry.registerPath({
     responses: createApiResponse(GetCarSchema, "Success"),
 });
 
-carRouter.delete("/:id", validateRequest(GetCarSchema), carController.deleteUser);
+carRouter.delete("/:id", validateRequest(GetCarSchema), carController.deleteCar);
+
+
+carRegistry.registerPath({
+	method: "post",
+	path: "/cars",
+	tags: ["Car"],
+	operationId: "createCar",
+	summary: "Create a new car",
+	request: {
+	  body: {
+		content: {
+		  "application/json": {
+			schema: CreateCarSchema.shape.body, 
+		  },
+		},
+	  },
+	},
+	responses: createApiResponse(CarSchema, "Car created successfully", 201),
+});
+  
+carRouter.post("/", validateRequest(CreateCarSchema), carController.createCar);
+
+
+
 
 carRegistry.registerPath({
     method: "post",

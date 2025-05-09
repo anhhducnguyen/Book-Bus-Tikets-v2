@@ -53,6 +53,18 @@ export class CarService {
 		}
 	}
 
+	async createCar(data: Omit<Car, "id" | "created_at" | "updated_at">): Promise<ServiceResponse<Car | null>> {
+		try {	  
+		  const newCar = await this.carRepository.createCarAsync(data);
+	  
+		  return ServiceResponse.success<Car>("Car created successfully", newCar, StatusCodes.CREATED);
+		} catch (ex) {
+		  const errorMessage = `Error creating car: ${(ex as Error).message}`;
+		  console.error("Full error object:", ex);
+		  logger.error(errorMessage);
+		  return ServiceResponse.failure("An error occurred while creating car.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+		}
+	} 
 	async generateSeatByCarId(busId: number): Promise<ServiceResponse<Car | null>> {
 		try {
 			// Kiem tra xem xe co ton tai khong
