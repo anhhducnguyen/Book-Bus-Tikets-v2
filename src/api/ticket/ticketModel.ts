@@ -85,8 +85,3 @@ export type BookTicketInput = z.infer<typeof BookTicketInputSchema>;
 export const CancelTicketSchema = z.object({
   params: z.object({ ticketId: commonValidations.id }),
 });
-
-// export const CancelTicketSchema = z.object({
-//   params: z.object({
-//     ticketId: commonValidations.id.openapi({ description: "ID vé cần hủy" }),
-//   }),
