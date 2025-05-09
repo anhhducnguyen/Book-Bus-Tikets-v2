@@ -3,7 +3,7 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { GetCarSchema, CarSchema, CreateCarSchema } from "@/api/car/carModel";
+import { GetCarSchema, CarSchema, CreateCarSchema, UpdateCarSchema } from "@/api/car/carModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { carController } from "./carController";
 
@@ -41,7 +41,6 @@ carRegistry.registerPath({
 
 carRouter.delete("/:id", validateRequest(GetCarSchema), carController.deleteCar);
 
-
 carRegistry.registerPath({
 	method: "post",
 	path: "/cars",
@@ -62,8 +61,31 @@ carRegistry.registerPath({
   
 carRouter.post("/", validateRequest(CreateCarSchema), carController.createCar);
 
+carRegistry.registerPath({
+  method: "put",
+  path: "/cars/{id}",
+  tags: ["Car"],
+  operationId: "updateCar",
+  summary: "Update an existing car",
+  request: {
+    params: z.object({
+      id: z.number().int().openapi({
+        description: "The ID of the car to update",
+        example: 5,
+      }),
+    }),
+    body: {
+      content: {
+        "application/json": {
+          schema: UpdateCarSchema.shape.body,
+        },
+      },
+    },
+  },
+  responses: createApiResponse(CarSchema, "Car updated successfully", 200),
+});
 
-
+carRouter.put("/:id", validateRequest(UpdateCarSchema), carController.updateCar);
 
 carRegistry.registerPath({
     method: "post",

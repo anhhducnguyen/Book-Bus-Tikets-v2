@@ -176,4 +176,15 @@ export class CarRepository {
         //   throw error;
         // }
     }
+
+    async updateAsync(id: number, data: Partial<Car>): Promise<Car | null> {
+        const affectedRows = await db<Car>('buses').where('id', id).update(data);
+
+        if (affectedRows === 0) {
+            return null;
+        }
+
+        const updatedRows = await db<Car>('buses').where('id', id).select('*').first();
+        return updatedRows ?? null;
+    }
 }

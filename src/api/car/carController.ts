@@ -50,7 +50,19 @@ class CarController {
             message: "An error occurred while creating car.",
           });
         }
-      };
+    };
+
+    public updateCar: RequestHandler = async (req: Request, res: Response) => {
+        const id = Number.parseInt(req.params.id as string, 10);
+        const carData = req.body;
+        
+        // console.log("id", id);
+        // console.log("carData", carData);
+        
+        const serviceResponse = await carService.updateCar(id, carData);
+        res.status(serviceResponse.statusCode).send(serviceResponse);
+    }
+
 
     public generateSeatByCarId: RequestHandler = async (req: Request, res: Response) => {
         const busId = Number.parseInt(req.params.id as string, 10);

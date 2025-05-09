@@ -25,6 +25,18 @@ export const CreateCarSchema = z.object({
   body: CreateCarBodySchema,
 });
 
+export const UpdateCarSchema = z.object({
+  body: CreateCarBodySchema.partial().openapi({
+    example: {
+      name: "Ford Transit",
+      description: "A comfortable 16-seat van used for intercity travel.",
+      license_plate: "51B-123.45",
+      capacity: 16,
+      company_id: 2,
+    },
+  }),
+});
+
 // export const CreateCarSchema = z.object({
 //     body: z.object({
 //       name: z.string(),
