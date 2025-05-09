@@ -104,6 +104,28 @@ export class TicketService {
       return ServiceResponse.failure("Failed to book ticket", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
+
+    // Hủy vé
+  async cancelTicket(ticketId: number): Promise<ServiceResponse<null>> {
+    try {
+      const ticket = await db<Ticket>("tickets").where({ id: ticketId }).first();
+      if (!ticket) {
+        return ServiceResponse.failure("Ticket not found", null, StatusCodes.NOT_FOUND);
+      }
+      if (ticket.status === "CANCELLED") {
+        return ServiceResponse.failure("Ticket already cancelled", null, StatusCodes.BAD_REQUEST);
+      }
+
+      await this.ticketRepository.cancelTicket(ticketId);
+      await this.ticketRepository.updateSeatStatus(ticket.seat_id, "AVAILABLE");
+      await this.ticketRepository.updateScheduleSeats(ticket.schedule_id, false);
+
+      return ServiceResponse.success<null>("Ticket cancelled successfully", null);
+    } catch (ex) {
+      logger.error(`Error cancelling ticket: ${(ex as Error).message}`);
+      return ServiceResponse.failure("Error cancelling ticket", null, StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
 
 export const ticketService = new TicketService();

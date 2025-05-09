@@ -93,7 +93,7 @@ CREATE TABLE `tickets` (
   `arrival_time` datetime,
   `seat_type` enum("LUXURY","VIP","STANDARD"),
   `price` double,
-  `status` enum("BOOKED","CAMCELLED"),
+  `status` enum("BOOKED","CANCELLED"),
   `created_at` datetime,
   `updated_at` datetime
 );

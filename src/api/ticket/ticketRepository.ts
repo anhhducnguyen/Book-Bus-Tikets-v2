@@ -83,4 +83,11 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
       .where({ id: scheduleId })
       .increment("available_seats", decrement ? -1 : 1);
   }
+
+  // Hủy vé
+  async cancelTicket(ticketId: number): Promise<void> {
+    await db<Ticket>("tickets")
+      .where({ id: ticketId })
+      .update({ status: "CANCELLED", updated_at: new Date() });
+  }
 }

@@ -57,3 +57,13 @@ ticketRegistry.registerPath({
   responses: createApiResponse(TicketSchema, "Success"),
 });
 ticketRouter.post("/tickets", ticketController.bookTicket);
+
+// Hủy vé
+ticketRegistry.registerPath({
+  method: "delete",
+  path: "/tickets/:ticketId",
+  tags: ["Ticket"],
+  request: { params: CancelTicketSchema.shape.params },
+  responses: createApiResponse(z.void(), "Success"),
+});
+ticketRouter.delete("/tickets/:ticketId", validateRequest(CancelTicketSchema), ticketController.cancelTicket);
