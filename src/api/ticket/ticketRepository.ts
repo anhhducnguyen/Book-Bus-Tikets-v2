@@ -44,6 +44,33 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
 
   }
 
+// Đặt vé
+  async bookTicket(ticketData: {
+    seat_id: number;
+    schedule_id: number;
+    departure_time: Date;
+    arrival_time: Date;
+    seat_type: "LUXURY" | "VIP" | "STANDARD";
+    price: number;
+  }): Promise<Ticket> {
+    const newTicket = {
+      seat_id: ticketData.seat_id,  
+      schedule_id: ticketData.schedule_id, 
+      departure_time: ticketData.departure_time,  
+      arrival_time: ticketData.arrival_time,  
+      seat_type: ticketData.seat_type,  
+      price: ticketData.price,
+      status: "BOOKED" as "BOOKED",  
+      created_at: new Date(),  
+      updated_at: new Date(),  
+    };
+
+    // Insert vào cơ sở dữ liệu
+    const [id] = await db<Ticket>("tickets").insert(newTicket);
+
+    // Trả về đối tượng ticket với id
+    return { id, ...newTicket };
+  }
 
   // Cập nhật trạng thái ghế
   async updateSeatStatus(seatId: number, status: "AVAILABLE" | "BOOKED"): Promise<void> {

@@ -21,6 +21,12 @@ class TicketController {
     const serviceResponse = await ticketService.getAvailableSeats(busId);
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
+
+  // Đặt vé
+  public bookTicket: RequestHandler = async (req: Request, res: Response) => {
+    const serviceResponse = await ticketService.bookTicket(req.body);
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
 }
 
 export const ticketController = new TicketController();

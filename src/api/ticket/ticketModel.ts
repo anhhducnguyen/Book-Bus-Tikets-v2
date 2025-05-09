@@ -61,28 +61,32 @@ export type Schedule = z.infer<typeof ScheduleSchema>;
 // Schema cho Ticket
 export const TicketSchema = z.object({
   id: z.number(),
-  seatId: z.number(),
-  scheduleId: z.number(),
-  departureTime: z.date(),
-  arrivalTime: z.date(),
-  seatType: z.enum(["LUXURY", "VIP", "STANDARD"]),
+  seat_id: z.number(),
+  schedule_id: z.number(),
+  departure_time: z.date(),
+  arrival_time: z.date(),
+  seat_type: z.enum(["LUXURY", "VIP", "STANDARD"]),
   price: z.number(),
   status: z.enum(["BOOKED", "CANCELLED"]),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  created_at: z.date(),
+  updated_at: z.date(),
 });
 export type Ticket = z.infer<typeof TicketSchema>;
 
 // Validation cho các endpoint
-export const BookTicketSchema = z.object({
-  body: z.object({
-    userId: commonValidations.id,
-    routeId: commonValidations.id,
-    busId: commonValidations.id,
-    seatId: commonValidations.id,
-  }),
+export const BookTicketInputSchema = z.object({
+  userId: z.number().int().positive(),
+  routeId: z.number().int().positive(),
+  busId: z.number().int().positive(),
+  seatId: z.number().int().positive(),
 });
+export type BookTicketInput = z.infer<typeof BookTicketInputSchema>;
 
 export const CancelTicketSchema = z.object({
   params: z.object({ ticketId: commonValidations.id }),
 });
+
+// export const CancelTicketSchema = z.object({
+//   params: z.object({
+//     ticketId: commonValidations.id.openapi({ description: "ID vé cần hủy" }),
+//   }),

@@ -4,7 +4,7 @@ import { z } from "zod";
 import { commonValidations } from "@/common/utils/commonValidation";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { BookTicketSchema, CancelTicketSchema, RouteSchema, BusSchema, SeatSchema, TicketSchema } from "@/api/ticket/ticketModel";
+import { BookTicketInputSchema, CancelTicketSchema, RouteSchema, BusSchema, SeatSchema, TicketSchema } from "@/api/ticket/ticketModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { ticketController } from "./ticketController";
 
@@ -39,3 +39,21 @@ ticketRegistry.registerPath({
   responses: createApiResponse(z.array(SeatSchema), "Success"),
 });
 ticketRouter.get("/buses/:busId/seats", ticketController.getAvailableSeats);
+
+// Đặt vé
+ticketRegistry.registerPath({
+  method: "post",
+  path: "/tickets",
+  tags: ["Ticket"],
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: BookTicketInputSchema, // Sử dụng schema đầu vào trực tiếp
+        },
+      },
+    },
+  },
+  responses: createApiResponse(TicketSchema, "Success"),
+});
+ticketRouter.post("/tickets", ticketController.bookTicket);

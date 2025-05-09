@@ -1,8 +1,9 @@
 import { StatusCodes } from "http-status-codes";
-import type { Route, Bus, Seat, Schedule, Ticket } from "@/api/ticket/ticketModel";
+import { BookTicketInputSchema, Route, Bus, Seat, Schedule, Ticket } from "@/api/ticket/ticketModel";
 import { TicketRepository } from "@/api/ticket/ticketRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
+import { db } from "@/common/config/database";
 
 export class TicketService {
   private ticketRepository: TicketRepository;
@@ -41,6 +42,66 @@ export class TicketService {
     } catch (ex) {
       logger.error(`Error fetching seats: ${(ex as Error).message}`);
       return ServiceResponse.failure("Error fetching seats", null, StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  // Đặt vé
+  async bookTicket(input: unknown): Promise<ServiceResponse<Ticket | null>> {
+    const trx = await db.transaction();
+    try {
+      const parsedInput = BookTicketInputSchema.parse(input);
+      const { userId, routeId, busId, seatId } = parsedInput;
+  
+      // Kiểm tra tuyến đường
+      const route = await trx("routes").where({ id: routeId }).first();
+      if (!route) return ServiceResponse.failure("Route not found", null, StatusCodes.NOT_FOUND);
+  
+      // Lấy schedule
+      const schedule = await trx("schedules")
+        .where({ route_id: routeId, bus_id: busId, status: "AVAILABLE" })
+        .andWhere("departure_time", ">", new Date())
+        .orderBy("departure_time", "asc")
+        .first();
+      if (!schedule || schedule.available_seats <= 0) {
+        await trx.rollback();
+        return ServiceResponse.failure("No available schedule for this bus and route", null, StatusCodes.BAD_REQUEST);
+      }
+  
+      // Kiểm tra ghế và xe
+      const seat = await trx("seats").where({ id: seatId, bus_id: busId, status: "AVAILABLE" }).first();
+      if (!seat) {
+        await trx.rollback();
+        return ServiceResponse.failure("Seat not available", null, StatusCodes.BAD_REQUEST);
+      }
+  
+      const totalPrice = route.price + seat.price_for_type_seat;
+  
+      // Tạo ticket
+      const ticketData = {
+      seat_id: seatId,
+      schedule_id: schedule.id,
+      departure_time: schedule.departure_time,
+      arrival_time: schedule.arrival_time,
+      seat_type: seat.seat_type,
+      price: totalPrice,
+      status: "BOOKED" as const,
+      created_at: new Date(),
+      updated_at: new Date(),
+      };
+  
+      const [ticketId] = await trx("tickets").insert(ticketData);
+      const ticket = { id: ticketId, ...ticketData };
+  
+      // Cập nhật trạng thái
+      await trx("seats").where({ id: seatId }).update({ status: "BOOKED" });
+      await trx("schedules").where({ id: schedule.id }).decrement("available_seats", 1);
+  
+      await trx.commit();
+      return ServiceResponse.success<Ticket>("Ticket booked successfully", ticket);
+    } catch (error) {
+      await trx.rollback();
+      logger.error(`Error booking ticket: ${(error as Error).message}`);
+      return ServiceResponse.failure("Failed to book ticket", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 }
