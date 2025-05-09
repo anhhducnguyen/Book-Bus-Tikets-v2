@@ -13,6 +13,17 @@ export const carRouter: Router = express.Router();
 carRegistry.register("Car", CarSchema);
 
 carRegistry.registerPath({
+  method: "get",
+  path: "/cars/popular-garage",
+  tags: ["Car"],
+  summary: "Get the most popular garage",
+  description: "Get the most popular garage",
+  responses: createApiResponse(z.object({ garage: z.string() }), "Success"),
+});
+
+carRouter.get("/popular-garage", carController.PopularGarage);
+
+carRegistry.registerPath({
     method: "get",
     path: "/cars",
     tags: ["Car"],
@@ -109,6 +120,8 @@ carRegistry.registerPath({
 });
 
 carRouter.post("/:id/seats", validateRequest(GetCarSchema), carController.generateSeatByCarId);
+
+
 
 
 
