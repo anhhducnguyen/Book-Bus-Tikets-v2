@@ -69,6 +69,11 @@ class CarController {
         const serviceResponse = await carService.generateSeatByCarId(busId);
         res.status(serviceResponse.statusCode).send(serviceResponse);
     }
+
+    public PopularGarage: RequestHandler = async (req: Request, res: Response) => {
+        const serviceResponse = await carService.PopularGarage();
+        res.status(serviceResponse.statusCode).send(serviceResponse);
+    }
 }
 
 export const carController = new CarController();

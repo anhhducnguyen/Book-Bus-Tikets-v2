@@ -4,6 +4,7 @@ import type { Car } from "@/api/car/carModel";
 import { CarRepository } from "@/api/car/carRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
+import { json } from "express";
 
 export class CarService {
 	private carRepository: CarRepository;
@@ -107,6 +108,18 @@ export class CarService {
 			const errorMessage = `Error generating seats for Car with id ${busId}: ${(ex as Error).message}`;
 			logger.error(errorMessage);
 			return ServiceResponse.failure("An error occurred while generating seats for Car.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	async PopularGarage(): Promise<ServiceResponse<Car[] | null>> {
+		try {
+			const car = await this.carRepository.getTopBusCompanies(); 
+			if (!car) {
+				return ServiceResponse.failure("Car not found", null, StatusCodes.NOT_FOUND);
+			}
+			return ServiceResponse.success("Top bus companies retrieved successfully", car); 
+		} catch (ex) {
+			return ServiceResponse.failure("An error occurred while finding Car.", null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

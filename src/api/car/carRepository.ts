@@ -187,4 +187,46 @@ export class CarRepository {
         const updatedRows = await db<Car>('buses').where('id', id).select('*').first();
         return updatedRows ?? null;
     }
+    async getTopBusCompanies(): Promise<any[]> {
+        // const result = await db.raw(`
+        //     SELECT 
+        //         bc.id AS company_id,
+        //         bc.company_name,
+        //         bc.image,
+        //         bc.descriptions,
+        //         COUNT(b.id) AS total_buses,
+        //         ROUND(AVG(br.rating), 1) AS avg_rating,
+        //         COUNT(br.id) AS total_reviews
+        //     FROM 
+        //         bus_companies bc
+        //     LEFT JOIN 
+        //         buses b ON bc.id = b.company_id
+        //     LEFT JOIN 
+        //         bus_reviews br ON b.id = br.bus_id
+        //     GROUP BY 
+        //         bc.id, bc.company_name, bc.image, bc.descriptions
+        //     ORDER BY 
+        //         total_reviews DESC, avg_rating DESC
+        //     LIMIT 10;
+        // `);
+        // Chuyen sang dung knex
+        const result = await db('bus_companies as bc')
+            .leftJoin('buses as b', 'bc.id', 'b.company_id')
+            .leftJoin('bus_reviews as br', 'b.id', 'br.bus_id')
+            .select(
+                'bc.id as company_id',
+                'bc.company_name',
+                'bc.image',
+                'bc.descriptions',
+                db.raw('COUNT(b.id) as total_buses'),
+                db.raw('ROUND(AVG(br.rating), 1) as avg_rating'),
+                db.raw('COUNT(br.id) as total_reviews')
+            )
+            .groupBy('bc.id', 'bc.company_name', 'bc.image', 'bc.descriptions')
+            .orderByRaw('total_reviews DESC, avg_rating DESC')
+            .limit(10);
+
+        return result;
+    }
+
 }
