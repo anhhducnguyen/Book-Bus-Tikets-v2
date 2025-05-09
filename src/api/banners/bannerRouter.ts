@@ -19,7 +19,7 @@ bannerRegistry.register("Routes", BannerSchema);
 // Đăng ký đường dẫn cho OpenAPI với method 'get'
 bannerRegistry.registerPath({
   method: "get",
-  path: "/banner",
+  path: "/banners",
   tags: ["banner"],
   responses: createApiResponse(z.array(BannerSchema), "Success"),
 });
