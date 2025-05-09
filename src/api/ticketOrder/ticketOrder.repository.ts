@@ -14,40 +14,27 @@ export class TicketOrderRepository {
     order?: "asc" | "desc";
     search?: string;
   }) {
-    const offset = (page - 1) * limit;
-
     const query = db("tickets")
       .select(
         "tickets.id as ticketId",
         "tickets.status",
-        "users.name as userName",
+        "users.first_name as first_name",
         "users.email as userEmail",
         "schedules.departure_time",
-        "routes.name as routeName",
-        "from_station.name as fromStation",
-        "to_station.name as toStation",
+        "routes.price as price",
         "buses.license_plate",
-        "bus_companies.name as busCompanyName",
+        "bus_companies.company_name as busCompanyName",
         "seats.seat_number"
       )
-      .join("users", "tickets.user_id", "users.id")
+      .join("payments", "tickets.id", "payments.ticket_id")
+      .join("users", "payments.user_id", "users.id")
       .join("schedules", "tickets.schedule_id", "schedules.id")
       .join("routes", "schedules.route_id", "routes.id")
-      .join("stations as from_station", "routes.from_station_id", "from_station.id")
-      .join("stations as to_station", "routes.to_station_id", "to_station.id")
-      .join("buses", "schedules.bus_id", "buses.id")
-      .join("bus_companies", "buses.bus_company_id", "bus_companies.id")
+      .join("buses", "schedules.bus_id", "buses.id") 
+      .join("bus_companies", "buses.company_id", "bus_companies.id")
       .join("seats", "tickets.seat_id", "seats.id")
-      .where((builder) => {
-        if (search) {
-          builder.where("users.name", "like", `%${search}%`)
-            .orWhere("routes.name", "like", `%${search}%`)
-            .orWhere("bus_companies.name", "like", `%${search}%`);
-        }
-      })
-      .orderBy(sortBy, order)
-      .limit(limit)
-      .offset(offset);
+
+    console.log("Query:", query.toSQL().sql); 
 
     return await query;
   }
@@ -71,26 +58,31 @@ export class TicketOrderRepository {
       .select(
         "tickets.id as ticketId",
         "tickets.status",
-        "users.name as userName",
+        "users.first_name as first_name",
+        "users.email as userEmail",
         "schedules.departure_time",
-        "routes.name as routeName",
-        "bus_companies.name as busCompanyName"
+        "routes.price as price",
+        "buses.license_plate",
+        "bus_companies.company_name as busCompanyName",
+        "seats.seat_number"
       )
-      .join("users", "tickets.user_id", "users.id")
+      .join("payments", "tickets.id", "payments.ticket_id")
+      .join("users", "payments.user_id", "users.id")
       .join("schedules", "tickets.schedule_id", "schedules.id")
       .join("routes", "schedules.route_id", "routes.id")
-      .join("buses", "schedules.bus_id", "buses.id")
-      .join("bus_companies", "buses.bus_company_id", "bus_companies.id")
+      .join("buses", "schedules.bus_id", "buses.id") 
+      .join("bus_companies", "buses.company_id", "bus_companies.id")
+      .join("seats", "tickets.seat_id", "seats.id")
       .where("bus_companies.id", companyId)
-      .andWhere((builder) => {
-        if (search) {
-          builder.where("users.name", "like", `%${search}%`)
-            .orWhere("routes.name", "like", `%${search}%`);
-        }
-      })
-      .orderBy(sortBy, order)
-      .limit(limit)
-      .offset(offset);
+      // .andWhere((builder) => {
+      //   if (search) {
+      //     builder.where("users.name", "like", `%${search}%`)
+      //       .orWhere("routes.name", "like", `%${search}%`);
+      //   }
+      // })
+      // .orderBy(sortBy, order)
+      // .limit(limit)
+      // .offset(offset);
 
     return await query;
   }
@@ -111,26 +103,35 @@ export class TicketOrderRepository {
     const offset = (page - 1) * limit;
 
     const query = db("tickets")
-      .select(
-        "tickets.id as ticketId",
-        "tickets.status",
-        "users.name as userName",
-        "schedules.departure_time",
-        "routes.name as routeName"
-      )
-      .join("users", "tickets.user_id", "users.id")
-      .join("schedules", "tickets.schedule_id", "schedules.id")
-      .join("routes", "schedules.route_id", "routes.id")
-      .where("tickets.status", status)
-      .andWhere((builder) => {
-        if (search) {
-          builder.where("users.name", "like", `%${search}%`)
-            .orWhere("routes.name", "like", `%${search}%`);
-        }
-      })
-      .orderBy(sortBy, order)
-      .limit(limit)
-      .offset(offset);
+    .select(
+      "tickets.id as ticketId",
+      "tickets.status",
+      "users.first_name as first_name",
+      "users.email as userEmail",
+      "schedules.departure_time",
+      "routes.price as price",
+      "buses.license_plate",
+      "bus_companies.company_name as busCompanyName",
+      "seats.seat_number"
+    )
+    .join("payments", "tickets.id", "payments.ticket_id")
+    .join("users", "payments.user_id", "users.id")
+    .join("schedules", "tickets.schedule_id", "schedules.id")
+    .join("routes", "schedules.route_id", "routes.id")
+    .join("buses", "schedules.bus_id", "buses.id") 
+    .join("bus_companies", "buses.company_id", "bus_companies.id")
+    .join("seats", "tickets.seat_id", "seats.id")
+    .where("tickets.status", status)
+      // .andWhere((builder) => {
+      //   if (search) {
+      //     builder.where("users.name", "like", `%${search}%`)
+      //       .orWhere("routes.name", "like", `%${search}%`);
+      //   }
+      // })
+      // .orderBy(sortBy, order)
+      // .limit(limit)
+      // .offset(offset);
+      console.log("Query:", query.toSQL().sql);
 
     return await query;
   }

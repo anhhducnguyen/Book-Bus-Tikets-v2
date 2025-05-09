@@ -1,5 +1,5 @@
-create database db_prj_test;
-use db_prj_test;
+create database check_db;
+use check_db; 
 
 CREATE TABLE `users` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
@@ -8,7 +8,7 @@ CREATE TABLE `users` (
   `email` varchar(255),
   `password` varchar(255),
   `phone` varchar(11),
-  `status` enum("ACTIVE","BLOCKED"),
+  `status` enum("ACTIVE", "BLOCKED"),
   `created_at` datetime,
   `updated_at` datetime
 );
@@ -21,7 +21,9 @@ CREATE TABLE `roles` (
 CREATE TABLE `user_role` (
   `role_id` int,
   `user_id` int,
-  PRIMARY KEY (`role_id`, `user_id`)
+  PRIMARY KEY (`role_id`, `user_id`),
+  FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 );
 
 CREATE TABLE `stations` (
@@ -33,12 +35,6 @@ CREATE TABLE `stations` (
   `location` varchar(255),
   `created_at` datetime,
   `updated_at` datetime
-);
-
-CREATE TABLE `station_bus` (
-  `station_id` int,
-  `buse_id` int,
-  PRIMARY KEY (`station_id`, `buse_id`)
 );
 
 CREATE TABLE `bus_companies` (
@@ -58,7 +54,16 @@ CREATE TABLE `buses` (
   `capacity` int,
   `company_id` int,
   `created_at` datetime,
-  `updated_at` datetime
+  `updated_at` datetime,
+  FOREIGN KEY (`company_id`) REFERENCES `bus_companies` (`id`)
+);
+
+CREATE TABLE `station_bus` (
+  `station_id` int,
+  `bus_id` int,
+  PRIMARY KEY (`station_id`, `bus_id`),
+  FOREIGN KEY (`station_id`) REFERENCES `stations` (`id`),
+  FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`)
 );
 
 CREATE TABLE `routes` (
@@ -69,7 +74,9 @@ CREATE TABLE `routes` (
   `duration` int,
   `distance` int,
   `created_at` datetime,
-  `updated_at` datetime
+  `updated_at` datetime,
+  FOREIGN KEY (`departure_station_id`) REFERENCES `stations` (`id`),
+  FOREIGN KEY (`arrival_station_id`) REFERENCES `stations` (`id`)
 );
 
 CREATE TABLE `schedules` (
@@ -80,9 +87,23 @@ CREATE TABLE `schedules` (
   `arrival_time` datetime,
   `available_seats` int,
   `total_seats` int,
-  `status` enum("AVAILABLE","FULL","CANCELLED"),
+  `status` enum("AVAILABLE", "FULL", "CANCELLED"),
   `created_at` datetime,
-  `updated_at` datetime
+  `updated_at` datetime,
+  FOREIGN KEY (`route_id`) REFERENCES `routes` (`id`),
+  FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`)
+);
+
+CREATE TABLE `seats` (
+  `id` int PRIMARY KEY AUTO_INCREMENT,
+  `bus_id` int,
+  `seat_number` varchar(20),
+  `seat_type` enum("LUXURY", "VIP", "STANDARD"),
+  `status` enum("AVAILABLE", "BOOKED"),
+  `price_for_type_seat` double,
+  `created_at` datetime,
+  `updated_at` datetime,
+  FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`)
 );
 
 CREATE TABLE `tickets` (
@@ -91,11 +112,13 @@ CREATE TABLE `tickets` (
   `schedule_id` int,
   `departure_time` datetime,
   `arrival_time` datetime,
-  `seat_type` enum("LUXURY","VIP","STANDARD"),
+  `seat_type` enum("LUXURY", "VIP", "STANDARD"),
   `price` double,
-  `status` enum("BOOKED","CAMCELLED"),
+  `status` enum("BOOKED", "CANCELLED"),
   `created_at` datetime,
-  `updated_at` datetime
+  `updated_at` datetime,
+  FOREIGN KEY (`seat_id`) REFERENCES `seats` (`id`),
+  FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`id`)
 );
 
 CREATE TABLE `bus_reviews` (
@@ -105,7 +128,9 @@ CREATE TABLE `bus_reviews` (
   `rating` int,
   `review` varchar(255),
   `created_at` datetime,
-  `updated_at` datetime
+  `updated_at` datetime,
+  FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 );
 
 CREATE TABLE `banners` (
@@ -117,7 +142,8 @@ CREATE TABLE `banners` (
 CREATE TABLE `bus_image` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `image_url` varchar(255),
-  `bus_id` int
+  `bus_id` int,
+  FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`)
 );
 
 CREATE TABLE `cancellation_policies` (
@@ -127,13 +153,14 @@ CREATE TABLE `cancellation_policies` (
   `cancellation_time_limit` int,
   `refund_percentage` int,
   `created_at` datetime,
-  `updated_at` datetime
+  `updated_at` datetime,
+  FOREIGN KEY (`route_id`) REFERENCES `routes` (`id`)
 );
 
 CREATE TABLE `payment_providers` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `provider_name` varchar(100),
-  `provider_type` enum("CARD","E_WALLET","BANK_TRANSFER","QR_CODE"),
+  `provider_type` enum("CARD", "E_WALLET", "BANK_TRANSFER", "QR_CODE"),
   `api_endpoint` varchar(255),
   `created_at` datetime,
   `updated_at` datetime
@@ -144,58 +171,128 @@ CREATE TABLE `payments` (
   `payment_provider_id` int,
   `user_id` int,
   `ticket_id` int,
-  `payment_method` enum("CASH","ONLINE"),
+  `payment_method` enum("CASH", "ONLINE"),
   `amount` double,
-  `status` enum("PENDING","COMPLETED","FAILED"),
+  `status` enum("PENDING", "COMPLETED", "FAILED"),
   `created_at` datetime,
-  `updated_at` datetime
+  `updated_at` datetime,
+  FOREIGN KEY (`payment_provider_id`) REFERENCES `payment_providers` (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`)
 );
 
-CREATE TABLE `seats` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `bus_id` int,
-  `seat_number` varchar(20),
-  `seat_type` enum("LUXURY","VIP","STANDARD"),
-  `status` enum("AVAILABLE","BOOKED"),
-  `price_for_type_seat` double,
-  `created_at` datetime,
-  `updated_at` datetime
-);
+INSERT INTO `users` (`first_name`, `last_name`, `email`, `password`, `phone`, `status`, `created_at`, `updated_at`) VALUES
+('John', 'Doe', 'john.doe@example.com', 'hashed_password_1', '1234567890', 'ACTIVE', NOW(), NOW()),
+('Jane', 'Smith', 'jane.smith@example.com', 'hashed_password_2', '0987654321', 'BLOCKED', NOW(), NOW()),
+('Alice', 'Johnson', 'alice.johnson@example.com', 'hashed_password_3', '1112233445', 'ACTIVE', NOW(), NOW()),
+('Bob', 'Williams', 'bob.williams@example.com', 'hashed_password_4', '2233445566', 'ACTIVE', NOW(), NOW()),
+('Charlie', 'Brown', 'charlie.brown@example.com', 'hashed_password_5', '3344556677', 'BLOCKED', NOW(), NOW());
 
-ALTER TABLE `user_role` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+INSERT INTO `roles` (`role_name`) VALUES
+('ROLE_ADMIN'),
+('ROLE_USER');
 
-ALTER TABLE `user_role` ADD FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`);
+INSERT INTO `user_role` (`role_id`, `user_id`) VALUES
+(1, 1),
+(2, 2),
+(2, 3),
+(1, 4),
+(2, 5);
 
-ALTER TABLE `station_bus` ADD FOREIGN KEY (`buse_id`) REFERENCES `buses` (`id`);
+INSERT INTO `stations` (`name`, `image`, `wallpaper`, `descriptions`, `location`, `created_at`, `updated_at`) VALUES
+('Station A', 'station_a.jpg', 'wallpaper_a.jpg', 'Main station for bus routes', 'City Center', NOW(), NOW()),
+('Station B', 'station_b.jpg', 'wallpaper_b.jpg', 'Suburban station', 'North District', NOW(), NOW()),
+('Station C', 'station_c.jpg', 'wallpaper_c.jpg', 'Central hub for commuters', 'South City', NOW(), NOW()),
+('Station D', 'station_d.jpg', 'wallpaper_d.jpg', 'Small station for short routes', 'East District', NOW(), NOW()),
+('Station E', 'station_e.jpg', 'wallpaper_e.jpg', 'Major stop for long-distance buses', 'West Side', NOW(), NOW());
 
-ALTER TABLE `station_bus` ADD FOREIGN KEY (`station_id`) REFERENCES `stations` (`id`);
+INSERT INTO `bus_companies` (`company_name`, `image`, `descriptions`, `created_at`, `updated_at`) VALUES
+('ABC Bus Co.', 'abc_logo.png', 'A leading bus company', NOW(), NOW()),
+('XYZ Transport', 'xyz_logo.png', 'Reliable transport service', NOW(), NOW()),
+('Speedy Travels', 'speedy_logo.png', 'Fast and efficient bus services', NOW(), NOW()),
+('Elite Transport', 'elite_logo.png', 'Luxurious travel experience', NOW(), NOW()),
+('Green Bus', 'green_logo.png', 'Eco-friendly and sustainable buses', NOW(), NOW());
 
-ALTER TABLE `routes` ADD FOREIGN KEY (`departure_station_id`) REFERENCES `stations` (`id`);
+INSERT INTO `buses` (`name`, `description`, `license_plate`, `capacity`, `company_id`, `created_at`, `updated_at`) VALUES
+('Bus 101', 'Luxury bus for long routes', 'AB123CD', 50, 1, NOW(), NOW()),
+('Bus 202', 'Economy bus', 'XY987ZT', 40, 2, NOW(), NOW()),
+('Bus 303', 'Express bus for daily commuters', 'LM234GH', 60, 3, NOW(), NOW()),
+('Bus 404', 'VIP bus', 'JK567MN', 30, 4, NOW(), NOW()),
+('Bus 505', 'Sustainable bus with eco-friendly features', 'GH890XY', 45, 5, NOW(), NOW());
 
-ALTER TABLE `routes` ADD FOREIGN KEY (`arrival_station_id`) REFERENCES `stations` (`id`);
+INSERT INTO `station_bus` (`station_id`, `bus_id`) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5);
 
-ALTER TABLE `schedules` ADD FOREIGN KEY (`route_id`) REFERENCES `routes` (`id`);
+INSERT INTO `routes` (`departure_station_id`, `arrival_station_id`, `price`, `duration`, `distance`, `created_at`, `updated_at`) VALUES
+(1, 2, 20.0, 120, 50, NOW(), NOW()),
+(2, 3, 30.0, 150, 75, NOW(), NOW()),
+(3, 4, 40.0, 180, 100, NOW(), NOW()),
+(4, 5, 50.0, 240, 120, NOW(), NOW()),
+(5, 1, 60.0, 300, 150, NOW(), NOW());
 
-ALTER TABLE `schedules` ADD FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`);
+INSERT INTO `schedules` (`route_id`, `bus_id`, `departure_time`, `arrival_time`, `available_seats`, `total_seats`, `status`, `created_at`, `updated_at`) VALUES
+(1, 1, '2025-05-10 08:00:00', '2025-05-10 10:00:00', 50, 50, 'AVAILABLE', NOW(), NOW()),
+(2, 2, '2025-05-11 09:00:00', '2025-05-11 11:30:00', 40, 40, 'FULL', NOW(), NOW()),
+(3, 3, '2025-05-12 10:00:00', '2025-05-12 12:30:00', 60, 60, 'AVAILABLE', NOW(), NOW()),
+(4, 4, '2025-05-13 11:00:00', '2025-05-13 13:00:00', 30, 30, 'CANCELLED', NOW(), NOW()),
+(5, 5, '2025-05-14 12:00:00', '2025-05-14 14:30:00', 45, 45, 'AVAILABLE', NOW(), NOW());
 
-ALTER TABLE `bus_reviews` ADD FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`);
+INSERT INTO `seats` (`bus_id`, `seat_number`, `seat_type`, `status`, `price_for_type_seat`, `created_at`, `updated_at`) VALUES
+(1, '1A', 'VIP', 'AVAILABLE', 50.0, NOW(), NOW()),
+(1, '1B', 'VIP', 'BOOKED', 50.0, NOW(), NOW()),
+(2, '2A', 'STANDARD', 'AVAILABLE', 30.0, NOW(), NOW()),
+(2, '2B', 'STANDARD', 'BOOKED', 30.0, NOW(), NOW()),
+(3, '3A', 'LUXURY', 'AVAILABLE', 70.0, NOW(), NOW());
 
-ALTER TABLE `bus_reviews` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+INSERT INTO `tickets` (`seat_id`, `schedule_id`, `departure_time`, `arrival_time`, `seat_type`, `price`, `status`, `created_at`, `updated_at`) VALUES
+(1, 1, '2025-05-10 08:00:00', '2025-05-10 10:00:00', 'VIP', 50.0, 'BOOKED', NOW(), NOW()),
+(2, 2, '2025-05-11 09:00:00', '2025-05-11 11:30:00', 'STANDARD', 30.0, 'CANCELLED', NOW(), NOW()),
+(3, 3, '2025-05-12 10:00:00', '2025-05-12 12:30:00', 'LUXURY', 70.0, 'BOOKED', NOW(), NOW()),
+(4, 4, '2025-05-13 11:00:00', '2025-05-13 13:00:00', 'STANDARD', 30.0, 'BOOKED', NOW(), NOW()),
+(5, 5, '2025-05-14 12:00:00', '2025-05-14 14:30:00', 'VIP', 50.0, 'CANCELLED', NOW(), NOW());
 
-ALTER TABLE `bus_image` ADD FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`);
+INSERT INTO `bus_reviews` (`bus_id`, `user_id`, `rating`, `review`, `created_at`, `updated_at`) VALUES
+(1, 1, 5, 'Great service and comfortable ride!', NOW(), NOW()),
+(2, 2, 4, 'Good value for money.', NOW(), NOW()),
+(3, 3, 3, 'Decent but could be better.', NOW(), NOW()),
+(4, 4, 2, 'The bus was delayed and uncomfortable.', NOW(), NOW()),
+(5, 5, 5, 'Excellent experience, will travel again.', NOW(), NOW());
 
-ALTER TABLE `cancellation_policies` ADD FOREIGN KEY (`route_id`) REFERENCES `routes` (`id`);
+INSERT INTO `banners` (`banner_url`, `position`) VALUES
+('banner1.jpg', 'TOP'),
+('banner2.jpg', 'BOTTOM'),
+('banner3.jpg', 'LEFT'),
+('banner4.jpg', 'RIGHT'),
+('banner5.jpg', 'CENTER');
 
-ALTER TABLE `payments` ADD FOREIGN KEY (`payment_provider_id`) REFERENCES `payment_providers` (`id`);
+INSERT INTO `bus_image` (`image_url`, `bus_id`) VALUES
+('bus101_image1.jpg', 1),
+('bus202_image1.jpg', 2),
+('bus303_image1.jpg', 3),
+('bus404_image1.jpg', 4),
+('bus505_image1.jpg', 5);
 
-ALTER TABLE `payments` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+INSERT INTO `cancellation_policies` (`descriptions`, `route_id`, `cancellation_time_limit`, `refund_percentage`, `created_at`, `updated_at`) VALUES
+('Cancel up to 24 hours before departure for full refund', 1, 24, 100, NOW(), NOW()),
+('Cancel up to 12 hours before departure for 50% refund', 2, 12, 50, NOW(), NOW()),
+('No refund after departure', 3, 0, 0, NOW(), NOW()),
+('Cancel up to 48 hours before departure for full refund', 4, 48, 100, NOW(), NOW()),
+('Cancel up to 6 hours before departure for 25% refund', 5, 6, 25, NOW(), NOW());
 
-ALTER TABLE `payments` ADD FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`);
+INSERT INTO `payment_providers` (`provider_name`, `provider_type`, `api_endpoint`, `created_at`, `updated_at`) VALUES
+('PayPal', 'E_WALLET', 'https://api.paypal.com', NOW(), NOW()),
+('Stripe', 'CARD', 'https://api.stripe.com', NOW(), NOW()),
+('BankTransfer', 'BANK_TRANSFER', 'https://api.banktransfer.com', NOW(), NOW()),
+('QRPay', 'QR_CODE', 'https://api.qrpay.com', NOW(), NOW()),
+('GooglePay', 'E_WALLET', 'https://api.googlepay.com', NOW(), NOW());
 
-ALTER TABLE `buses` ADD FOREIGN KEY (`capacity`) REFERENCES `bus_companies` (`id`);
-
-ALTER TABLE `seats` ADD FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`);
-
-ALTER TABLE `tickets` ADD FOREIGN KEY (`seat_id`) REFERENCES `seats` (`id`);
-
-ALTER TABLE `tickets` ADD FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`id`);
+INSERT INTO `payments` (`payment_provider_id`, `user_id`, `ticket_id`, `payment_method`, `amount`, `status`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 'ONLINE', 50.0, 'COMPLETED', NOW(), NOW()),
+(2, 2, 2, 'CASH', 30.0, 'PENDING', NOW(), NOW()),
+(3, 3, 3, 'ONLINE', 70.0, 'COMPLETED', NOW(), NOW()),
+(4, 4, 4, 'ONLINE', 30.0, 'FAILED', NOW(), NOW()),
+(5, 5, 5, 'CASH', 50.0, 'PENDING', NOW(), NOW());

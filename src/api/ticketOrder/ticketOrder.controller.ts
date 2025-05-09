@@ -32,6 +32,8 @@ class TicketOrderController {
   public getTicketOrdersByCompany: RequestHandler = async (req: Request, res: Response) => {
     try {
       const companyId = Number(req.params.companyId);
+      console.log("companyId", companyId);
+      
       const { page = 1, limit = 10, sortBy = "ticketNumber", order = "asc", search = "" } = req.query;
       const serviceResponse = await ticketOrderService.getTicketOrdersByCompany(companyId, {
         page: Number(page),
