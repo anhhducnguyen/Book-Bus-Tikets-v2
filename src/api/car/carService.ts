@@ -65,6 +65,29 @@ export class CarService {
 		  return ServiceResponse.failure("An error occurred while creating car.", null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	} 
+
+	async updateCar(id: number, data: Partial<Car>): Promise<ServiceResponse<Car | null>> {
+		try {
+		  const car = await this.carRepository.findByIdAsync(id);
+	
+		  if (!car) {
+			return ServiceResponse.failure("Car not found", null, StatusCodes.NOT_FOUND);
+		  }
+	
+		  const updatedCar = await this.carRepository.updateAsync(id, data);
+	
+		  if (!updatedCar) {
+			return ServiceResponse.failure("Failed to update car", null, StatusCodes.BAD_REQUEST);
+		  }
+	
+		  return ServiceResponse.success<Car>("Car updated", updatedCar);
+		} catch (ex) {
+		  const errorMessage = `Error updating Car with id ${id}: ${(ex as Error).message}`;
+		  logger.error(errorMessage);
+		  return ServiceResponse.failure("An error occurred while updating Car.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+		}
+	  }
+
 	async generateSeatByCarId(busId: number): Promise<ServiceResponse<Car | null>> {
 		try {
 			// Kiem tra xem xe co ton tai khong

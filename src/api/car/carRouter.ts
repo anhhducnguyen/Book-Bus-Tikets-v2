@@ -3,7 +3,7 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { GetCarSchema, CarSchema, CreateCarSchema } from "@/api/car/carModel";
+import { GetCarSchema, CarSchema, CreateCarSchema, UpdateCarSchema } from "@/api/car/carModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { carController } from "./carController";
 
@@ -16,6 +16,9 @@ carRegistry.registerPath({
     method: "get",
     path: "/cars",
     tags: ["Car"],
+    operationId: "getCars",
+    summary: "Get all cars",
+    description: "Fetch all cars with optional filters and pagination.",
     responses: createApiResponse(z.array(CarSchema), "Success"),
 });
 
@@ -25,6 +28,9 @@ carRegistry.registerPath({
     method: "get",
     path: "/cars/{id}",
     tags: ["Car"],
+    operationId: "getCar",
+    summary: "Get a car by ID",
+    description: "Fetch a car by its ID.",
     request: { params: GetCarSchema.shape.params },
     responses: createApiResponse(GetCarSchema, "Success"),
 });
@@ -35,12 +41,14 @@ carRegistry.registerPath({
     method: "delete",
     path: "/cars/{id}",
     tags: ["Car"],
+    operationId: "deleteCar",
+    summary: "Delete a car by ID",
+    description: "Delete a car by its ID.",
     request: { params: GetCarSchema.shape.params },
     responses: createApiResponse(GetCarSchema, "Success"),
 });
 
 carRouter.delete("/:id", validateRequest(GetCarSchema), carController.deleteCar);
-
 
 carRegistry.registerPath({
 	method: "post",
@@ -48,6 +56,7 @@ carRegistry.registerPath({
 	tags: ["Car"],
 	operationId: "createCar",
 	summary: "Create a new car",
+  description: "Create a new car with the provided details.",
 	request: {
 	  body: {
 		content: {
@@ -62,8 +71,32 @@ carRegistry.registerPath({
   
 carRouter.post("/", validateRequest(CreateCarSchema), carController.createCar);
 
+carRegistry.registerPath({
+  method: "put",
+  path: "/cars/{id}",
+  tags: ["Car"],
+  operationId: "updateCar",
+  summary: "Update an existing car",
+  description: "Update an existing car with the provided details.",
+  request: {
+    params: z.object({
+      id: z.number().int().openapi({
+        description: "The ID of the car to update",
+        example: 5,
+      }),
+    }),
+    body: {
+      content: {
+        "application/json": {
+          schema: UpdateCarSchema.shape.body,
+        },
+      },
+    },
+  },
+  responses: createApiResponse(CarSchema, "Car updated successfully", 200),
+});
 
-
+carRouter.put("/:id", validateRequest(UpdateCarSchema), carController.updateCar);
 
 carRegistry.registerPath({
     method: "post",
