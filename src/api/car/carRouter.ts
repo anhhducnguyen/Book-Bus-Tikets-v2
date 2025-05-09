@@ -16,6 +16,9 @@ carRegistry.registerPath({
     method: "get",
     path: "/cars",
     tags: ["Car"],
+    operationId: "getCars",
+    summary: "Get all cars",
+    description: "Fetch all cars with optional filters and pagination.",
     responses: createApiResponse(z.array(CarSchema), "Success"),
 });
 
@@ -25,6 +28,9 @@ carRegistry.registerPath({
     method: "get",
     path: "/cars/{id}",
     tags: ["Car"],
+    operationId: "getCar",
+    summary: "Get a car by ID",
+    description: "Fetch a car by its ID.",
     request: { params: GetCarSchema.shape.params },
     responses: createApiResponse(GetCarSchema, "Success"),
 });
@@ -35,6 +41,9 @@ carRegistry.registerPath({
     method: "delete",
     path: "/cars/{id}",
     tags: ["Car"],
+    operationId: "deleteCar",
+    summary: "Delete a car by ID",
+    description: "Delete a car by its ID.",
     request: { params: GetCarSchema.shape.params },
     responses: createApiResponse(GetCarSchema, "Success"),
 });
@@ -47,6 +56,7 @@ carRegistry.registerPath({
 	tags: ["Car"],
 	operationId: "createCar",
 	summary: "Create a new car",
+  description: "Create a new car with the provided details.",
 	request: {
 	  body: {
 		content: {
@@ -67,6 +77,7 @@ carRegistry.registerPath({
   tags: ["Car"],
   operationId: "updateCar",
   summary: "Update an existing car",
+  description: "Update an existing car with the provided details.",
   request: {
     params: z.object({
       id: z.number().int().openapi({
