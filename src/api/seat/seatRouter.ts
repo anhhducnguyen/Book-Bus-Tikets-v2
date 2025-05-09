@@ -16,6 +16,7 @@ seatRegistry.registerPath({
 	method: "get",
 	path: "/seats",
 	tags: ["Seat"],
+	summary: "Get all seats",
 	responses: createApiResponse(z.array(SeatSchema), "Success"),
 });
 
@@ -25,6 +26,7 @@ seatRegistry.registerPath({
 	method: "get",
 	path: "/seats/{id}",
 	tags: ["Seat"],
+	summary: "Get seat by id",
 	request: { params: GetSeatSchema.shape.params },
 	responses: createApiResponse(SeatSchema, "Success"),
 });
@@ -35,6 +37,7 @@ seatRegistry.registerPath({
 	method: "delete",
 	path: "/seats/{id}",
 	tags: ["Seat"],
+	summary: "Delete seat by bus id",
 	request: { params: GetSeatSchema.shape.params },
 	responses: createApiResponse(SeatSchema, "Success"),
 });

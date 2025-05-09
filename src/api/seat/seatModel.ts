@@ -7,7 +7,7 @@ extendZodWithOpenApi(z);
 
 export type Seat = z.infer<typeof SeatSchema>;
 export const SeatSchema = z.object({
-	id: z.number().int().optional(), // Vì id là auto-increment
+	id: z.number().int().optional(), 
 	bus_id: z.number().int(),
 	seat_number: z.string().max(20),
 	seat_type: z.enum(["LUXURY", "VIP", "STANDARD"]),
@@ -21,3 +21,4 @@ export const SeatSchema = z.object({
 export const GetSeatSchema = z.object({
 	params: z.object({ id: commonValidations.id }),
 });
+
