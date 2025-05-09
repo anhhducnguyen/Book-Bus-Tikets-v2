@@ -6,6 +6,7 @@ import { routesRegistry} from "@/api/routes/routesRouter";
 import { bannerRegistry } from "@/api/banners/bannerRouter";
 import { carRegistry } from "@/api/car/carRouter";
 import { seatRegistry } from "@/api/seat/seatRouter";
+import { ticketRegistry } from "@/api/ticket/ticketRouter"
 
 export type OpenAPIDocument = ReturnType<OpenApiGeneratorV3["generateDocument"]>;
 

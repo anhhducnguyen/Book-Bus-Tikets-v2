@@ -10,6 +10,7 @@ import { routesRouter } from "./api/routes/routesRouter";
 import { bannerRouter } from "./api/banners/bannerRouter";
 import { carRouter } from "@/api/car/carRouter";
 import { seatRoter } from "./api/seat/seatRouter";
+import { ticketRouter } from "@/api/ticket/ticketRouter";
 import errorHandler from "@/common/middleware/errorHandler";
 import rateLimiter from "@/common/middleware/rateLimiter";
 import requestLogger from "@/common/middleware/requestLogger";
@@ -38,6 +39,7 @@ app.use("/routes", routesRouter);
 app.use("/banners", bannerRouter);
 app.use("/cars", carRouter);
 app.use("/seats", seatRoter);
+app.use("/tickets", ticketRouter);
 
 // Swagger UI
 app.use(openAPIRouter);
