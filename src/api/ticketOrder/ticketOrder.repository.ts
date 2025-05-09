@@ -4,7 +4,7 @@ export class TicketOrderRepository {
   async getAllTicketOrders({
     page = 1,
     limit = 10,
-    sortBy = "tickets.created_at",
+    sortBy = "tickets.id",
     order = "desc",
     search = "",
   }: {
@@ -33,7 +33,9 @@ export class TicketOrderRepository {
       .join("buses", "schedules.bus_id", "buses.id") 
       .join("bus_companies", "buses.company_id", "bus_companies.id")
       .join("seats", "tickets.seat_id", "seats.id")
-
+      .orderBy(sortBy, order)
+      .limit(limit)
+      // .offset(offset);
     console.log("Query:", query.toSQL().sql); 
 
     return await query;
@@ -80,9 +82,9 @@ export class TicketOrderRepository {
       //       .orWhere("routes.name", "like", `%${search}%`);
       //   }
       // })
-      // .orderBy(sortBy, order)
-      // .limit(limit)
-      // .offset(offset);
+      .orderBy(sortBy, order)
+      .limit(limit)
+      .offset(offset);
 
     return await query;
   }
