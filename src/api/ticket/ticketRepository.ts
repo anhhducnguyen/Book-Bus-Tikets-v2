@@ -90,4 +90,11 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
       .where({ id: ticketId })
       .update({ status: "CANCELLED", updated_at: new Date() });
   }
+
+  // Hiển thị lịch sử đặt vé theo trạng thái
+  async getTicketsByStatus(status: "BOOKED" | "CANCELLED"): Promise<Ticket[]> {
+    return await db("tickets")
+      .where("status", status)
+      .select("*");
+  }
 }
