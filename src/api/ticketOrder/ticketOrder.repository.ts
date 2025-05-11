@@ -17,7 +17,15 @@ export class TicketOrderRepository {
     const offset = (page - 1) * limit;
 
     if (!sortBy.includes(".")) {
-    sortBy = `tickets.${sortBy}`;
+    sortBy = `tickets.id`;
+    sortBy = `tickets.status`;
+    sortBy = `users.first_name`;
+    sortBy = `users.email`;
+    sortBy = `schedules.departure_time`;
+    sortBy = `routes.price`;
+    sortBy = `buses.license_plate`;
+    sortBy = `bus_companies.company_name`;
+    sortBy = `seats.seat_number`;
     }
 
     const query = db("tickets")

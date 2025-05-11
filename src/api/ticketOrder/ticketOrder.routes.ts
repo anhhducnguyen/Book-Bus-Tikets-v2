@@ -31,7 +31,7 @@ ticketOrderRegistry.registerPath({
   method: "get",
   path: "/ticket-orders/company/{companyId}",
   tags: ["TicketOrder"],
-  request: { params: GetTicketOrdersByCompanySchema.shape.params, query: GetTicketOrdersByCompanySchema.shape.query },
+  request: { params: GetTicketOrdersByCompanySchema.shape.params },
   responses: createApiResponse(z.array(TicketOrderSchema), "Success"),
 });
 
@@ -44,7 +44,7 @@ ticketOrderRegistry.registerPath({
   method: "get",
   path: "/ticket-orders/status/{status}",
   tags: ["TicketOrder"],
-  request: { params: GetTicketOrdersByStatusSchema.shape.params, query: GetTicketOrdersByStatusSchema.shape.query },
+  request: { params: GetTicketOrdersByStatusSchema.shape.params },
   responses: createApiResponse(z.array(TicketOrderSchema), "Success"),
 });
 
