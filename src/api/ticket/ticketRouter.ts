@@ -8,8 +8,14 @@ import { BookTicketInputSchema, CancelTicketSchema, RouteSchema, BusSchema, Seat
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { ticketController } from "./ticketController";
 
+
+import { ROLES } from "@/common/constants/role";
+import { authenticate, authorize } from "@/common/middleware/auth/authMiddleware";
+
 export const ticketRegistry = new OpenAPIRegistry();
 export const ticketRouter: Router = express.Router();
+
+ticketRouter.use(authenticate);
 
 // Lựa chọn tuyến đường đi
 ticketRegistry.registerPath({

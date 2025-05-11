@@ -7,8 +7,14 @@ import { GetSeatSchema, SeatSchema } from "@/api/seat/seatModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { seatController } from "./seatController";
 
+import { ROLES } from "@/common/constants/role";
+import { authenticate, authorize } from "@/common/middleware/auth/authMiddleware";
+
 export const seatRegistry = new OpenAPIRegistry();
 export const seatRoter: Router = express.Router();
+
+seatRoter.use(authenticate);
+const permission = authorize([ROLES.ADMIN]);
 
 seatRegistry.register("User", SeatSchema);
 
@@ -20,7 +26,7 @@ seatRegistry.registerPath({
 	responses: createApiResponse(z.array(SeatSchema), "Success"),
 });
 
-seatRoter.get("/", seatController.getSeats);
+seatRoter.get("/", permission, seatController.getSeats);
 
 seatRegistry.registerPath({
 	method: "get",
@@ -31,7 +37,7 @@ seatRegistry.registerPath({
 	responses: createApiResponse(SeatSchema, "Success"),
 });
 
-seatRoter.get("/:id", validateRequest(GetSeatSchema), seatController.getSeat);
+seatRoter.get("/:id", permission, validateRequest(GetSeatSchema), seatController.getSeat);
 
 seatRegistry.registerPath({
 	method: "delete",
@@ -42,7 +48,7 @@ seatRegistry.registerPath({
 	responses: createApiResponse(SeatSchema, "Success"),
 });
 
-seatRoter.delete("/:id", validateRequest(GetSeatSchema), seatController.deleteSeat);
+seatRoter.delete("/:id", permission, validateRequest(GetSeatSchema), seatController.deleteSeat);
 
 
 
