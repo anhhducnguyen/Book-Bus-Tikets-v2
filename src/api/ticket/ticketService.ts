@@ -1,5 +1,4 @@
 import { StatusCodes } from "http-status-codes";
-import { BookTicketInputSchema, Route, Bus, Seat, Schedule, Ticket, TicketSchema } from "@/api/ticket/ticketModel";
 import { BookTicketInputSchema, Route, Bus, Seat, Schedule, Ticket, TicketSchema, RouteSchema } from "@/api/ticket/ticketModel";
 import { TicketRepository } from "@/api/ticket/ticketRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
@@ -149,7 +148,9 @@ export class TicketService {
     } catch (ex) {
       logger.error(`Error fetching tickets for status: ${(ex as Error).message}`);
       return ServiceResponse.failure("Error fetching tickets for status", null, StatusCodes.INTERNAL_SERVER_ERROR);
-  // Hiển thị lịch sử đặt vé theo nhà xe
+    }
+  }
+    // Hiển thị lịch sử đặt vé theo nhà xe
   async getTicketsByCompany(companyId: number): Promise<ServiceResponse<Ticket[] | null>> {
     try {
       const tickets = await this.ticketRepository.getTicketsByCompany(companyId);
@@ -163,6 +164,8 @@ export class TicketService {
     } catch (ex) {
       logger.error(`Error fetching tickets for company: ${(ex as Error).message}`);
       return ServiceResponse.failure("Error fetching tickets for company", null, StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
   // Xem lại tất cả lịch sử đặt vé
   async getTicketHistory(): Promise<ServiceResponse<Ticket[] | null>> {
     try {

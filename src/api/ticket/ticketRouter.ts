@@ -76,6 +76,10 @@ ticketRegistry.registerPath({
   request: {
     params: z.object({
       status: z.enum(["BOOKED", "CANCELLED"]),
+    }),
+  },
+  responses: createApiResponse(z.array(TicketSchema), "Success"),
+});
 
 // Thêm route mới: Lịch sử đặt vé theo nhà xe
 ticketRegistry.registerPath({

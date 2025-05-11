@@ -54,11 +54,13 @@ class TicketController {
       return; 
     }
     const serviceResponse = await ticketService.getTicketsByStatus(status as "BOOKED" | "CANCELLED");
+  }
 
   // Hiển thị lịch sử đặt vé theo nhà xe
   public getTicketsByCompany: RequestHandler = async (req, res) => {
     const { companyId } = req.params;
     const serviceResponse = await ticketService.getTicketsByCompany(Number(companyId));
+  }
 
   // Xem tất cả lịch sử đặt vé
   public getTicketHistory: RequestHandler = async (req, res) => {
