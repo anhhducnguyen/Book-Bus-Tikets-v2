@@ -20,16 +20,70 @@ bannerRegistry.register("Routes", BannerSchema);
 bannerRegistry.registerPath({
   method: "get",
   path: "/banners",
-  tags: ["banner"],
-  responses: createApiResponse(z.array(BannerSchema), "Success"),
+  operationId: "getAllBanners",
+  summary: "Lấy danh sách banner có hỗ trợ phân trang, tìm kiếm và lọc",
+  tags: ["banners"],
+  parameters: [
+    {
+      name: "page",
+      in: "query",
+      required: false,
+      schema: { type: "integer", minimum: 1 },
+      description: "Số trang (mặc định: 1)",
+    },
+    {
+      name: "limit",
+      in: "query",
+      required: false,
+      schema: { type: "integer", minimum: 1 },
+      description: "Số lượng bản ghi mỗi trang (mặc định: 10)",
+    },
+    {
+      name: "banner",
+      in: "query",
+      required: false,
+      schema: { type: "string" },
+      description: "Tìm theo đường dẫn banner (banner_url)",
+    },
+    {
+      name: "position",
+      in: "query",
+      required: false,
+      schema: { type: "string" },
+      description: "Tìm theo vị trí hiển thị banner",
+    },
+    {
+      name: "sortBy",
+      in: "query",
+      required: false,
+      schema: {
+        type: "string",
+        enum: ["position", "banner_url"],
+      },
+      description: "Sắp xếp theo trường (position hoặc banner_url)",
+    },
+    {
+      name: "order",
+      in: "query",
+      required: false,
+      schema: {
+        type: "string",
+        enum: ["asc", "desc"],
+      },
+      description: "Thứ tự sắp xếp (tăng dần hoặc giảm dần)",
+    },
+  ],
+  responses: createApiResponse(z.array(BannerSchema), "Thành công"),
 });
 
 // Đăng ký handler cho GET /banner
 bannerRouter.get("/", bannerController.getAllBanner);
-//them moi tuyen duong 
+//them moi banner
+
 bannerRegistry.registerPath({
     method: "post",
-    path: "/banner",
+    path: "/banners",
+    tags: ["banners"],
     operationId: "createBanner",  // Thay 'operation' bằng 'operationId'
     summary: "Create a new Banner",  // Thêm phần mô tả ngắn gọn về API
     requestBody: {
@@ -72,6 +126,39 @@ bannerRegistry.registerPath({
       },
     },
   });
+
  bannerRouter.post("/", validateRequest(CreateBannerSchema), bannerController.createBanner);
- 
+ bannerRegistry.registerPath({
+  method: "delete",
+  path: "/banners/{id}",
+  operationId: "deleteBanner",
+  summary: "Xóa banner theo ID",
+  tags: ["banners"],
+  parameters: [
+    {
+      name: "id",
+      in: "path",
+      required: true,
+      schema: { type: "integer" },
+      description: "ID của banner cần xóa",
+    },
+  ],
+  responses: {
+    200: {
+      description: "Banner đã được xóa thành công",
+      content: {
+        "application/json": {
+          schema: BannerSchema,
+        },
+      },
+    },
+    404: {
+      description: "Không tìm thấy banner",
+    },
+    500: {
+      description: "Lỗi server nội bộ",
+    },
+  },
+});
+//xoa 1 banner
  bannerRouter.delete("/:id", bannerController.deleteBanner);
