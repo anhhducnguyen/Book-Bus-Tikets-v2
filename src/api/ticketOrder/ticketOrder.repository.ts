@@ -14,6 +14,12 @@ export class TicketOrderRepository {
     order?: "asc" | "desc";
     search?: string;
   }) {
+    const offset = (page - 1) * limit;
+
+    if (!sortBy.includes(".")) {
+    sortBy = `tickets.${sortBy}`;
+    }
+
     const query = db("tickets")
       .select(
         "tickets.id as ticketId",
@@ -33,28 +39,22 @@ export class TicketOrderRepository {
       .join("buses", "schedules.bus_id", "buses.id") 
       .join("bus_companies", "buses.company_id", "bus_companies.id")
       .join("seats", "tickets.seat_id", "seats.id")
-      .orderBy(sortBy, order)
+      
+    if (search) {
+      query.where(function() {
+        this.where("users.first_name", "like", `%${search}%`)
+          .orWhere("users.email", "like", `%${search}%`);
+      });
+    }
+    query.orderBy(sortBy, order)
       .limit(limit)
-      // .offset(offset);
+      .offset(offset);
     console.log("Query:", query.toSQL().sql); 
 
     return await query;
   }
 
-  async getTicketOrdersByCompany(companyId: number, {
-    page = 1,
-    limit = 10,
-    sortBy = "tickets.created_at",
-    order = "desc",
-    search = "",
-  }: {
-    page?: number;
-    limit?: number;
-    sortBy?: string;
-    order?: "asc" | "desc";
-    search?: string;
-  }) {
-    const offset = (page - 1) * limit;
+  async getTicketOrdersByCompany(companyId: number) {
 
     const query = db("tickets")
       .select(
@@ -76,33 +76,11 @@ export class TicketOrderRepository {
       .join("bus_companies", "buses.company_id", "bus_companies.id")
       .join("seats", "tickets.seat_id", "seats.id")
       .where("bus_companies.id", companyId)
-      // .andWhere((builder) => {
-      //   if (search) {
-      //     builder.where("users.name", "like", `%${search}%`)
-      //       .orWhere("routes.name", "like", `%${search}%`);
-      //   }
-      // })
-      .orderBy(sortBy, order)
-      .limit(limit)
-      .offset(offset);
 
     return await query;
   }
 
-  async getTicketOrdersByStatus(status: string, {
-    page = 1,
-    limit = 10,
-    sortBy = "tickets.created_at",
-    order = "desc",
-    search = "",
-  }: {
-    page?: number;
-    limit?: number;
-    sortBy?: string;
-    order?: "asc" | "desc";
-    search?: string;
-  }) {
-    const offset = (page - 1) * limit;
+  async getTicketOrdersByStatus(status: string) { 
 
     const query = db("tickets")
     .select(
@@ -124,16 +102,8 @@ export class TicketOrderRepository {
     .join("bus_companies", "buses.company_id", "bus_companies.id")
     .join("seats", "tickets.seat_id", "seats.id")
     .where("tickets.status", status)
-      // .andWhere((builder) => {
-      //   if (search) {
-      //     builder.where("users.name", "like", `%${search}%`)
-      //       .orWhere("routes.name", "like", `%${search}%`);
-      //   }
-      // })
-      // .orderBy(sortBy, order)
-      // .limit(limit)
-      // .offset(offset);
-      console.log("Query:", query.toSQL().sql);
+
+    console.log("Query:", query.toSQL().sql);
 
     return await query;
   }

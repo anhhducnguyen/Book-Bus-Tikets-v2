@@ -14,6 +14,7 @@ export const ticketOrderRouter: Router = express.Router();
 ticketOrderRegistry.register("TicketOrder", TicketOrderSchema);
 
 // 1. Lấy tất cả đơn đặt vé
+// http://localhost:3000/ticket-orders?page=1&limit=10&sortBy=tickets.created_at&order=asc&search=John
 ticketOrderRegistry.registerPath({
   method: "get",
   path: "/ticket-orders",
@@ -25,6 +26,7 @@ ticketOrderRegistry.registerPath({
 ticketOrderRouter.get("/", validateRequest(GetAllTicketOrdersSchema), ticketOrderController.getTicketOrders);
 
 // 2. Lấy đơn đặt vé theo nhà xe
+// GET /ticket-orders/company/1
 ticketOrderRegistry.registerPath({
   method: "get",
   path: "/ticket-orders/company/{companyId}",
@@ -36,6 +38,8 @@ ticketOrderRegistry.registerPath({
 ticketOrderRouter.get("/company/:companyId", validateRequest(GetTicketOrdersByCompanySchema), ticketOrderController.getTicketOrdersByCompany);
 
 // 3. Lấy đơn đặt vé theo trạng thái
+// http://localhost:3000/ticket-orders/status/BOOKED
+// http://localhost:3000/ticket-orders/status/CANCELLED
 ticketOrderRegistry.registerPath({
   method: "get",
   path: "/ticket-orders/status/{status}",

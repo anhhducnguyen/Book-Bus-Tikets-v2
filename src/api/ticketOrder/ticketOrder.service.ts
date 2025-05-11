@@ -54,23 +54,10 @@ export class TicketOrderService {
   // 2. Lấy đơn đặt vé theo nhà xe
   async getTicketOrdersByCompany(
     companyId: number,
-    params: {
-      page: number;
-      limit: number;
-      sortBy: string;
-      order: "asc" | "desc";
-      search: string;
-    }
+    _params?: any
   ): Promise<ServiceResponse<TicketOrder[] | null>> {
     try {
-      const { page, limit, sortBy, order, search } = params;
-      const ticketOrders = await this.ticketOrderRepository.getTicketOrdersByCompany(companyId, {
-        page,
-        limit,
-        sortBy,
-        order,
-        search,
-      });
+      const ticketOrders = await this.ticketOrderRepository.getTicketOrdersByCompany(companyId);
 
       if (!ticketOrders || ticketOrders.length === 0) {
         return ServiceResponse.failure("No ticket orders found for this company", null, StatusCodes.NOT_FOUND);
@@ -91,23 +78,10 @@ export class TicketOrderService {
   // 3. Lấy đơn đặt vé theo trạng thái
   async getTicketOrdersByStatus(
     status: string,
-    params: {
-      page: number;
-      limit: number;
-      sortBy: string;
-      order: "asc" | "desc";
-      search: string;
-    }
+    _params?: any
   ): Promise<ServiceResponse<TicketOrder[] | null>> {
     try {
-      const { page, limit, sortBy, order, search } = params;
-      const ticketOrders = await this.ticketOrderRepository.getTicketOrdersByStatus(status, {
-        page,
-        limit,
-        sortBy,
-        order,
-        search,
-      });
+      const ticketOrders = await this.ticketOrderRepository.getTicketOrdersByStatus(status);
 
       if (!ticketOrders || ticketOrders.length === 0) {
         return ServiceResponse.failure("No ticket orders found with this status", null, StatusCodes.NOT_FOUND);
