@@ -135,6 +135,20 @@ export class TicketService {
     }
   }
 
+  // Hiển thị lịch sử đặt vé theo trạng thái
+  async getTicketsByStatus(status: "BOOKED" | "CANCELLED"): Promise<ServiceResponse<Ticket[] | null>> {
+    try {
+      const tickets = await this.ticketRepository.getTicketsByStatus(status);
+      if (!Array.isArray(tickets)) {
+        logger.warn("Invalid data format returned from repository");
+        return ServiceResponse.success<Ticket[]>("No tickets found for this status", []);
+      }
+
+      const validatedTickets = TicketSchema.array().parse(tickets);
+      return ServiceResponse.success<Ticket[]>("Tickets retrieved for status", validatedTickets);
+    } catch (ex) {
+      logger.error(`Error fetching tickets for status: ${(ex as Error).message}`);
+      return ServiceResponse.failure("Error fetching tickets for status", null, StatusCodes.INTERNAL_SERVER_ERROR);
   // Hiển thị lịch sử đặt vé theo nhà xe
   async getTicketsByCompany(companyId: number): Promise<ServiceResponse<Ticket[] | null>> {
     try {

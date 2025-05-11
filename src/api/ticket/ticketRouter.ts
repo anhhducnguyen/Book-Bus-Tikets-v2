@@ -68,6 +68,15 @@ ticketRegistry.registerPath({
 });
 ticketRouter.delete("/tickets/:ticketId", validateRequest(CancelTicketSchema), ticketController.cancelTicket);
 
+// Lịch sử đặt vé theo trạng thái
+ticketRegistry.registerPath({
+  method: "get",
+  path: "/history/:status",
+  tags: ["Ticket"],
+  request: {
+    params: z.object({
+      status: z.enum(["BOOKED", "CANCELLED"]),
+
 // Thêm route mới: Lịch sử đặt vé theo nhà xe
 ticketRegistry.registerPath({
   method: "get",
@@ -80,6 +89,8 @@ ticketRegistry.registerPath({
   },
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
+ticketRouter.get("/history/:status", ticketController.getTicketsByStatus);
+
 ticketRouter.get("/tickets/history/:companyId", ticketController.getTicketsByCompany);
 
 // Xem tất cả lịch sử đặt vé

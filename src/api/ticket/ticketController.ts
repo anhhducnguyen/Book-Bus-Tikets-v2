@@ -1,5 +1,7 @@
 import type { Request, RequestHandler, Response } from "express";
 import { ticketService } from "@/api/ticket/ticketService";
+import { StatusCodes } from "http-status-codes";
+import { ServiceResponse } from "@/common/models/serviceResponse";
 
 class TicketController {
   // Lựa chọn tuyến đường đi
@@ -34,6 +36,24 @@ class TicketController {
     const serviceResponse = await ticketService.cancelTicket(ticketId);
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
+
+  // Hiển thị lịch sử đặt vé theo trạng thái
+  public getTicketsByStatus: RequestHandler = async (req: Request, res: Response) => {
+    const { status } = req.params as { status?: string };
+    if (!status) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Status is required", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+    console.log("Received status:", status);
+    if (status !== "BOOKED" && status !== "CANCELLED") {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid status. Must be 'BOOKED' or 'CANCELLED'", null, StatusCodes.BAD_REQUEST)
+      );
+      return; 
+    }
+    const serviceResponse = await ticketService.getTicketsByStatus(status as "BOOKED" | "CANCELLED");
 
   // Hiển thị lịch sử đặt vé theo nhà xe
   public getTicketsByCompany: RequestHandler = async (req, res) => {
