@@ -67,3 +67,12 @@ ticketRegistry.registerPath({
   responses: createApiResponse(z.void(), "Success"),
 });
 ticketRouter.delete("/tickets/:ticketId", validateRequest(CancelTicketSchema), ticketController.cancelTicket);
+
+// Xem tất cả lịch sử đặt vé
+ticketRegistry.registerPath({
+  method: "get",
+  path: "/tickets/history",
+  tags: ["Ticket"],
+  responses: createApiResponse(z.array(TicketSchema), "Success"),
+});
+ticketRouter.get("/tickets/history", ticketController.getTicketHistory);

@@ -34,6 +34,12 @@ class TicketController {
     const serviceResponse = await ticketService.cancelTicket(ticketId);
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
+
+  // Xem tất cả lịch sử đặt vé
+  public getTicketHistory: RequestHandler = async (req, res) => {
+    const serviceResponse = await ticketService.getTicketHistory();
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
 }
 
 export const ticketController = new TicketController();
