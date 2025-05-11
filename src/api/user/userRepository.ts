@@ -1,5 +1,5 @@
 import type { User } from "@/api/user/userModel";
-import { db } from "@/common/config/database"; 
+import { db } from "@/common/config/database";
 
 export const users: User[] = [
 	{
@@ -21,16 +21,59 @@ export const users: User[] = [
 ];
 
 export class UserRepository {
-	async findAllAsync(): Promise<User[]> {
-		const rows = await db<User>('users').select('*');
-		return rows as User[];
+	async findAllAsync(filter: any, options: { sortBy?: string; limit?: number; page?: number }) {
+		const { sortBy = "id:asc", limit = 10, page = 1 } = options;
+		const [sortField, sortOrder] = sortBy.split(":");
+
+		const query = db<User>("users");
+
+		if (filter.email) {
+			query.where("email", "like", `%${filter.email}%`);
+		}
+
+		const offset = (page - 1) * limit;
+
+		const data = await query.orderBy(sortField, sortOrder).limit(limit).offset(offset);
+
+		const countResult = await db<User>("users")
+			.modify((qb) => {
+				if (filter.email) {
+					qb.where("email", "like", `%${filter.email}%`);
+				}
+			})
+			.count("id as count");
+
+		const totalCount = Number((countResult[0] as { count: string }).count);
+
+		return {
+			results: data,
+			page,
+			limit,
+			total: totalCount,
+			totalPages: Math.ceil(totalCount / limit),
+		};
 	}
 
+	// Lấy người dùng theo ID
 	async findByIdAsync(id: number): Promise<User | null> {
 		const user = await db<User>('users')
-		  .where({ id })
-		  .first();
+			.where({ id })
+			.first();
 
 		return user ?? null;
+	}
+
+	async createUserAsync(data: Omit<User, "id" | "createdAt" | "updatedAt">): Promise<User> {
+		const currentTime = new Date();
+
+		const [id] = await db('users').insert({
+			...data,
+			createdAt: currentTime,
+			updatedAt: currentTime,
+		});
+
+		const [newUser] = await db('users').where({ id }).select('*');
+
+		return newUser;
 	}
 }
