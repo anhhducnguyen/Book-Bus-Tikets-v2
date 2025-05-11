@@ -76,8 +76,28 @@ ticketRegistry.registerPath({
   request: {
     params: z.object({
       status: z.enum(["BOOKED", "CANCELLED"]),
+
+// Thêm route mới: Lịch sử đặt vé theo nhà xe
+ticketRegistry.registerPath({
+  method: "get",
+  path: "/tickets/history/:companyId",
+  tags: ["Ticket"],
+  request: {
+    params: z.object({
+      companyId: z.string().regex(/^\d+$/, "Company ID must be a numeric string"),
     }),
   },
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
 ticketRouter.get("/history/:status", ticketController.getTicketsByStatus);
+
+ticketRouter.get("/tickets/history/:companyId", ticketController.getTicketsByCompany);
+
+// Xem tất cả lịch sử đặt vé
+ticketRegistry.registerPath({
+  method: "get",
+  path: "/tickets/history",
+  tags: ["Ticket"],
+  responses: createApiResponse(z.array(TicketSchema), "Success"),
+});
+ticketRouter.get("/tickets/history", ticketController.getTicketHistory);

@@ -1,6 +1,6 @@
 import { Request, Response, RequestHandler } from 'express';
 import { BannerService } from '@/api/banners/bannerService';
-import { StatusCodes } from "http-status-codes";  // Đảm bảo import StatusCodes
+import { StatusCodes } from "http-status-codes";  
 
 export const bannerService = new BannerService();
 
@@ -39,7 +39,7 @@ export class BannerController {
         }
       }
       
-  //Them moi tuyen duong
+  //Them moi banner
   public createBanner: RequestHandler = async (req: Request, res: Response): Promise<void> => {
       const bannerData = req.body;
       try {
@@ -69,7 +69,7 @@ export class BannerController {
       }
     };
 
-//xoa 1 bannerbanner
+//xoa 1 banner
 public deleteBanner: RequestHandler = async (req: Request, res: Response): Promise<void> => {
     const id = parseInt(req.params.id);
   
