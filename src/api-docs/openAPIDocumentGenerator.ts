@@ -2,6 +2,7 @@ import { OpenAPIRegistry, OpenApiGeneratorV3 } from "@asteasolutions/zod-to-open
 
 import { healthCheckRegistry } from "@/api/healthCheck/healthCheckRouter";
 import { userRegistry } from "@/api/user/userRouter";
+import { ticketOrderRegistry } from "@/api/ticketOrder/ticketOrder.routes";
 import { authRegistry } from "@/api/auth/authRouter";
 import { carRegistry } from "@/api/car/carRouter";
 import { seatRegistry } from "@/api/seat/seatRouter";
@@ -21,6 +22,7 @@ export function generateOpenAPIDocument(): OpenAPIDocument {
 		routesRegistry,
 		bannerRegistry,
 		busReviewRegistry,
+		ticketOrderRegistry
 	]);
 
 	const generator = new OpenApiGeneratorV3(registry.definitions);
