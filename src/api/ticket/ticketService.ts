@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { BookTicketInputSchema, Route, Bus, Seat, Schedule, Ticket } from "@/api/ticket/ticketModel";
+import { BookTicketInputSchema, Route, Bus, Seat, Schedule, Ticket, TicketSchema } from "@/api/ticket/ticketModel";
 import { TicketRepository } from "@/api/ticket/ticketRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
@@ -124,6 +124,23 @@ export class TicketService {
     } catch (ex) {
       logger.error(`Error cancelling ticket: ${(ex as Error).message}`);
       return ServiceResponse.failure("Error cancelling ticket", null, StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  // Hiển thị lịch sử đặt vé theo nhà xe
+  async getTicketsByCompany(companyId: number): Promise<ServiceResponse<Ticket[] | null>> {
+    try {
+      const tickets = await this.ticketRepository.getTicketsByCompany(companyId);
+      if (!Array.isArray(tickets)) {
+        logger.warn("Invalid data format returned from repository");
+        return ServiceResponse.success<Ticket[]>("No tickets found for this company", []);
+      }
+
+      const validatedTickets = TicketSchema.array().parse(tickets);
+      return ServiceResponse.success<Ticket[]>("Tickets retrieved for company", validatedTickets);
+    } catch (ex) {
+      logger.error(`Error fetching tickets for company: ${(ex as Error).message}`);
+      return ServiceResponse.failure("Error fetching tickets for company", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 }

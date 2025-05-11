@@ -34,6 +34,13 @@ class TicketController {
     const serviceResponse = await ticketService.cancelTicket(ticketId);
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
+
+  // Hiển thị lịch sử đặt vé theo nhà xe
+  public getTicketsByCompany: RequestHandler = async (req, res) => {
+    const { companyId } = req.params;
+    const serviceResponse = await ticketService.getTicketsByCompany(Number(companyId));
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
 }
 
 export const ticketController = new TicketController();
