@@ -1,171 +1,231 @@
-create database check_db;
-use check_db; 
+-- MySQL dump 10.13  Distrib 8.0.30, for Win64 (x86_64)
+--
+-- Host: localhost    Database: check_db
+-- ------------------------------------------------------
+-- Server version	8.0.30
 
-CREATE TABLE `users` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `first_name` varchar(100),
-  `last_name` varchar(100),
-  `email` varchar(255),
-  `password` varchar(255),
-  `phone` varchar(11),
-  `status` enum("ACTIVE", "BLOCKED"),
-  `created_at` datetime,
-  `updated_at` datetime
-);
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-CREATE TABLE `roles` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `role_name` enum("ROLE_ADMIN", "ROLE_USER")
-);
+--
+-- Table structure for table `banners`
+--
 
-CREATE TABLE `user_role` (
-  `role_id` int,
-  `user_id` int,
-  PRIMARY KEY (`role_id`, `user_id`),
-  FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`),
-  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-);
-
-CREATE TABLE `stations` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `name` varchar(255),
-  `image` varchar(255),
-  `wallpaper` varchar(255),
-  `descriptions` longtext,
-  `location` varchar(255),
-  `created_at` datetime,
-  `updated_at` datetime
-);
-
-CREATE TABLE `bus_companies` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `company_name` varchar(255),
-  `image` varchar(255),
-  `descriptions` longtext,
-  `created_at` datetime,
-  `updated_at` datetime
-);
-
-CREATE TABLE `buses` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `name` varchar(255),
-  `description` text,
-  `license_plate` varchar(20),
-  `capacity` int,
-  `company_id` int,
-  `created_at` datetime,
-  `updated_at` datetime,
-  FOREIGN KEY (`company_id`) REFERENCES `bus_companies` (`id`)
-);
-
-CREATE TABLE `station_bus` (
-  `station_id` int,
-  `bus_id` int,
-  PRIMARY KEY (`station_id`, `bus_id`),
-  FOREIGN KEY (`station_id`) REFERENCES `stations` (`id`),
-  FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`)
-);
-
-CREATE TABLE `routes` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `departure_station_id` int,
-  `arrival_station_id` int,
-  `price` double,
-  `duration` int,
-  `distance` int,
-  `created_at` datetime,
-  `updated_at` datetime,
-  FOREIGN KEY (`departure_station_id`) REFERENCES `stations` (`id`),
-  FOREIGN KEY (`arrival_station_id`) REFERENCES `stations` (`id`)
-);
-
-CREATE TABLE `schedules` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `route_id` int,
-  `bus_id` int,
-  `departure_time` datetime,
-  `arrival_time` datetime,
-  `available_seats` int,
-  `total_seats` int,
-  `status` enum("AVAILABLE", "FULL", "CANCELLED"),
-  `created_at` datetime,
-  `updated_at` datetime,
-  FOREIGN KEY (`route_id`) REFERENCES `routes` (`id`),
-  FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`)
-);
-
-CREATE TABLE `seats` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `bus_id` int,
-  `seat_number` varchar(20),
-  `seat_type` enum("LUXURY", "VIP", "STANDARD"),
-  `status` enum("AVAILABLE", "BOOKED"),
-  `price_for_type_seat` double,
-  `created_at` datetime,
-  `updated_at` datetime,
-  FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`)
-);
-
-CREATE TABLE `tickets` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `seat_id` int,
-  `schedule_id` int,
-  `departure_time` datetime,
-  `arrival_time` datetime,
-  `seat_type` enum("LUXURY", "VIP", "STANDARD"),
-  `price` double,
-  `status` enum("BOOKED", "CANCELLED"),
-  `created_at` datetime,
-  `updated_at` datetime,
-  FOREIGN KEY (`seat_id`) REFERENCES `seats` (`id`),
-  FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`id`)
-);
-
-CREATE TABLE `bus_reviews` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `bus_id` int,
-  `user_id` int,
-  `rating` int,
-  `review` varchar(255),
-  `created_at` datetime,
-  `updated_at` datetime,
-  FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`),
-  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-);
-
+DROP TABLE IF EXISTS `banners`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `banners` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `banner_url` varchar(255),
-  `position` varchar(100)
-);
+  `id` int NOT NULL AUTO_INCREMENT,
+  `banner_url` varchar(255) DEFAULT NULL,
+  `position` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Dumping data for table `banners`
+--
+
+LOCK TABLES `banners` WRITE;
+/*!40000 ALTER TABLE `banners` DISABLE KEYS */;
+INSERT INTO `banners` VALUES (1,'banner1.jpg','TOP'),(2,'banner2.jpg','BOTTOM'),(3,'banner3.jpg','LEFT'),(4,'banner4.jpg','RIGHT'),(5,'banner5.jpg','CENTER');
+/*!40000 ALTER TABLE `banners` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `bus_companies`
+--
+
+DROP TABLE IF EXISTS `bus_companies`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `bus_companies` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_name` varchar(255) DEFAULT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `descriptions` longtext,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bus_companies`
+--
+
+LOCK TABLES `bus_companies` WRITE;
+/*!40000 ALTER TABLE `bus_companies` DISABLE KEYS */;
+INSERT INTO `bus_companies` VALUES (1,'ABC Bus Co.','abc_logo.png','A leading bus company','2025-05-11 08:15:34','2025-05-11 08:15:34'),(2,'XYZ Transport','xyz_logo.png','Reliable transport service','2025-05-11 08:15:34','2025-05-11 08:15:34'),(3,'Speedy Travels','speedy_logo.png','Fast and efficient bus services','2025-05-11 08:15:34','2025-05-11 08:15:34'),(4,'Elite Transport','elite_logo.png','Luxurious travel experience','2025-05-11 08:15:34','2025-05-11 08:15:34'),(5,'Green Bus','green_logo.png','Eco-friendly and sustainable buses','2025-05-11 08:15:34','2025-05-11 08:15:34');
+/*!40000 ALTER TABLE `bus_companies` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `bus_image`
+--
+
+DROP TABLE IF EXISTS `bus_image`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `bus_image` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `image_url` varchar(255),
-  `bus_id` int,
-  FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`)
-);
+  `id` int NOT NULL AUTO_INCREMENT,
+  `image_url` varchar(255) DEFAULT NULL,
+  `bus_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `bus_id` (`bus_id`),
+  CONSTRAINT `bus_image_ibfk_1` FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Dumping data for table `bus_image`
+--
+
+LOCK TABLES `bus_image` WRITE;
+/*!40000 ALTER TABLE `bus_image` DISABLE KEYS */;
+INSERT INTO `bus_image` VALUES (1,'bus101_image1.jpg',1),(2,'bus202_image1.jpg',2),(3,'bus303_image1.jpg',3),(4,'bus404_image1.jpg',4),(5,'bus505_image1.jpg',5);
+/*!40000 ALTER TABLE `bus_image` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `bus_reviews`
+--
+
+DROP TABLE IF EXISTS `bus_reviews`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `bus_reviews` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `bus_id` int DEFAULT NULL,
+  `user_id` int unsigned DEFAULT NULL,
+  `rating` int DEFAULT NULL,
+  `review` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `bus_id` (`bus_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `bus_reviews_ibfk_1` FOREIGN KEY (`bus_id`) REFERENCES `buses` (`id`),
+  CONSTRAINT `bus_reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bus_reviews`
+--
+
+LOCK TABLES `bus_reviews` WRITE;
+/*!40000 ALTER TABLE `bus_reviews` DISABLE KEYS */;
+INSERT INTO `bus_reviews` VALUES (1,1,1,5,'Great service and comfortable ride!','2025-05-11 08:15:34','2025-05-11 08:15:34'),(2,2,2,4,'Good value for money.','2025-05-11 08:15:34','2025-05-11 08:15:34'),(3,3,3,3,'Decent but could be better.','2025-05-11 08:15:34','2025-05-11 08:15:34'),(4,4,4,2,'The bus was delayed and uncomfortable.','2025-05-11 08:15:34','2025-05-11 08:15:34'),(5,5,5,5,'Excellent experience, will travel again.','2025-05-11 08:15:34','2025-05-11 08:15:34');
+/*!40000 ALTER TABLE `bus_reviews` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `buses`
+--
+
+DROP TABLE IF EXISTS `buses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `buses` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `description` text,
+  `license_plate` varchar(20) DEFAULT NULL,
+  `capacity` int DEFAULT NULL,
+  `company_id` int DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `company_id` (`company_id`),
+  CONSTRAINT `buses_ibfk_1` FOREIGN KEY (`company_id`) REFERENCES `bus_companies` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `buses`
+--
+
+LOCK TABLES `buses` WRITE;
+/*!40000 ALTER TABLE `buses` DISABLE KEYS */;
+INSERT INTO `buses` VALUES (1,'Bus 101','Luxury bus for long routes','AB123CD',50,1,'2025-05-11 08:15:34','2025-05-11 08:15:34'),(2,'Bus 202','Economy bus','XY987ZT',40,2,'2025-05-11 08:15:34','2025-05-11 08:15:34'),(3,'Bus 303','Express bus for daily commuters','LM234GH',60,3,'2025-05-11 08:15:34','2025-05-11 08:15:34'),(4,'Bus 404','VIP bus','JK567MN',30,4,'2025-05-11 08:15:34','2025-05-11 08:15:34'),(5,'Bus 505','Sustainable bus with eco-friendly features','GH890XY',45,5,'2025-05-11 08:15:34','2025-05-11 08:15:34');
+/*!40000 ALTER TABLE `buses` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `cancellation_policies`
+--
+
+DROP TABLE IF EXISTS `cancellation_policies`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cancellation_policies` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `descriptions` text,
-  `route_id` int,
-  `cancellation_time_limit` int,
-  `refund_percentage` int,
-  `created_at` datetime,
-  `updated_at` datetime,
-  FOREIGN KEY (`route_id`) REFERENCES `routes` (`id`)
-);
+  `route_id` int DEFAULT NULL,
+  `cancellation_time_limit` int DEFAULT NULL,
+  `refund_percentage` int DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `route_id` (`route_id`),
+  CONSTRAINT `cancellation_policies_ibfk_1` FOREIGN KEY (`route_id`) REFERENCES `routes` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Dumping data for table `cancellation_policies`
+--
+
+LOCK TABLES `cancellation_policies` WRITE;
+/*!40000 ALTER TABLE `cancellation_policies` DISABLE KEYS */;
+INSERT INTO `cancellation_policies` VALUES (1,'Cancel up to 24 hours before departure for full refund',1,24,100,'2025-05-11 08:15:34','2025-05-11 08:15:34'),(2,'Cancel up to 12 hours before departure for 50% refund',2,12,50,'2025-05-11 08:15:34','2025-05-11 08:15:34'),(3,'No refund after departure',3,0,0,'2025-05-11 08:15:34','2025-05-11 08:15:34'),(4,'Cancel up to 48 hours before departure for full refund',4,48,100,'2025-05-11 08:15:34','2025-05-11 08:15:34'),(5,'Cancel up to 6 hours before departure for 25% refund',5,6,25,'2025-05-11 08:15:34','2025-05-11 08:15:34');
+/*!40000 ALTER TABLE `cancellation_policies` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `payment_providers`
+--
+
+DROP TABLE IF EXISTS `payment_providers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `payment_providers` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `provider_name` varchar(100),
-  `provider_type` enum("CARD", "E_WALLET", "BANK_TRANSFER", "QR_CODE"),
-  `api_endpoint` varchar(255),
-  `created_at` datetime,
-  `updated_at` datetime
-);
+  `id` int NOT NULL AUTO_INCREMENT,
+  `provider_name` varchar(100) DEFAULT NULL,
+  `provider_type` enum('CARD','E_WALLET','BANK_TRANSFER','QR_CODE') DEFAULT NULL,
+  `api_endpoint` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Dumping data for table `payment_providers`
+--
+
+LOCK TABLES `payment_providers` WRITE;
+/*!40000 ALTER TABLE `payment_providers` DISABLE KEYS */;
+INSERT INTO `payment_providers` VALUES (1,'PayPal','E_WALLET','https://api.paypal.com','2025-05-11 08:15:34','2025-05-11 08:15:34'),(2,'Stripe','CARD','https://api.stripe.com','2025-05-11 08:15:34','2025-05-11 08:15:34'),(3,'BankTransfer','BANK_TRANSFER','https://api.banktransfer.com','2025-05-11 08:15:34','2025-05-11 08:15:34'),(4,'QRPay','QR_CODE','https://api.qrpay.com','2025-05-11 08:15:34','2025-05-11 08:15:34'),(5,'GooglePay','E_WALLET','https://api.googlepay.com','2025-05-11 08:15:34','2025-05-11 08:15:34');
+/*!40000 ALTER TABLE `payment_providers` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `payments`
+--
+
+DROP TABLE IF EXISTS `payments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `payments` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `payment_provider_id` int,
