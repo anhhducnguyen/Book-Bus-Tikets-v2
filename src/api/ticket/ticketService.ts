@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { BookTicketInputSchema, Route, Bus, Seat, Schedule, Ticket, TicketSchema } from "@/api/ticket/ticketModel";
+import { BookTicketInputSchema, Route, Bus, Seat, Schedule, Ticket, TicketSchema, RouteSchema } from "@/api/ticket/ticketModel";
 import { TicketRepository } from "@/api/ticket/ticketRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
@@ -16,7 +17,14 @@ export class TicketService {
   async getRoutes(): Promise<ServiceResponse<Route[] | null>> {
     try {
       const routes = await this.ticketRepository.getRoutes();
-      return ServiceResponse.success<Route[]>("Routes retrieved", routes);
+      if (!Array.isArray(routes)) {
+        logger.warn("Invalid data format returned from repository");
+        return ServiceResponse.success<Route[]>("No routes found", []);
+      }
+  
+      // Validate dữ liệu với RouteSchema
+      const validatedRoutes = RouteSchema.array().parse(routes);
+      return ServiceResponse.success<Route[]>("Routes retrieved", validatedRoutes);
     } catch (ex) {
       logger.error(`Error fetching routes: ${(ex as Error).message}`);
       return ServiceResponse.failure("Error fetching routes", null, StatusCodes.INTERNAL_SERVER_ERROR);
@@ -141,6 +149,21 @@ export class TicketService {
     } catch (ex) {
       logger.error(`Error fetching tickets for company: ${(ex as Error).message}`);
       return ServiceResponse.failure("Error fetching tickets for company", null, StatusCodes.INTERNAL_SERVER_ERROR);
+  // Xem lại tất cả lịch sử đặt vé
+  async getTicketHistory(): Promise<ServiceResponse<Ticket[] | null>> {
+    try {
+      const tickets = await this.ticketRepository.getAllTickets();
+      if (!Array.isArray(tickets)) {
+        logger.warn("Invalid data format returned from repository");
+        return ServiceResponse.success<Ticket[]>("No tickets found", []);
+      }
+  
+      // Validate dữ liệu với TicketSchema
+      const validatedTickets = TicketSchema.array().parse(tickets);
+      return ServiceResponse.success<Ticket[]>("Tickets retrieved", validatedTickets);
+    } catch (ex) {
+      logger.error(`Error fetching tickets: ${(ex as Error).message}`);
+      return ServiceResponse.failure("Error fetching tickets", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 }

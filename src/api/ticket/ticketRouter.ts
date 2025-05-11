@@ -81,3 +81,12 @@ ticketRegistry.registerPath({
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
 ticketRouter.get("/tickets/history/:companyId", ticketController.getTicketsByCompany);
+
+// Xem tất cả lịch sử đặt vé
+ticketRegistry.registerPath({
+  method: "get",
+  path: "/tickets/history",
+  tags: ["Ticket"],
+  responses: createApiResponse(z.array(TicketSchema), "Success"),
+});
+ticketRouter.get("/tickets/history", ticketController.getTicketHistory);

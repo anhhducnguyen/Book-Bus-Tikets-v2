@@ -59,17 +59,17 @@ interface GetBannerOptions {
       }
       async deleteBannerAsync(id: number): Promise<Banner | null> {
         try {
-            // Tìm tuyến đường cần xóa
+            // Tìm banner cần xóa
             const bannerToDelete = await db('banners').where({ id }).first();
     
             if (!bannerToDelete) {
-                return null; // Nếu không tìm thấy tuyến đường để xóa
+                return null; // Nếu không tìm thấy banner để xóa
             }
     
-            // Thực hiện xóa tuyến đường
+            // Thực hiện xóa banner
             await db('banners').where({ id }).del();
     
-            // Trả về tuyến đường đã xóa
+            // Trả về banner đã xóa
             return bannerToDelete;
         } catch (error: unknown) {
             throw new Error(`Error deleting banner: ${(error instanceof Error) ? error.message : 'Unknown error'}`);
@@ -78,7 +78,7 @@ interface GetBannerOptions {
       
   }
   
-    //them moi mot banner
+    
     
     
       

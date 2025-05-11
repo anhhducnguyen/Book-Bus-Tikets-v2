@@ -2,26 +2,32 @@ import { OpenAPIRegistry, OpenApiGeneratorV3 } from "@asteasolutions/zod-to-open
 
 import { healthCheckRegistry } from "@/api/healthCheck/healthCheckRouter";
 import { userRegistry } from "@/api/user/userRouter";
-import { routesRegistry} from "@/api/routes/routesRouter";
-import { bannerRegistry } from "@/api/banners/bannerRouter";
+import { ticketOrderRegistry } from "@/api/ticketOrder/ticketOrder.routes";
+import { authRegistry } from "@/api/auth/authRouter";
 import { carRegistry } from "@/api/car/carRouter";
 import { seatRegistry } from "@/api/seat/seatRouter";
-import { ticketRegistry } from "@/api/ticket/ticketRouter"
+import { routesRegistry } from "@/api/routes/routesRouter";
+import { bannerRegistry } from "@/api/banners/bannerRouter";
+import { busReviewRegistry } from "@/api/bus_reviews/busReviewRouter";
 
 export type OpenAPIDocument = ReturnType<OpenApiGeneratorV3["generateDocument"]>;
 
 export function generateOpenAPIDocument(): OpenAPIDocument {
 	const registry = new OpenAPIRegistry([
 		healthCheckRegistry,
-		userRegistry, 
-		carRegistry, 
+		authRegistry,
+		userRegistry,
+		carRegistry,
 		seatRegistry,
 		routesRegistry,
-		bannerRegistry
+		bannerRegistry,
+		busReviewRegistry,
+		ticketOrderRegistry
 	]);
+
 	const generator = new OpenApiGeneratorV3(registry.definitions);
 
-	return generator.generateDocument({
+	const document = generator.generateDocument({
 		openapi: "3.0.0",
 		info: {
 			version: "1.0.0",
@@ -32,4 +38,23 @@ export function generateOpenAPIDocument(): OpenAPIDocument {
 			url: "/swagger.json",
 		},
 	});
+
+	document.components = {
+		securitySchemes: {
+			bearerAuth: {
+				type: "http",
+				scheme: "bearer",
+				bearerFormat: "JWT",
+			},
+		},
+	};
+
+	document.security = [
+		{
+			bearerAuth: [],
+		},
+	];
+
+	return document;
 }
+

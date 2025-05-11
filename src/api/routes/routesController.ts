@@ -72,7 +72,7 @@ export class RoutesController {
         });
       }
     };
-//cap nhat tuyen duong
+
 // Cập nhật tuyến đường
 public updateRoutes: RequestHandler = async (req: Request, res: Response): Promise<void> => {
     const routesData = req.body;

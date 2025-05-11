@@ -98,5 +98,8 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
       .join("buses", "schedules.bus_id", "buses.id")
       .where("buses.company_id", companyId)
       .select("tickets.*");
+  // Xem lại tất cả lịch sử đặt vé
+  async getAllTickets(): Promise<Ticket[]> {
+    return await db("tickets").select("*");
   }
 }

@@ -17,19 +17,74 @@ export const routesRouter: Router = express.Router();
 routesRegistry.register("Routes", RoutesSchema);
 
 // Đăng ký đường dẫn cho OpenAPI với method 'get'
+// 
+
+
+// Đăng ký handler cho GET /routes
 routesRegistry.registerPath({
   method: "get",
   path: "/routes",
-  tags: ["Routes"],
-  responses: createApiResponse(z.array(RoutesSchema), "Success"),
+  operationId: "getAllRoutes",
+  summary: "Lấy danh sách routes có hỗ trợ phân trang, tìm kiếm và lọc",
+  tags: ["routes"],
+  parameters: [
+    {
+      name: "page",
+      in: "query",
+      required: false,
+      schema: { type: "integer", minimum: 1 },
+      description: "Số trang (mặc định: 1)",
+    },
+    {
+      name: "limit",
+      in: "query",
+      required: false,
+      schema: { type: "integer", minimum: 1 },
+      description: "Số lượng bản ghi mỗi trang (mặc định: 10)",
+    },
+    {
+      name: "departure_station_id",
+      in: "query",
+      required: false,
+      schema: { type: "number" },
+      description: "Tìm theo departure_station",
+    },
+    {
+      name: "arrival_station_id",
+      in: "query",
+      required: false,
+      schema: { type: "number" },
+      description: "Tìm theo vị trí hiển thị arrival_station",
+    },
+    {
+      name: "sortBy",
+      in: "query",
+      required: false,
+      schema: {
+        type: "string",
+        enum: ['price' , 'duration' , 'distance' , 'created_at'],
+      },
+      description: "Sắp xếp theo trường ('price' | 'duration' | 'distance' | 'created_at')",
+    },
+    {
+      name: "order",
+      in: "query",
+      required: false,
+      schema: {
+        type: "string",
+        enum: ["asc", "desc"],
+      },
+      description: "Thứ tự sắp xếp (tăng dần hoặc giảm dần)",
+    },
+  ],
+  responses: createApiResponse(z.array(RoutesSchema), "Thành công"),
 });
-
-// Đăng ký handler cho GET /routes
 routesRouter.get("/", routesController.getAllRoutes);
 //them moi tuyen duong 
 routesRegistry.registerPath({
     method: "post",
     path: "/routes",
+    tags: ["routes"],
     operationId: "createRoutes",  // Thay 'operation' bằng 'operationId'
     summary: "Create a new Routes",  // Thêm phần mô tả ngắn gọn về API
     requestBody: {
@@ -77,5 +132,39 @@ routesRegistry.registerPath({
     },
   });
  routesRouter.post("/", validateRequest(CreateRoutesSchema), routesController.createRoutes);
+ //update tuyen duong theo id
  routesRouter.put("/:id", validateRequest(CreateRoutesSchema), routesController.updateRoutes);
+ //Xoa tuyen duong
+ routesRegistry.registerPath({
+   method: "delete",
+   path: "/routes/{id}",
+   operationId: "deleteRoutes",
+   summary: "Xóa routes theo ID",
+   tags: ["routes"],
+   parameters: [
+     {
+       name: "id",
+       in: "path",
+       required: true,
+       schema: { type: "integer" },
+       description: "ID của banner cần xóa",
+     },
+   ],
+   responses: {
+     200: {
+       description: "Banner đã được xóa thành công",
+       content: {
+         "application/json": {
+           schema: RoutesSchema,
+         },
+       },
+     },
+     404: {
+       description: "Không tìm thấy banner",
+     },
+     500: {
+       description: "Lỗi server nội bộ",
+     },
+   },
+ });
  routesRouter.delete("/:id", routesController.deleteRoutes);

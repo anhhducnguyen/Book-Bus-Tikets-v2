@@ -7,6 +7,9 @@ import { GetUserSchema, UserSchema, CreateUserSchema } from "@/api/user/userMode
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { userController } from "./userController";
 
+import { ROLES } from "@/common/constants/role";
+import { authenticate, authorize } from "@/common/middleware/auth/authMiddleware";
+
 export const userRegistry = new OpenAPIRegistry();
 export const userRouter: Router = express.Router();
 
@@ -19,7 +22,11 @@ userRegistry.registerPath({
 	responses: createApiResponse(z.array(UserSchema), "Success"),
 });
 
-userRouter.get("/", userController.getUsers);
+userRouter.get("/",
+	authenticate,
+	authorize([ROLES.ADMIN]),
+	userController.getUsers
+);
 
 userRegistry.registerPath({
 	method: "get",
@@ -29,54 +36,34 @@ userRegistry.registerPath({
 	responses: createApiResponse(UserSchema, "Success"),
 });
 
-userRouter.get("/:id", validateRequest(GetUserSchema), userController.getUser);
+userRouter.get("/:id",
+	authenticate,
+	authorize([ROLES.ADMIN]),
+	validateRequest(GetUserSchema),
+	userController.getUser
+);
+
 userRegistry.registerPath({
 	method: "post",
 	path: "/users",
-	operationId: "createUser",  // Thay 'operation' bằng 'operationId'
-	summary: "Create a new user",  // Thêm phần mô tả ngắn gọn về API
-	requestBody: {
-	  content: {
-		"application/json": {
-		  schema: {
-			type: "object",
-			properties: {
-			  name: { type: "string" },
-			  email: { type: "string", format: "email" },
-			  age: { type: "integer", minimum: 18 },
+	tags: ["User"],
+	operationId: "createUser",
+	summary: "Create a new user",
+	request: {
+		body: {
+			content: {
+				"application/json": {
+					schema: CreateUserSchema.shape.body,
+				},
 			},
-			required: ["name", "email", "age"],
-		  },
 		},
-	  },
 	},
-	responses: {
-	  201: {
-		description: "User created successfully",
-		content: {
-		  "application/json": {
-			schema: {
-			  type: "object",
-			  properties: {
-				id: { type: "number" },
-				name: { type: "string" },
-				email: { type: "string" },
-				age: { type: "number" },
-				createdAt: { type: "string", format: "date-time" },
-				updatedAt: { type: "string", format: "date-time" },
-			  },
-			},
-		  },
-		},
-	  },
-	  400: {
-		description: "Invalid input data",
-	  },
-	  500: {
-		description: "Internal server error",
-	  },
-	},
-  });
-  
-  // Đăng ký phương thức POST trên userRouter
-  userRouter.post("/", validateRequest(CreateUserSchema), userController.createUser);
+	responses: createApiResponse(UserSchema, "User created successfully", 201),
+});
+
+userRouter.post("/",
+	authenticate,
+	authorize([ROLES.ADMIN]),
+	validateRequest(CreateUserSchema),
+	userController.createUser
+);
