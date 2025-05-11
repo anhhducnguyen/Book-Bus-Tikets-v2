@@ -54,6 +54,7 @@ export class UserRepository {
 		};
 	}
 
+	// Lấy người dùng theo ID
 	async findByIdAsync(id: number): Promise<User | null> {
 		const user = await db<User>('users')
 			.where({ id })

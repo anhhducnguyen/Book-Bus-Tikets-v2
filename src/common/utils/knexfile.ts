@@ -1,6 +1,5 @@
-
-import { env } from "@/common/utils/envConfig";
 import type { Knex } from 'knex';
+import { env } from "@/common/utils/envConfig";
 
 export const config: { [key: string]: Knex.Config } = {
   development: {
@@ -18,6 +17,19 @@ export const config: { [key: string]: Knex.Config } = {
       directory: './src/db/seeds',
     },
   },
+  production: {
+    client: 'mysql2',
+    connection: {
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+    },
+    migrations: {
+      directory: './dist/db/migrations',
+    },
+    seeds: {
+      directory: './dist/db/seeds',
+    },
+  },
 };
-
-

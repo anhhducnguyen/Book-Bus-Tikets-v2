@@ -7,9 +7,16 @@ import { authRegistry } from "@/api/auth/authRouter";
 export type OpenAPIDocument = ReturnType<OpenApiGeneratorV3["generateDocument"]>;
 
 export function generateOpenAPIDocument(): OpenAPIDocument {
-	const registry = new OpenAPIRegistry([healthCheckRegistry, authRegistry, userRegistry]);
+	const registry = new OpenAPIRegistry([
+		healthCheckRegistry,
+		userRegistry, 
+		carRegistry, 
+		seatRegistry,
+		routesRegistry,
+		bannerRegistry,
+		busReviewRegistry
+	]);
 	const generator = new OpenApiGeneratorV3(registry.definitions);
-
 	return generator.generateDocument({
 		openapi: "3.0.0",
 		info: {
