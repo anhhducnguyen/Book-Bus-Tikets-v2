@@ -15,15 +15,17 @@ export function generateOpenAPIDocument(): OpenAPIDocument {
 	const registry = new OpenAPIRegistry([
 		healthCheckRegistry,
 		authRegistry,
-		userRegistry, 
-		carRegistry, 
+		userRegistry,
+		carRegistry,
 		seatRegistry,
 		routesRegistry,
 		bannerRegistry,
-		busReviewRegistry
+		busReviewRegistry,
 	]);
+
 	const generator = new OpenApiGeneratorV3(registry.definitions);
-	return generator.generateDocument({
+
+	const document = generator.generateDocument({
 		openapi: "3.0.0",
 		info: {
 			version: "1.0.0",
@@ -34,4 +36,23 @@ export function generateOpenAPIDocument(): OpenAPIDocument {
 			url: "/swagger.json",
 		},
 	});
+
+	document.components = {
+		securitySchemes: {
+			bearerAuth: {
+				type: "http",
+				scheme: "bearer",
+				bearerFormat: "JWT",
+			},
+		},
+	};
+
+	document.security = [
+		{
+			bearerAuth: [],
+		},
+	];
+
+	return document;
 }
+
