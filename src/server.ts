@@ -8,6 +8,7 @@ import { healthCheckRouter } from "@/api/healthCheck/healthCheckRouter";
 import { userRouter } from "@/api/user/userRouter";
 import { routesRouter } from "./api/routes/routesRouter";
 import { bannerRouter } from "./api/banners/bannerRouter";
+import { busReviewRouter } from "./api/bus_reviews/busReviewRouter";
 import { carRouter } from "@/api/car/carRouter";
 import { seatRoter } from "./api/seat/seatRouter";
 import { ticketRouter } from "@/api/ticket/ticketRouter";
@@ -37,6 +38,7 @@ app.use("/health-check", healthCheckRouter);
 app.use("/users", userRouter);
 app.use("/routes", routesRouter);
 app.use("/banners", bannerRouter);
+app.use("/bus-reviews", busReviewRouter)
 app.use("/cars", carRouter);
 app.use("/seats", seatRoter);
 app.use("/tickets", ticketRouter);

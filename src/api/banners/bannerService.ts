@@ -24,11 +24,11 @@ export class BannerService {
     this.bannerRepository = new BannerRepository();
   }
 
-  // Lấy danh sách các tuyến đường với phân trang, tìm kiếm, sắp xếp
+  // Lấy danh sách các banner với phân trang, tìm kiếm, sắp xếp
   async getAllBanner(options: GetRoutesOptions): Promise<Banner[]> {
     return await this.bannerRepository.findAllAsync(options);
   }
-  //Tao 1 tuyen duong moi
+  //Tao 1 banner moi
   async createBanner(data: Omit<Banner, "id">): Promise<ServiceResponse<Banner| null>> {
     try {
         const newBanner = await this.bannerRepository.createBannerAsync(data);
@@ -40,14 +40,14 @@ export class BannerService {
     }
 }
 
-//xoa tuyen duong 
+//xoa banner theo id 
 async deleteBanner(id: number): Promise<ServiceResponse<Banner | null>> {
     try {
-        // Gọi phương thức xóa tuyến đường trong repository
+        // Gọi phương thức xóa banner trong repository
         const deletedBanner = await this.bannerRepository.deleteBannerAsync(id);
 
         if (!deletedBanner) {
-            // Nếu không tìm thấy tuyến đường cần xóa
+            // Nếu không tìm thấy banner cần xóa
             return ServiceResponse.failure("Banner not found.", null, StatusCodes.NOT_FOUND);
         }
 
