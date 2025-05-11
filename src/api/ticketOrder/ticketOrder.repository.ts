@@ -19,7 +19,7 @@ export class TicketOrderRepository {
     if (!sortBy.includes(".")) {
     sortBy = `tickets.id`;
     sortBy = `tickets.status`;
-    sortBy = `users.first_name`;
+    // sortBy = `users.first_name`;
     sortBy = `users.email`;
     sortBy = `schedules.departure_time`;
     sortBy = `routes.price`;
@@ -32,7 +32,7 @@ export class TicketOrderRepository {
       .select(
         "tickets.id as ticketId",
         "tickets.status",
-        "users.first_name as first_name",
+        // "users.first_name as first_name",
         "users.email as userEmail",
         "schedules.departure_time",
         "routes.price as price",
@@ -50,8 +50,10 @@ export class TicketOrderRepository {
       
     if (search) {
       query.where(function() {
-        this.where("users.first_name", "like", `%${search}%`)
-          .orWhere("users.email", "like", `%${search}%`);
+        this
+          // .where("users.first_name", "like", `%${search}%`)
+          // .orWhere("users.email", "like", `%${search}%`);
+          .where("users.email", "like", `%${search}%`);
       });
     }
     query.orderBy(sortBy, order)
@@ -68,7 +70,7 @@ export class TicketOrderRepository {
       .select(
         "tickets.id as ticketId",
         "tickets.status",
-        "users.first_name as first_name",
+        // "users.first_name as first_name",
         "users.email as userEmail",
         "schedules.departure_time",
         "routes.price as price",
@@ -94,7 +96,7 @@ export class TicketOrderRepository {
     .select(
       "tickets.id as ticketId",
       "tickets.status",
-      "users.first_name as first_name",
+      // "users.first_name as first_name",
       "users.email as userEmail",
       "schedules.departure_time",
       "routes.price as price",
