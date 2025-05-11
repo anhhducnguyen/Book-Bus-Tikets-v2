@@ -7,11 +7,17 @@ import { validateRequest } from "@/common/utils/httpHandlers"; // Nếu bạn mu
 import { bannerController } from "@/api/banners/bannerController"; // Controller để xử lý logic route
 import { BannerSchema, CreateBannerSchema } from "./bannerModel"; // Schema Zod cho routes
 
+import { ROLES } from "@/common/constants/role";
+import { authenticate, authorize } from "@/common/middleware/auth/authMiddleware";
+
 // Khởi tạo OpenAPI registry
 export const bannerRegistry = new OpenAPIRegistry();
 
 // Khởi tạo router
 export const bannerRouter: Router = express.Router();
+
+bannerRouter.use(authenticate);
+const permission = authorize([ROLES.ADMIN]);
 
 // Đăng ký schema OpenAPI cho Routes
 bannerRegistry.register("Routes", BannerSchema);
@@ -77,7 +83,11 @@ bannerRegistry.registerPath({
 });
 
 // Đăng ký handler cho GET /banner
-bannerRouter.get("/", bannerController.getAllBanner);
+bannerRouter.get(
+  "/",
+  permission, 
+  bannerController.getAllBanner
+);
 //them moi banner
 
 bannerRegistry.registerPath({
@@ -127,7 +137,7 @@ bannerRegistry.registerPath({
     },
   });
 
- bannerRouter.post("/", validateRequest(CreateBannerSchema), bannerController.createBanner);
+ bannerRouter.post("/", permission, validateRequest(CreateBannerSchema), bannerController.createBanner);
  bannerRegistry.registerPath({
   method: "delete",
   path: "/banners/{id}",
@@ -161,4 +171,4 @@ bannerRegistry.registerPath({
   },
 });
 //xoa 1 banner
- bannerRouter.delete("/:id", bannerController.deleteBanner);
+ bannerRouter.delete("/:id", permission, bannerController.deleteBanner);

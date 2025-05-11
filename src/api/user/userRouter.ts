@@ -13,6 +13,9 @@ import { authenticate, authorize } from "@/common/middleware/auth/authMiddleware
 export const userRegistry = new OpenAPIRegistry();
 export const userRouter: Router = express.Router();
 
+userRouter.use(authenticate);
+const permission = authorize([ROLES.ADMIN]);
+
 userRegistry.register("User", UserSchema);
 
 userRegistry.registerPath({
@@ -23,8 +26,7 @@ userRegistry.registerPath({
 });
 
 userRouter.get("/",
-	authenticate,
-	authorize([ROLES.ADMIN]),
+	permission,
 	userController.getUsers
 );
 
@@ -37,8 +39,7 @@ userRegistry.registerPath({
 });
 
 userRouter.get("/:id",
-	authenticate,
-	authorize([ROLES.ADMIN]),
+	permission,
 	validateRequest(GetUserSchema),
 	userController.getUser
 );
@@ -62,8 +63,7 @@ userRegistry.registerPath({
 });
 
 userRouter.post("/",
-	authenticate,
-	authorize([ROLES.ADMIN]),
+	permission,
 	validateRequest(CreateUserSchema),
 	userController.createUser
 );
