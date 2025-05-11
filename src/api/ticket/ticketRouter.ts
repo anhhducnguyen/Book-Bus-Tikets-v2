@@ -71,7 +71,7 @@ ticketRouter.delete("/tickets/:ticketId", validateRequest(CancelTicketSchema), t
 // Lịch sử đặt vé theo trạng thái
 ticketRegistry.registerPath({
   method: "get",
-  path: "/tickets/history/:status",
+  path: "/history/:status",
   tags: ["Ticket"],
   request: {
     params: z.object({
@@ -80,4 +80,4 @@ ticketRegistry.registerPath({
   },
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
-ticketRouter.get("/tickets/history/:status", ticketController.getTicketsByStatus);
+ticketRouter.get("/history/:status", ticketController.getTicketsByStatus);
