@@ -7,6 +7,9 @@ import { GetUserSchema, UserSchema, CreateUserSchema } from "@/api/user/userMode
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { userController } from "./userController";
 
+import { ROLES } from "@/common/constants/role";
+import { authenticate, authorize } from "@/common/middleware/auth/authMiddleware";
+
 export const userRegistry = new OpenAPIRegistry();
 export const userRouter: Router = express.Router();
 
@@ -19,7 +22,11 @@ userRegistry.registerPath({
 	responses: createApiResponse(z.array(UserSchema), "Success"),
 });
 
-userRouter.get("/", userController.getUsers);
+userRouter.get("/",
+	authenticate,
+	authorize([ROLES.ADMIN]),
+	userController.getUsers
+);
 
 userRegistry.registerPath({
 	method: "get",
@@ -29,7 +36,12 @@ userRegistry.registerPath({
 	responses: createApiResponse(UserSchema, "Success"),
 });
 
-userRouter.get("/:id", validateRequest(GetUserSchema), userController.getUser);
+userRouter.get("/:id",
+	authenticate,
+	authorize([ROLES.ADMIN]),
+	validateRequest(GetUserSchema),
+	userController.getUser
+);
 
 userRegistry.registerPath({
 	method: "post",
@@ -38,15 +50,20 @@ userRegistry.registerPath({
 	operationId: "createUser",
 	summary: "Create a new user",
 	request: {
-	  body: {
-		content: {
-		  "application/json": {
-			schema: CreateUserSchema.shape.body, // chỉ định schema body
-		  },
+		body: {
+			content: {
+				"application/json": {
+					schema: CreateUserSchema.shape.body,
+				},
+			},
 		},
-	  },
 	},
 	responses: createApiResponse(UserSchema, "User created successfully", 201),
-  });
-  
-userRouter.post("/", validateRequest(CreateUserSchema), userController.createUser);
+});
+
+userRouter.post("/",
+	authenticate,
+	authorize([ROLES.ADMIN]),
+	validateRequest(CreateUserSchema),
+	userController.createUser
+);

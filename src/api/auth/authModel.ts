@@ -17,12 +17,23 @@ export const AuthSchema = z.object({
         .optional(),
     role: z.enum(["user", "admin"]).default("user"),
     google_id: z.string().nullable().optional(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    created_at: z.date(),
+    updated_at: z.date(),
 });
 
 // Input Validation for 'GET users/:id' endpoint
 export const GetUserSchema = z.object({
     params: z.object({ id: commonValidations.id }),
 });
+
+export const SignUpSchema = z.object({
+    body: AuthSchema.omit({ id: true, created_at: true, updated_at: true }).pick({
+      email: true,
+      password: true,
+    }),
+  });
+  
+
+  
+
 

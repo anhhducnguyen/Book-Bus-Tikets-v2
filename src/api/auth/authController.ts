@@ -1,18 +1,39 @@
 import type { Request, RequestHandler, Response } from "express";
-
 import { authService } from "@/api/auth/authService";
 
 class AuthController {
-    public getUser: RequestHandler = async (req: Request, res: Response) => {
-        const id = Number.parseInt(req.params.id as string, 10);
-        const serviceResponse = await authService.findById(id);
-        res.status(serviceResponse.statusCode).send(serviceResponse);
-    };
+  public register: RequestHandler = async (req, res) => {
+    const serviceResponse = await authService.register(req.body);
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
 
-    public register: RequestHandler = async (req, res) => {
-        const serviceResponse = await authService.register(req.body);
-        res.status(serviceResponse.statusCode).send(serviceResponse);
-    };
+  public resetPassword: RequestHandler = async (req: Request, res: Response) => {
+    const response = await authService.resetPassword(req.body.email);
+    res.status(response.statusCode).send(response);
+  };
+
+  public confirmResetPassword: RequestHandler = async (req: Request, res: Response) => {
+    const { token, newPassword } = req.body;
+    const response = await authService.confirmResetPassword(token, newPassword);
+    res.status(response.statusCode).send(response);
+  };
+
+  public logout: RequestHandler = async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader?.startsWith("Bearer ")) {
+        res.status(401).json({ message: "Không có token" });
+        return;
+      }
+
+      const token = authHeader.split(" ")[1];
+      await authService.logout(token);
+
+      res.status(200).json({ message: "Đăng xuất thành công" });
+    } catch (error) {
+      res.status(400).json({ message: (error as Error).message });
+    }
+  };
 }
 
 export const authController = new AuthController();

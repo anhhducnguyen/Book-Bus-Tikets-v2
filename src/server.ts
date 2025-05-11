@@ -12,11 +12,29 @@ import rateLimiter from "@/common/middleware/rateLimiter";
 import requestLogger from "@/common/middleware/requestLogger";
 import { env } from "@/common/utils/envConfig";
 
+import '@/common/config/passport';
+import session from 'express-session';
+import passport from 'passport';
+import sessionMiddleware from '@/common/middleware/sessionMiddleware';
+
 const logger = pino({ name: "server start" });
 const app: Express = express();
 
 // Set the application to trust the reverse proxy
 app.set("trust proxy", true);
+
+// auth passport
+app.use(sessionMiddleware);
+app.use(passport.initialize());
+app.use(passport.session());
+// app.use(session({
+//     secret: 'your_secret',
+//     resave: false,
+//     saveUninitialized: false
+// }));
+
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 // Middlewares
 app.use(express.json());
