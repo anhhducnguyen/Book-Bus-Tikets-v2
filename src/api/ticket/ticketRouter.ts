@@ -43,7 +43,7 @@ ticketRouter.get("/buses/:busId/seats", ticketController.getAvailableSeats);
 // Đặt vé
 ticketRegistry.registerPath({
   method: "post",
-  path: "/tickets",
+  path: "/booking",
   tags: ["Ticket"],
   request: {
     body: {
@@ -56,22 +56,22 @@ ticketRegistry.registerPath({
   },
   responses: createApiResponse(TicketSchema, "Success"),
 });
-ticketRouter.post("/tickets", ticketController.bookTicket);
+ticketRouter.post("/booking", ticketController.bookTicket);
 
 // Hủy vé
 ticketRegistry.registerPath({
   method: "delete",
-  path: "/tickets/:ticketId",
+  path: "/cancle/:ticketId",
   tags: ["Ticket"],
   request: { params: CancelTicketSchema.shape.params },
   responses: createApiResponse(z.void(), "Success"),
 });
-ticketRouter.delete("/tickets/:ticketId", validateRequest(CancelTicketSchema), ticketController.cancelTicket);
+ticketRouter.delete("/cancle/:ticketId", validateRequest(CancelTicketSchema), ticketController.cancelTicket);
 
 // Lịch sử đặt vé theo trạng thái
 ticketRegistry.registerPath({
   method: "get",
-  path: "/history/:status",
+  path: "/history_status/:status",
   tags: ["Ticket"],
   request: {
     params: z.object({
@@ -80,11 +80,12 @@ ticketRegistry.registerPath({
   },
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
+ticketRouter.get("/history_status/:status", ticketController.getTicketsByStatus);
 
 // Thêm route mới: Lịch sử đặt vé theo nhà xe
 ticketRegistry.registerPath({
   method: "get",
-  path: "/tickets/history/:companyId",
+  path: "/history_companyid/:companyId",
   tags: ["Ticket"],
   request: {
     params: z.object({
@@ -93,15 +94,13 @@ ticketRegistry.registerPath({
   },
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
-ticketRouter.get("/history/:status", ticketController.getTicketsByStatus);
-
-ticketRouter.get("/tickets/history/:companyId", ticketController.getTicketsByCompany);
+ticketRouter.get("/history_companyid/:companyId", ticketController.getTicketsByCompany);
 
 // Xem tất cả lịch sử đặt vé
 ticketRegistry.registerPath({
   method: "get",
-  path: "/tickets/history",
+  path: "/history",
   tags: ["Ticket"],
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
-ticketRouter.get("/tickets/history", ticketController.getTicketHistory);
+ticketRouter.get("/history", ticketController.getTicketHistory);

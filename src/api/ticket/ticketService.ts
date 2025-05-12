@@ -138,6 +138,7 @@ export class TicketService {
   async getTicketsByStatus(status: "BOOKED" | "CANCELLED"): Promise<ServiceResponse<Ticket[] | null>> {
     try {
       const tickets = await this.ticketRepository.getTicketsByStatus(status);
+      // console.log(tickets);
       if (!Array.isArray(tickets)) {
         logger.warn("Invalid data format returned from repository");
         return ServiceResponse.success<Ticket[]>("No tickets found for this status", []);
@@ -150,6 +151,7 @@ export class TicketService {
       return ServiceResponse.failure("Error fetching tickets for status", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
+  
     // Hiển thị lịch sử đặt vé theo nhà xe
   async getTicketsByCompany(companyId: number): Promise<ServiceResponse<Ticket[] | null>> {
     try {
@@ -166,6 +168,7 @@ export class TicketService {
       return ServiceResponse.failure("Error fetching tickets for company", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
+
   // Xem lại tất cả lịch sử đặt vé
   async getTicketHistory(): Promise<ServiceResponse<Ticket[] | null>> {
     try {

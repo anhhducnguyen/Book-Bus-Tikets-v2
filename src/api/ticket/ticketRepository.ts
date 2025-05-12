@@ -93,9 +93,11 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
 
   // Hiển thị lịch sử đặt vé theo trạng thái
   async getTicketsByStatus(status: "BOOKED" | "CANCELLED"): Promise<Ticket[]> {
-    return await db("tickets")
+    const data = await db("tickets")
       .where("status", status)
       .select("*");
+    // console.log(data);
+    return data;
   }
 
   // Hiển thị lịch sử đặt vé theo nhà xe (companyId)
