@@ -14,6 +14,7 @@ import { authRouter } from "@/api/auth/authRouter";
 import { routesRouter } from "./api/routes/routesRouter";
 import { bannerRouter } from "./api/banners/bannerRouter";
 import { busReviewRouter } from "./api/bus_reviews/busReviewRouter";
+import { stationRouter } from "./api/stations/stationRouter";
 import { carRouter } from "@/api/car/carRouter";
 import { seatRoter } from "./api/seat/seatRouter";
 import { ticketRouter } from "@/api/ticket/ticketRouter";
@@ -68,6 +69,7 @@ app.use("/auth", authRouter);
 app.use("/routes", routesRouter);
 app.use("/banners", bannerRouter);
 app.use("/bus-reviews", busReviewRouter)
+app.use("/stations", stationRouter);
 app.use("/cars", carRouter);
 app.use("/seats", seatRoter);
 app.use("/tickets", ticketRouter);

@@ -11,6 +11,7 @@ import { carRegistry } from "@/api/car/carRouter";
 import { seatRegistry } from "@/api/seat/seatRouter";
 import { routesRegistry } from "@/api/routes/routesRouter";
 import { bannerRegistry } from "@/api/banners/bannerRouter";
+import { stationRegistry } from "@/api/stations/stationRouter";
 import { busReviewRegistry } from "@/api/bus_reviews/busReviewRouter";
 import { ticketRegistry } from "@/api/ticket/ticketRouter";
 import { paymentProviderRegistry } from "@/api/paymentProvider/paymentProvider.routes";
