@@ -3,33 +3,36 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { GetRouteSchema, RouteSchema } from "@/api/route/route.model";
+import { GetRouteByIdSchema, RouteListItemSchema, RouteDetailSchema } from "@/api/route/route.model";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { routeController } from "./route.controller";
 
 export const routeRegistry = new OpenAPIRegistry();
 export const routeRouter: Router = express.Router();
 
-// Đăng ký schema cho Route
-routeRegistry.register("Route", RouteSchema);
+// Đăng ký các schema
+routeRegistry.register("RouteListItem", RouteListItemSchema);
+routeRegistry.register("RouteDetail", RouteDetailSchema);
 
-// Đăng ký API endpoint: Lấy tất cả tuyến đường
+// Đăng ký endpoint lấy danh sách tuyến đường
+// http://localhost:3000/routes
 routeRegistry.registerPath({
   method: "get",
   path: "/routes",
   tags: ["Route"],
-  responses: createApiResponse(z.array(RouteSchema), "Success"),
+  responses: createApiResponse(z.array(RouteListItemSchema), "Success"),
 });
 
 routeRouter.get("/", routeController.getRoutes);
 
-// Đăng ký API endpoint: Lấy chi tiết tuyến đường theo ID
+// Đăng ký endpoint lấy chi tiết tuyến đường theo ID
+// http://localhost:3000/routes/:id
 routeRegistry.registerPath({
   method: "get",
   path: "/routes/{id}",
   tags: ["Route"],
-  request: { params: GetRouteSchema.shape.params },
-  responses: createApiResponse(RouteSchema, "Success"),
+  request: { params: GetRouteByIdSchema.shape.params },
+  responses: createApiResponse(RouteDetailSchema, "Success"),
 });
 
-routeRouter.get("/:id", validateRequest(GetRouteSchema), routeController.getRoute);
+routeRouter.get("/:id", validateRequest(GetRouteByIdSchema), routeController.getRoute);

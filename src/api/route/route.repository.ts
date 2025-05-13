@@ -1,72 +1,56 @@
-import type { Route } from "@/api/route/route.model";
+import type { RouteDetail, RouteListItem } from "./route.model";
 import { db } from "@/common/config/database";
 
-// Dữ liệu mẫu tuyến đường (sample routes)
-export const sampleRoutes: Route[] = [
-  {
-    id: 1,
-    departure_station_id: 1,
-    arrival_station_id: 2,
-    price: 150000,
-    duration: 180, // 3 hours
-    distance: 120, // 120 km
-    created_at: new Date(),
-    updated_at: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days later
-  },
-  {
-    id: 2,
-    departure_station_id: 2,
-    arrival_station_id: 3,
-    price: 200000,
-    duration: 240, // 4 hours
-    distance: 180, // 180 km
-    created_at: new Date(),
-    updated_at: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days later
-  },
-  {
-    id: 3,
-    departure_station_id: 1,
-    arrival_station_id: 3,
-    price: 250000,
-    duration: 300, // 5 hours
-    distance: 240, // 240 km
-    created_at: new Date(),
-    updated_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days later
-  },
-];
-
-// Định nghĩa kiểu trả về cho count
-interface CountResult {
-  count: string;
-}
-
-// Class RouteRepository để tương tác với cơ sở dữ liệu
 export class RouteRepository {
-  // Lấy tất cả tuyến đường
-  async findAllAsync(): Promise<Route[]> {
-    const rows = await db<Route>("routes").select("*");
-    return rows as Route[];
-    // return sampleRoutes;
+  async findAllAsync(): Promise<RouteListItem[]> {
+    const rows = await db("routes as r")
+      .join("stations as s1", "r.departure_station_id", "s1.id")
+      .join("stations as s2", "r.arrival_station_id", "s2.id")
+      .select({
+        route_id: "r.id",
+      })
+      .select(
+        db.raw(
+          `CONCAT(
+            'Đặt vé xe tuyến ', 
+            s1.name, ' - ', s2.name, 
+            ', Giá: ', FORMAT(r.price, 0), 'đ', 
+            ', Thời gian: ', r.duration, ' tiếng'
+          ) AS route_label`
+        )
+      );
+
+    return rows as RouteListItem[];
   }
 
-  // Tìm một tuyến đường theo ID
-  async findByIdAsync(id: number): Promise<Route | null> {
-    const route = await db<Route>("routes").where({ id }).first();
-    return route ?? null;
-  }
+  async findByIdAsync(id: number): Promise<RouteDetail | null> {
+    const row = await db("routes as r")
+      .join("stations as s1", "r.departure_station_id", "s1.id")
+      .join("stations as s2", "r.arrival_station_id", "s2.id")
+      .leftJoin("schedules as sc", "r.id", "sc.route_id")
+      .leftJoin("buses as b", "sc.bus_id", "b.id")
+      .leftJoin("bus_companies as bc", "b.company_id", "bc.id")
+      .leftJoin("cancellation_policies as cp", "r.id", "cp.route_id")
+      .select({
+        route_id: "r.id",
+        departure_station: "s1.name",
+        arrival_station: "s2.name",
+        price: "r.price",
+        duration: "r.duration",
+        distance: "r.distance",
+        schedule_id: "sc.id",
+        departure_time: "sc.departure_time",
+        arrival_time: "sc.arrival_time",
+        bus_name: "b.name",
+        license_plate: "b.license_plate",
+        company_name: "bc.company_name",
+        cancellation_policy: "cp.descriptions",
+        cancellation_time_limit: "cp.cancellation_time_limit",
+        refund_percentage: "cp.refund_percentage",
+      })
+      .where("r.id", id)
+      .first();
 
-  // Thêm dữ liệu mẫu vào bảng routes (dùng cho mục đích testing)
-  async insertSampleRoutes(): Promise<void> {
-    // Kiểm tra xem bảng routes đã có dữ liệu chưa
-    const routesCount = await db<Route>("routes").count("* as count").first<CountResult>();
-
-    // Kiểm tra kiểu trả về đúng và truy xuất count
-    if (routesCount && routesCount.count === "0") {
-      // Chỉ insert dữ liệu mẫu nếu bảng routes rỗng
-      await db<Route>("routes").insert(sampleRoutes);
-      console.log("Sample routes inserted into the database.");
-    } else {
-      console.log("Routes data already exists.");
-    }
+    return row ?? null;
   }
 }
