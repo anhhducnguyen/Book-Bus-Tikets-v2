@@ -3,44 +3,80 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { PaymentProviderSchema, GetPaymentProviderSchema } from "@/api/paymentProvider/paymentProvider.model";
+import { PaymentProviderSchema, CreatePaymentProviderSchema, GetPaymentProviderSchema } from "@/api/paymentProvider/paymentProvider.model";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { paymentProviderController } from "./paymentProvider.controller";
 
-import { ROLES } from "@/common/constants/role";
-import { authenticate, authorize } from "@/common/middleware/auth/authMiddleware";
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
+import { permission } from "@/common/middleware/auth/permission";
 
 export const paymentProviderRegistry = new OpenAPIRegistry();
 export const paymentProviderRouter: Router = express.Router();
 
-paymentProviderRegistry.register("PaymentProvider", PaymentProviderSchema);
+// Áp dụng middleware xác thực cho tất cả các route
+paymentProviderRouter.use(authenticate);
 
-// Endpoint: Get all payment providers
+// Đăng ký các đường dẫn cho tài liệu OpenAPI
+
+// Lấy danh sách tất cả các nhà cung cấp thanh toán
 paymentProviderRegistry.registerPath({
     method: "get",
     path: "/payment-providers",
     tags: ["PaymentProvider"],
-    responses: createApiResponse(z.array(PaymentProviderSchema), "Success"),
+    responses: createApiResponse(z.array(PaymentProviderSchema), "Lấy danh sách nhà cung cấp thanh toán thành công"),
 });
 
+// // Lấy thông tin chi tiết của một nhà cung cấp thanh toán theo ID
+// paymentProviderRegistry.registerPath({
+//     method: "get",
+//     path: "/payment-providers/{id}",
+//     tags: ["PaymentProvider"],
+//     request: { params: GetPaymentProviderSchema.shape.params },
+//     responses: createApiResponse(PaymentProviderSchema, "Tìm thấy nhà cung cấp thanh toán"),
+// });
+
+// Tạo mới một nhà cung cấp thanh toán
+paymentProviderRegistry.registerPath({
+    method: "post",
+    path: "/payment-providers",
+    tags: ["PaymentProvider"],
+    operationId: "createPaymentProvider",
+    summary: "Tạo mới một nhà cung cấp thanh toán",
+    request: {
+        body: {
+            content: {
+                "application/json": {
+                    schema: CreatePaymentProviderSchema.shape.body,
+                    example: {  // Thêm ví dụ minh họa cho request
+                        provider_name: "Payment Provider Example",
+                        provider_type: "E_WALLET",
+                        api_endpoint: "https://example.com/api/payment"
+                    }
+                },
+            },
+        },
+    },
+    responses: createApiResponse(PaymentProviderSchema, "Tạo nhà cung cấp thanh toán thành công", 201),
+});
+
+// Các route xử lý
+
+// Lấy danh sách tất cả nhà cung cấp thanh toán
 paymentProviderRouter.get("/",
-    authenticate,
-    authorize([ROLES.ADMIN, ROLES.USER]),
+    permission,
     paymentProviderController.getPaymentProviders
 );
 
-// Endpoint: Get a specific payment provider by ID
-// paymentProviderRegistry.registerPath({
-//     method: "get",
-//     path: "/payment-providers/{providerId}",
-//     tags: ["PaymentProvider"],
-//     request: { params: GetPaymentProviderSchema.shape.params },
-//     responses: createApiResponse(PaymentProviderSchema, "Success"),
-// });
-
-// paymentProviderRouter.get("/:providerId",
-//     authenticate,
-//     authorize([ROLES.ADMIN, ROLES.USER]),
+// // Lấy thông tin nhà cung cấp thanh toán theo ID
+// paymentProviderRouter.get("/:id",
+//     permission,
 //     validateRequest(GetPaymentProviderSchema),
-//     paymentProviderController.getPaymentProviderById
+//     paymentProviderController.getPaymentProvider
 // );
+
+// Tạo mới nhà cung cấp thanh toán
+paymentProviderRouter.post("/",
+    permission,
+    validateRequest(CreatePaymentProviderSchema),
+    paymentProviderController.createPaymentProvider
+);

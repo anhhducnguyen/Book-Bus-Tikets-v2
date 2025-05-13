@@ -2,33 +2,28 @@ import type { PaymentProvider } from "@/api/paymentProvider/paymentProvider.mode
 import { db } from "@/common/config/database";
 
 export class PaymentProviderRepository {
-    // Lấy danh sách nhà cung cấp thanh toán có phân trang, sắp xếp và lọc
-    async findAllAsync(
-        filter: { provider_type?: string },
-        options: { sortBy?: string; limit?: number; page?: number }
-    ) {
+    // Lấy danh sách tất cả các nhà cung cấp thanh toán, có thể lọc, phân trang và sắp xếp
+    async findAllAsync(filter: any, options: { sortBy?: string; limit?: number; page?: number }) {
         const { sortBy = "id:asc", limit = 10, page = 1 } = options;
         const [sortField, sortOrder] = sortBy.split(":");
 
         const query = db<PaymentProvider>("payment_providers");
 
-        // Lọc theo loại nhà cung cấp (CARD, E_WALLET, ...)
-        if (filter.provider_type) {
-            query.where("provider_type", filter.provider_type);
+        // Lọc theo tên nhà cung cấp (nếu có)
+        if (filter.provider_name) {
+            query.where("provider_name", "like", `%${filter.provider_name}%`);
         }
 
         const offset = (page - 1) * limit;
 
-        const data = await query
-            .orderBy(sortField, sortOrder as "asc" | "desc")
-            .limit(limit)
-            .offset(offset);
+        // Truy vấn dữ liệu với sắp xếp, phân trang
+        const data = await query.orderBy(sortField, sortOrder).limit(limit).offset(offset);
 
-        // Lấy tổng số bản ghi
+        // Truy vấn tổng số bản ghi để tính tổng trang
         const countResult = await db<PaymentProvider>("payment_providers")
             .modify((qb) => {
-                if (filter.provider_type) {
-                    qb.where("provider_type", filter.provider_type);
+                if (filter.provider_name) {
+                    qb.where("provider_name", "like", `%${filter.provider_name}%`);
                 }
             })
             .count("id as count");
@@ -44,12 +39,29 @@ export class PaymentProviderRepository {
         };
     }
 
-    // Lấy nhà cung cấp thanh toán theo ID
+    // Lấy thông tin chi tiết của một nhà cung cấp theo ID
     async findByIdAsync(id: number): Promise<PaymentProvider | null> {
-        const provider = await db<PaymentProvider>("payment_providers")
+        const provider = await db<PaymentProvider>('payment_providers')
             .where({ id })
             .first();
 
-        return provider ?? null;
+        return provider ?? null; // Trả về null nếu không tìm thấy
+    }
+
+    // Tạo mới một nhà cung cấp thanh toán
+    async createPaymentProviderAsync(data: Omit<PaymentProvider, "id" | "created_at" | "updated_at">): Promise<PaymentProvider> {
+        const currentTime = new Date();
+
+        // Chèn dữ liệu mới và lấy ID được tạo
+        const [id] = await db('payment_providers').insert({
+            ...data,
+            created_at: currentTime,
+            updated_at: currentTime,
+        });
+
+        // Truy vấn lại nhà cung cấp vừa tạo để trả về đầy đủ thông tin
+        const [newProvider] = await db('payment_providers').where({ id }).select('*');
+
+        return newProvider;
     }
 }
