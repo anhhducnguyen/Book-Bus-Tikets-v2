@@ -104,7 +104,7 @@ busReviewRegistry.registerPath({
   responses: createApiResponse(z.array(BusReviewSchema), "Thành công"),
 });
 // Đăng ký handler cho GET /routes
-busReviewRouter.get("/", busReviewController.getAllBusReview);
+busReviewRouter.get("/", permission, busReviewController.getAllBusReview);
 //them moi review
 busReviewRegistry.registerPath({
     method: "post",
