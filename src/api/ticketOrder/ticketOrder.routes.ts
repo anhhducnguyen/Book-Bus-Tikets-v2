@@ -7,8 +7,13 @@ import { TicketOrderSchema, GetAllTicketOrdersSchema, GetTicketOrdersByCompanySc
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { ticketOrderController } from "./ticketOrder.controller";
 
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
+import { permission } from "@/common/middleware/auth/permission";
+
 export const ticketOrderRegistry = new OpenAPIRegistry();
 export const ticketOrderRouter: Router = express.Router();
+
+ticketOrderRouter.use(authenticate);
 
 // Đăng ký schema của TicketOrder cho OpenAPI
 ticketOrderRegistry.register("TicketOrder", TicketOrderSchema);
@@ -18,24 +23,24 @@ ticketOrderRegistry.register("TicketOrder", TicketOrderSchema);
 ticketOrderRegistry.registerPath({
   method: "get",
   path: "/ticket-orders",
-  tags: ["TicketOrder"],
+  tags: ["Ticket order"],
   request: { query: GetAllTicketOrdersSchema.shape.query },
   responses: createApiResponse(z.array(TicketOrderSchema), "Success"),
 });
 
-ticketOrderRouter.get("/", validateRequest(GetAllTicketOrdersSchema), ticketOrderController.getTicketOrders);
+ticketOrderRouter.get("/", permission, validateRequest(GetAllTicketOrdersSchema), ticketOrderController.getTicketOrders);
 
 // 2. Lấy đơn đặt vé theo nhà xe
 // GET /ticket-orders/company/1
 ticketOrderRegistry.registerPath({
   method: "get",
   path: "/ticket-orders/company/{companyId}",
-  tags: ["TicketOrder"],
+  tags: ["Ticket order"],
   request: { params: GetTicketOrdersByCompanySchema.shape.params },
   responses: createApiResponse(z.array(TicketOrderSchema), "Success"),
 });
 
-ticketOrderRouter.get("/company/:companyId", validateRequest(GetTicketOrdersByCompanySchema), ticketOrderController.getTicketOrdersByCompany);
+ticketOrderRouter.get("/company/:companyId", permission, validateRequest(GetTicketOrdersByCompanySchema), ticketOrderController.getTicketOrdersByCompany);
 
 // 3. Lấy đơn đặt vé theo trạng thái
 // http://localhost:3000/ticket-orders/status/BOOKED
@@ -43,9 +48,9 @@ ticketOrderRouter.get("/company/:companyId", validateRequest(GetTicketOrdersByCo
 ticketOrderRegistry.registerPath({
   method: "get",
   path: "/ticket-orders/status/{status}",
-  tags: ["TicketOrder"],
+  tags: ["Ticket order"],
   request: { params: GetTicketOrdersByStatusSchema.shape.params },
   responses: createApiResponse(z.array(TicketOrderSchema), "Success"),
 });
 
-ticketOrderRouter.get("/status/:status", validateRequest(GetTicketOrdersByStatusSchema), ticketOrderController.getTicketOrdersByStatus);
+ticketOrderRouter.get("/status/:status", permission, validateRequest(GetTicketOrdersByStatusSchema), ticketOrderController.getTicketOrdersByStatus);

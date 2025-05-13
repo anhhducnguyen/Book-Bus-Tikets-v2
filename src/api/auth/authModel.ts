@@ -27,13 +27,44 @@ export const GetUserSchema = z.object({
 });
 
 export const SignUpSchema = z.object({
-    body: AuthSchema.omit({ id: true, created_at: true, updated_at: true }).pick({
-      email: true,
-      password: true,
-    }),
-  });
-  
+    body: z
+        .object({
+            email: z.string().email().openapi({ example: "anhnguyen2k373@gmail.com" }),
+            password: z.string().min(6).openapi({ example: "Ducanh12@#" }),
+        })
+        .openapi({
+            example: {
+                email: "anhnguyen2k373@gmail.com",
+                password: "Ducanh12@#",
+            },
+        }),
+});
 
-  
+
+export const ResetPasswordSchema = z.object({
+    body: z.object({
+        email: z.string().email(),
+    })
+    .openapi({
+        example: {
+            email: "anhnguyen2k373@gmail.com",
+        },
+    }),
+});
+
+export const ConfirmResetPasswordSchema = z.object({
+    body: z.object({
+        token: z.string().min(10, "Token không hợp lệ"),
+        newPassword: z.string().min(6, "Mật khẩu phải từ 6 ký tự trở lên"),
+    })
+    .openapi({
+      example: {
+        token: "abc123resetTokenXYZ",
+        newPassword: "NewPass12@#",
+      },
+    }),
+});
+
+
 
 

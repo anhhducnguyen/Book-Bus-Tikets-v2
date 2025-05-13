@@ -7,11 +7,16 @@ import { validateRequest } from "@/common/utils/httpHandlers"; // Nếu bạn mu
 import { bannerController } from "@/api/banners/bannerController"; // Controller để xử lý logic route
 import { BannerSchema, CreateBannerSchema } from "./bannerModel"; // Schema Zod cho routes
 
+import { permission } from "@/common/middleware/auth/permission";
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
+
 // Khởi tạo OpenAPI registry
 export const bannerRegistry = new OpenAPIRegistry();
 
 // Khởi tạo router
 export const bannerRouter: Router = express.Router();
+
+bannerRouter.use(authenticate);
 
 // Đăng ký schema OpenAPI cho Routes
 bannerRegistry.register("Routes", BannerSchema);
@@ -22,7 +27,7 @@ bannerRegistry.registerPath({
   path: "/banners",
   operationId: "getAllBanners",
   summary: "Lấy danh sách banner có hỗ trợ phân trang, tìm kiếm và lọc",
-  tags: ["banners"],
+  tags: ["Banners"],
   parameters: [
     {
       name: "page",
@@ -77,13 +82,17 @@ bannerRegistry.registerPath({
 });
 
 // Đăng ký handler cho GET /banner
-bannerRouter.get("/", bannerController.getAllBanner);
+bannerRouter.get(
+  "/",
+  permission, 
+  bannerController.getAllBanner
+);
 //them moi banner
 
 bannerRegistry.registerPath({
     method: "post",
     path: "/banners",
-    tags: ["banners"],
+    tags: ["Banners"],
     operationId: "createBanner",  // Thay 'operation' bằng 'operationId'
     summary: "Create a new Banner",  // Thêm phần mô tả ngắn gọn về API
     requestBody: {
@@ -127,13 +136,13 @@ bannerRegistry.registerPath({
     },
   });
 
- bannerRouter.post("/", validateRequest(CreateBannerSchema), bannerController.createBanner);
+ bannerRouter.post("/", permission, validateRequest(CreateBannerSchema), bannerController.createBanner);
  bannerRegistry.registerPath({
   method: "delete",
   path: "/banners/{id}",
   operationId: "deleteBanner",
   summary: "Xóa banner theo ID",
-  tags: ["banners"],
+  tags: ["Banners"],
   parameters: [
     {
       name: "id",
@@ -161,4 +170,4 @@ bannerRegistry.registerPath({
   },
 });
 //xoa 1 banner
- bannerRouter.delete("/:id", bannerController.deleteBanner);
+ bannerRouter.delete("/:id", permission, bannerController.deleteBanner);
