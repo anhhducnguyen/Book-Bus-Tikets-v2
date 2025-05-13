@@ -8,8 +8,13 @@ import { BookTicketInputSchema, CancelTicketSchema, RouteSchema, BusSchema, Seat
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { ticketController } from "./ticketController";
 
+import { permission } from "@/common/middleware/auth/permission";
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
+
 export const ticketRegistry = new OpenAPIRegistry();
 export const ticketRouter: Router = express.Router();
+
+ticketRouter.use(authenticate);
 
 // Lựa chọn tuyến đường đi
 ticketRegistry.registerPath({
@@ -43,7 +48,7 @@ ticketRouter.get("/buses/:busId/seats", ticketController.getAvailableSeats);
 // Đặt vé
 ticketRegistry.registerPath({
   method: "post",
-  path: "/tickets",
+  path: "/booking",
   tags: ["Ticket"],
   request: {
     body: {
@@ -56,7 +61,7 @@ ticketRegistry.registerPath({
   },
   responses: createApiResponse(TicketSchema, "Success"),
 });
-ticketRouter.post("/tickets", ticketController.bookTicket);
+ticketRouter.post("/booking", ticketController.bookTicket);
 
 // Hủy vé
 ticketRegistry.registerPath({
@@ -64,14 +69,18 @@ ticketRegistry.registerPath({
   path: "/cancel/:ticketId",
   tags: ["Ticket"],
   request: { params: CancelTicketSchema.shape.params },
-  responses: createApiResponse(z.void(), "Success"),
+  responses: createApiResponse(
+    z.null().openapi({ description: "No content" }),
+    "Success"
+  ),
 });
 ticketRouter.delete("/cancel/:ticketId", validateRequest(CancelTicketSchema), ticketController.cancelTicket);
+
 
 // Lịch sử đặt vé theo trạng thái
 ticketRegistry.registerPath({
   method: "get",
-  path: "/history/:status",
+  path: "/history_status/:status",
   tags: ["Ticket"],
   request: {
     params: z.object({
@@ -80,11 +89,12 @@ ticketRegistry.registerPath({
   },
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
+ticketRouter.get("/history_status/:status", ticketController.getTicketsByStatus);
 
 // Thêm route mới: Lịch sử đặt vé theo nhà xe
 ticketRegistry.registerPath({
   method: "get",
-  path: "/tickets/history/:companyId",
+  path: "/history_companyid/:companyId",
   tags: ["Ticket"],
   request: {
     params: z.object({
@@ -93,18 +103,17 @@ ticketRegistry.registerPath({
   },
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
-ticketRouter.get("/history/:status", ticketController.getTicketsByStatus);
-
-ticketRouter.get("/tickets/history/:companyId", ticketController.getTicketsByCompany);
+ticketRouter.get("/history_companyid/:companyId", ticketController.getTicketsByCompany);
 
 // Xem tất cả lịch sử đặt vé
 ticketRegistry.registerPath({
   method: "get",
-  path: "/tickets/history",
+  path: "/history",
   tags: ["Ticket"],
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
-ticketRouter.get("/tickets/history", ticketController.getTicketHistory);
+
+ticketRouter.get("/history", ticketController.getTicketHistory);
 
 // Thêm mới thông tin hủy vé xe dành cho admin
 ticketRegistry.registerPath({
@@ -125,3 +134,17 @@ ticketRegistry.registerPath({
   responses: createApiResponse(z.any(), "Success"),
 });
 ticketRouter.post("/cancel_ticket/add", ticketController.createCancelTicket);
+
+ticketRouter.get("/history", ticketController.getTicketHistory);
+
+// Hiển thi danh sách thông tin hủy theo vé xe
+ticketRegistry.registerPath({
+  method: "get",
+  path: "/cancelled",
+  tags: ["Ticket"],
+  request: {
+    params: z.object({}).strict(), // Không cần tham số
+  },
+  responses: createApiResponse(z.array(TicketSchema), "Success"),
+});
+ticketRouter.get("/cancelled", ticketController.getCancelledTickets);

@@ -6,6 +6,9 @@ import { pino } from "pino";
 import { openAPIRouter } from "@/api-docs/openAPIRouter";
 import { healthCheckRouter } from "@/api/healthCheck/healthCheckRouter";
 import { userRouter } from "@/api/user/userRouter";
+import { stationRouter } from "@/api/station/stationRouter";
+import { busCompanyRouter } from "@/api/busCompanies/busCompanyRouter";
+import { routeRouter } from "@/api/route/route.routes";
 import { ticketOrderRouter } from "@/api/ticketOrder/ticketOrder.routes";
 import { authRouter } from "@/api/auth/authRouter";
 import { routesRouter } from "./api/routes/routesRouter";
@@ -14,6 +17,7 @@ import { busReviewRouter } from "./api/bus_reviews/busReviewRouter";
 import { carRouter } from "@/api/car/carRouter";
 import { seatRoter } from "./api/seat/seatRouter";
 import { ticketRouter } from "@/api/ticket/ticketRouter";
+import { paymentProviderRouter } from "@/api/paymentProvider/paymentProvider.routes";
 import errorHandler from "@/common/middleware/errorHandler";
 import rateLimiter from "@/common/middleware/rateLimiter";
 import requestLogger from "@/common/middleware/requestLogger";
@@ -56,6 +60,9 @@ app.use(requestLogger);
 // Routes
 app.use("/health-check", healthCheckRouter);
 app.use("/users", userRouter);
+app.use("/stations", stationRouter);
+app.use("/bus-companies", busCompanyRouter);
+app.use("/routes", routeRouter);
 app.use("/ticket-orders", ticketOrderRouter);
 app.use("/auth", authRouter);
 app.use("/routes", routesRouter);
@@ -64,6 +71,7 @@ app.use("/bus-reviews", busReviewRouter)
 app.use("/cars", carRouter);
 app.use("/seats", seatRoter);
 app.use("/tickets", ticketRouter);
+app.use("/payment-providers", paymentProviderRouter);
 
 // Swagger UI
 app.use(openAPIRouter);
