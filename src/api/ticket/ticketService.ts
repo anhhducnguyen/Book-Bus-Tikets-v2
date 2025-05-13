@@ -202,8 +202,9 @@ export class TicketService {
     } catch (ex) {
       logger.error(`Error creating cancellation information: ${(ex as Error).message}`);
       return ServiceResponse.failure("Error creating cancellation information", null, StatusCodes.INTERNAL_SERVER_ERROR);
-  // Hiển thi danh sách thông tin hủy theo vé xe
-  
+    }
+  }
+      // Hiển thi danh sách thông tin hủy theo vé xe
   async getCancelledTickets(): Promise<ServiceResponse<Ticket[] | null>> {
     try {
       const tickets = await this.ticketRepository.getTicketsByStatus("CANCELLED");

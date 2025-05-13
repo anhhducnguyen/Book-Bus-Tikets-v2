@@ -147,4 +147,4 @@ ticketRegistry.registerPath({
   },
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
-ticketRouter.get("/cancelled", ticketController.getCancelledTickets);
+// ticketRouter.get("/cancelled", ticketController.getCancelledTickets);
