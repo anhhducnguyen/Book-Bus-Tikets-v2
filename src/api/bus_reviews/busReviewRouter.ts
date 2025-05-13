@@ -8,8 +8,8 @@ import { routesController } from "@/api/routes/routesController"; // Controller 
 import { BusReviewSchema, CreateBusReviewSchema } from "@/api/bus_reviews/busReviewModel"; // Schema Zod cho routes
 import { busReviewController } from "./busReviewController";
 
-import { ROLES } from "@/common/constants/role";
-import { authenticate, authorize } from "@/common/middleware/auth/authMiddleware";
+import { permission } from "@/common/middleware/auth/permission";
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
 
 // Khởi tạo OpenAPI registry
 export const busReviewRegistry = new OpenAPIRegistry();

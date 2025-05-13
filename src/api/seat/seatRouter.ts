@@ -7,14 +7,13 @@ import { GetSeatSchema, SeatSchema } from "@/api/seat/seatModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { seatController } from "./seatController";
 
-import { ROLES } from "@/common/constants/role";
-import { authenticate, authorize } from "@/common/middleware/auth/authMiddleware";
+import { permission } from "@/common/middleware/auth/permission";
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
 
 export const seatRegistry = new OpenAPIRegistry();
 export const seatRoter: Router = express.Router();
 
 seatRoter.use(authenticate);
-const permission = authorize([ROLES.ADMIN]);
 
 seatRegistry.register("User", SeatSchema);
 

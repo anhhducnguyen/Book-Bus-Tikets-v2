@@ -7,8 +7,8 @@ import { validateRequest } from "@/common/utils/httpHandlers"; // Nếu bạn mu
 import { routesController } from "@/api/routes/routesController"; // Controller để xử lý logic route
 import { RoutesSchema, CreateRoutesSchema } from "./routesModel"; // Schema Zod cho routes
 
-import { ROLES } from "@/common/constants/role";
-import { authenticate, authorize } from "@/common/middleware/auth/authMiddleware";
+import { permission } from "@/common/middleware/auth/permission";
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
 
 // Khởi tạo OpenAPI registry
 export const routesRegistry = new OpenAPIRegistry();
@@ -17,14 +17,11 @@ export const routesRegistry = new OpenAPIRegistry();
 export const routesRouter: Router = express.Router();
 
 routesRouter.use(authenticate);
-const permission = authorize([ROLES.ADMIN]);
 
 // Đăng ký schema OpenAPI cho Routes
 routesRegistry.register("Routes", RoutesSchema);
 
 // Đăng ký đường dẫn cho OpenAPI với method 'get'
-// 
-
 
 // Đăng ký handler cho GET /routes
 routesRegistry.registerPath({

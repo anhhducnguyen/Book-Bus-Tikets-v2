@@ -7,8 +7,8 @@ import { validateRequest } from "@/common/utils/httpHandlers"; // Nếu bạn mu
 import { bannerController } from "@/api/banners/bannerController"; // Controller để xử lý logic route
 import { BannerSchema, CreateBannerSchema } from "./bannerModel"; // Schema Zod cho routes
 
-import { ROLES } from "@/common/constants/role";
-import { authenticate, authorize } from "@/common/middleware/auth/authMiddleware";
+import { permission } from "@/common/middleware/auth/permission";
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
 
 // Khởi tạo OpenAPI registry
 export const bannerRegistry = new OpenAPIRegistry();
@@ -17,7 +17,6 @@ export const bannerRegistry = new OpenAPIRegistry();
 export const bannerRouter: Router = express.Router();
 
 bannerRouter.use(authenticate);
-const permission = authorize([ROLES.ADMIN]);
 
 // Đăng ký schema OpenAPI cho Routes
 bannerRegistry.register("Routes", BannerSchema);

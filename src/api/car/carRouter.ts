@@ -6,14 +6,14 @@ import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { GetCarSchema, CarSchema, CreateCarSchema, UpdateCarSchema } from "@/api/car/carModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { carController } from "./carController";
-import { ROLES } from "@/common/constants/role";
-import { authenticate, authorize } from "@/common/middleware/auth/authMiddleware";
+
+import { permission } from "@/common/middleware/auth/permission";
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
 
 export const carRegistry = new OpenAPIRegistry();
 export const carRouter: Router = express.Router();
 
 carRouter.use(authenticate);
-const permission = authorize([ROLES.ADMIN]);
 
 carRegistry.register("Car", CarSchema);
 
