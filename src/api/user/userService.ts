@@ -13,21 +13,12 @@ export class UserService {
 	}
 
 	// Retrieves all users from the database
-	async findAll(): Promise<ServiceResponse<User[] | null>> {
+	async findAll(filter: any, options: any) {
 		try {
-			const users = await this.userRepository.findAllAsync();
-			if (!users || users.length === 0) {
-				return ServiceResponse.failure("No Users found", null, StatusCodes.NOT_FOUND);
-			}
-			return ServiceResponse.success<User[]>("Users found", users);
-		} catch (ex) {
-			const errorMessage = `Error finding all users: $${(ex as Error).message}`;
-			logger.error(errorMessage);
-			return ServiceResponse.failure(
-				"An error occurred while retrieving users.",
-				null,
-				StatusCodes.INTERNAL_SERVER_ERROR,
-			);
+			const result = await this.userRepository.findAllAsync(filter, options);
+			return ServiceResponse.success("Users fetched successfully", result);
+		} catch (error) {
+			return ServiceResponse.failure("Failed to fetch users", null);
 		}
 	}
 
@@ -45,6 +36,7 @@ export class UserService {
 			return ServiceResponse.failure("An error occurred while finding user.", null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
+
 	async createUser(data: Omit<User, "id" | "createdAt" | "updatedAt">): Promise<ServiceResponse<User | null>> {
 		try {
 			const newUser = await this.userRepository.createUserAsync(data);
@@ -55,7 +47,6 @@ export class UserService {
 			return ServiceResponse.failure("An error occurred while creating user.", null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
-	  
 }
 
 

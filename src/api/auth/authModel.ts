@@ -1,0 +1,70 @@
+import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
+import { z } from "zod";
+
+import { commonValidations } from "@/common/utils/commonValidation";
+
+extendZodWithOpenApi(z);
+
+export type User = z.infer<typeof AuthSchema>;
+export const AuthSchema = z.object({
+    id: z.number(),
+    email: z.string().email(),
+    password: z.string(),
+    username: z.string(),
+    reset_token: z.string().nullable().optional(),
+    reset_token_expiry: z
+        .union([z.number().int(), z.null()])
+        .optional(),
+    role: z.enum(["user", "admin"]).default("user"),
+    google_id: z.string().nullable().optional(),
+    created_at: z.date(),
+    updated_at: z.date(),
+});
+
+// Input Validation for 'GET users/:id' endpoint
+export const GetUserSchema = z.object({
+    params: z.object({ id: commonValidations.id }),
+});
+
+export const SignUpSchema = z.object({
+    body: z
+        .object({
+            email: z.string().email().openapi({ example: "anhnguyen2k373@gmail.com" }),
+            password: z.string().min(6).openapi({ example: "Ducanh12@#" }),
+        })
+        .openapi({
+            example: {
+                email: "anhnguyen2k373@gmail.com",
+                password: "Ducanh12@#",
+            },
+        }),
+});
+
+
+export const ResetPasswordSchema = z.object({
+    body: z.object({
+        email: z.string().email(),
+    })
+    .openapi({
+        example: {
+            email: "anhnguyen2k373@gmail.com",
+        },
+    }),
+});
+
+export const ConfirmResetPasswordSchema = z.object({
+    body: z.object({
+        token: z.string().min(10, "Token không hợp lệ"),
+        newPassword: z.string().min(6, "Mật khẩu phải từ 6 ký tự trở lên"),
+    })
+    .openapi({
+      example: {
+        token: "abc123resetTokenXYZ",
+        newPassword: "NewPass12@#",
+      },
+    }),
+});
+
+
+
+
