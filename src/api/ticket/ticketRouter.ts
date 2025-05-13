@@ -74,7 +74,8 @@ ticketRegistry.registerPath({
     "Success"
   ),
 });
-ticketRouter.delete("/cancle/:ticketId", validateRequest(CancelTicketSchema), ticketController.cancelTicket);
+ticketRouter.delete("/cancel/:ticketId", validateRequest(CancelTicketSchema), ticketController.cancelTicket);
+
 
 // Lịch sử đặt vé theo trạng thái
 ticketRegistry.registerPath({
@@ -111,6 +112,29 @@ ticketRegistry.registerPath({
   tags: ["Ticket"],
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
+
+ticketRouter.get("/history", ticketController.getTicketHistory);
+
+// Thêm mới thông tin hủy vé xe dành cho admin
+ticketRegistry.registerPath({
+  method: "post",
+  path: "/cancel_ticket/add",
+  tags: ["Ticket"],
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: z.object({
+            ticketId: z.string().regex(/^\d+$/, "Ticket ID must be a numeric string"),
+          }),
+        },
+      },
+    },
+  },
+  responses: createApiResponse(z.any(), "Success"),
+});
+ticketRouter.post("/cancel_ticket/add", ticketController.createCancelTicket);
+
 ticketRouter.get("/history", ticketController.getTicketHistory);
 
 // Hiển thi danh sách thông tin hủy theo vé xe
