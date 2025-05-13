@@ -30,17 +30,17 @@ paymentProviderRouter.get("/",
 );
 
 // Endpoint: Get a specific payment provider by ID
-paymentProviderRegistry.registerPath({
-    method: "get",
-    path: "/payment-providers/{providerId}",
-    tags: ["PaymentProvider"],
-    request: { params: GetPaymentProviderSchema.shape.params },
-    responses: createApiResponse(PaymentProviderSchema, "Success"),
-});
+// paymentProviderRegistry.registerPath({
+//     method: "get",
+//     path: "/payment-providers/{providerId}",
+//     tags: ["PaymentProvider"],
+//     request: { params: GetPaymentProviderSchema.shape.params },
+//     responses: createApiResponse(PaymentProviderSchema, "Success"),
+// });
 
-paymentProviderRouter.get("/:providerId",
-    authenticate,
-    authorize([ROLES.ADMIN, ROLES.USER]),
-    validateRequest(GetPaymentProviderSchema),
-    paymentProviderController.getPaymentProviderById
-);
+// paymentProviderRouter.get("/:providerId",
+//     authenticate,
+//     authorize([ROLES.ADMIN, ROLES.USER]),
+//     validateRequest(GetPaymentProviderSchema),
+//     paymentProviderController.getPaymentProviderById
+// );
