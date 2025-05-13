@@ -2,7 +2,6 @@ import { OpenAPIRegistry, OpenApiGeneratorV3 } from "@asteasolutions/zod-to-open
 
 import { healthCheckRegistry } from "@/api/healthCheck/healthCheckRouter";
 import { userRegistry } from "@/api/user/userRouter";
-import { stationRegistry } from "@/api/station/stationRouter";
 import { busCompanyRegistry } from "@/api/busCompanies/busCompanyRouter";
 import { routeRegistry } from "@/api/route/route.routes";
 import { ticketOrderRegistry } from "@/api/ticketOrder/ticketOrder.routes";
