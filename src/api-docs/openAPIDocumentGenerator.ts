@@ -12,6 +12,7 @@ import { seatRegistry } from "@/api/seat/seatRouter";
 import { routesRegistry } from "@/api/routes/routesRouter";
 import { bannerRegistry } from "@/api/banners/bannerRouter";
 import { busReviewRegistry } from "@/api/bus_reviews/busReviewRouter";
+import { paymentProviderRegistry } from "@/api/paymentProvider/paymentProvider.routes";
 
 export type OpenAPIDocument = ReturnType<OpenApiGeneratorV3["generateDocument"]>;
 
@@ -26,6 +27,7 @@ export function generateOpenAPIDocument(): OpenAPIDocument {
 		bannerRegistry,
 		busReviewRegistry,
 		ticketOrderRegistry,
+		paymentProviderRegistry,
 		routeRegistry,
 		stationRegistry,
 		busCompanyRegistry
