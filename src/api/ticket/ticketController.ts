@@ -54,12 +54,14 @@ class TicketController {
       return; 
     }
     const serviceResponse = await ticketService.getTicketsByStatus(status as "BOOKED" | "CANCELLED");
+    res.status(serviceResponse.statusCode).send(serviceResponse);
   }
 
   // Hiển thị lịch sử đặt vé theo nhà xe
   public getTicketsByCompany: RequestHandler = async (req, res) => {
     const { companyId } = req.params;
     const serviceResponse = await ticketService.getTicketsByCompany(Number(companyId));
+    res.status(serviceResponse.statusCode).send(serviceResponse);
   }
 
   // Xem tất cả lịch sử đặt vé
@@ -67,6 +69,20 @@ class TicketController {
     const serviceResponse = await ticketService.getTicketHistory();
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
+
+  // Thêm mới thông tin hủy vé xe dành cho admin
+  public createCancelTicket: RequestHandler = async (req: Request, res: Response) => {
+    const ticketId = Number.parseInt(req.body.ticketId as string, 10);
+    if (isNaN(ticketId)) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid ticketId. Must be a number", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+    const serviceResponse = await ticketService.createCancelTicket(ticketId);
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
+
 }
 
 export const ticketController = new TicketController();

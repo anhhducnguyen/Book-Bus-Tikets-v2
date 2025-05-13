@@ -106,8 +106,25 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
       .where("buses.company_id", companyId)
       .select("tickets.*");
   }
+
   // Xem lại tất cả lịch sử đặt vé
   async getAllTickets(): Promise<Ticket[]> {
     return await db("tickets").select("*");
   }
+  
+  async getTicketById(ticketId: number): Promise<Ticket | undefined> {
+    return await db("tickets")
+      .where({ id: ticketId })
+      .first();
+  }
+  // Thêm mới thông tin hủy vé xe dành cho admin
+  async createCancelTicket(ticketId: number): Promise<void> {
+    await db("tickets")
+      .where({ id: ticketId })
+      .update({
+        status: "CANCELLED",
+        updated_at: new Date(),
+      });
+  }
+
 }
