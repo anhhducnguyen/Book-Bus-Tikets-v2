@@ -6,6 +6,7 @@ import { pino } from "pino";
 import { openAPIRouter } from "@/api-docs/openAPIRouter";
 import { healthCheckRouter } from "@/api/healthCheck/healthCheckRouter";
 import { userRouter } from "@/api/user/userRouter";
+import { routeRouter } from "@/api/route/route.routes";
 import { ticketOrderRouter } from "@/api/ticketOrder/ticketOrder.routes";
 import { authRouter } from "@/api/auth/authRouter";
 import { routesRouter } from "./api/routes/routesRouter";
@@ -56,6 +57,7 @@ app.use(requestLogger);
 // Routes
 app.use("/health-check", healthCheckRouter);
 app.use("/users", userRouter);
+app.use("/routes", routeRouter);
 app.use("/ticket-orders", ticketOrderRouter);
 app.use("/auth", authRouter);
 app.use("/routes", routesRouter);
