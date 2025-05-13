@@ -24,7 +24,7 @@ busReviewRegistry.registerPath({
   path: "/bus-reviews",
   operationId: "getAllBusReview",
   summary: "Lấy danh sách review có hỗ trợ phân trang, tìm kiếm và lọc",
-  tags: ["bus-reviews"],
+  tags: ["Bus reviews"],
   parameters: [
     {
       name: "page",
@@ -104,7 +104,7 @@ busReviewRouter.get("/", busReviewController.getAllBusReview);
 busReviewRegistry.registerPath({
     method: "post",
     path: "/bus-reviews",
-     tags: ["bus-reviews"],
+     tags: ["Bus reviews"],
     operationId: "createBusReview",  // Thay 'operation' bằng 'operationId'
     summary: "Create a new BusReview",  // Thêm phần mô tả ngắn gọn về API
     requestBody: {
@@ -156,7 +156,7 @@ busReviewRegistry.registerPath({
  busReviewRegistry.registerPath({
    method: "delete",
    path: "/bus-reviews/{id}",
-    tags: ["bus-reviews"],
+    tags: ["Bus reviews"],
    operationId: "deleteBusReview",
    summary: "Xóa busReview theo ID",
    

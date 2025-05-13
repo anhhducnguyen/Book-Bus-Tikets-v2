@@ -26,7 +26,7 @@ routesRegistry.registerPath({
   path: "/routes",
   operationId: "getAllRoutes",
   summary: "Lấy danh sách routes có hỗ trợ phân trang, tìm kiếm và lọc",
-  tags: ["routes"],
+  tags: ["Routes"],
   parameters: [
     {
       name: "page",
@@ -84,7 +84,7 @@ routesRouter.get("/", routesController.getAllRoutes);
 routesRegistry.registerPath({
     method: "post",
     path: "/routes",
-    tags: ["routes"],
+    tags: ["Routes"],
     operationId: "createRoutes",  // Thay 'operation' bằng 'operationId'
     summary: "Create a new Routes",  // Thêm phần mô tả ngắn gọn về API
     requestBody: {
@@ -140,7 +140,7 @@ routesRegistry.registerPath({
    path: "/routes/{id}",
    operationId: "deleteRoutes",
    summary: "Xóa routes theo ID",
-   tags: ["routes"],
+   tags: ["Routes"],
    parameters: [
      {
        name: "id",

@@ -112,7 +112,7 @@ carRouter.put("/:id", validateRequest(UpdateCarSchema), carController.updateCar)
 carRegistry.registerPath({
     method: "post",
     path: "/cars/{id}/seats",
-    tags: ["Car"],
+    tags: ["Seat"],
     summary: "Generate seats for a car by bus id",
     description: "Generate seats for a car by bus id",
     request: { params: GetCarSchema.shape.params },
