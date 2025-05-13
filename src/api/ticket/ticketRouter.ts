@@ -137,12 +137,12 @@ ticketRouter.post("/cancel_ticket/add", ticketController.createCancelTicket);
 // Hiển thi danh sách thông tin hủy theo vé xe
 ticketRegistry.registerPath({
   method: "get",
-  path: "/cancelled",
+  path: "/cancel_ticket/list",
   tags: ["Ticket"],
   request: {
     params: z.object({}).strict(), // Không cần tham số
   },
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
-ticketRouter.get("/cancelled", ticketController.getCancelledTickets);
+ticketRouter.get("/cancel_ticket/list", ticketController.getCancelledTickets);
 
