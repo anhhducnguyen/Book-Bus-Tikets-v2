@@ -59,6 +59,29 @@ paymentProviderRegistry.registerPath({
     responses: createApiResponse(PaymentProviderSchema, "Tạo nhà cung cấp thanh toán thành công", 201),
 });
 
+// Xóa nhà cung cấp thanh toán theo ID
+paymentProviderRegistry.registerPath({
+    method: "delete",
+    path: "/payment-providers/{id}",
+    tags: ["PaymentProvider"],
+    operationId: "deletePaymentProvider",
+    summary: "Xóa một nhà cung cấp thanh toán theo ID",
+    request: {
+        params: GetPaymentProviderSchema.shape.params,
+    },
+    responses: {
+        200: {
+            description: "Xóa nhà cung cấp thành công",
+        },
+        404: {
+            description: "Không tìm thấy nhà cung cấp",
+        },
+        500: {
+            description: "Lỗi máy chủ khi xóa nhà cung cấp",
+        },
+    },
+});
+
 // Các route xử lý
 
 // Lấy danh sách tất cả nhà cung cấp thanh toán
@@ -79,4 +102,10 @@ paymentProviderRouter.post("/",
     permission,
     validateRequest(CreatePaymentProviderSchema),
     paymentProviderController.createPaymentProvider
+);
+
+paymentProviderRouter.delete("/:id",
+    permission,
+    validateRequest(GetPaymentProviderSchema),
+    paymentProviderController.deletePaymentProvider
 );
