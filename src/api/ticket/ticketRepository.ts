@@ -108,8 +108,16 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
       .where("buses.company_id", companyId)
       .select("tickets.*");
   }
+  
   // Xem lại tất cả lịch sử đặt vé
   async getAllTickets(): Promise<Ticket[]> {
     return await db("tickets").select("*");
+  }
+
+  // Hiển thi danh sách thông tin hủy theo vé xe
+  async getCancelledTickets(ticketId: number): Promise<void> {
+    await db("tickets")
+      .where({ id: ticketId })
+      .update({ status: "CANCELLED", updated_at: new Date() });
   }
 }

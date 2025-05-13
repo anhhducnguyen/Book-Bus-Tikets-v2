@@ -186,6 +186,32 @@ export class TicketService {
       return ServiceResponse.failure("Error fetching tickets", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
+
+  // Hiển thi danh sách thông tin hủy theo vé xe
+  async getCancelledTickets(): Promise<ServiceResponse<Ticket[] | null>> {
+    try {
+      const tickets = await this.ticketRepository.getTicketsByStatus("CANCELLED");
+      if (!Array.isArray(tickets)) {
+        logger.warn("Invalid data format returned from repository");
+        return ServiceResponse.success<Ticket[]>("No cancelled tickets found", []);
+      }
+
+      const transformedTickets = tickets.map((ticket) => ({
+        ...ticket,
+        departure_time: ticket.departure_time instanceof Date ? ticket.departure_time : new Date(ticket.departure_time),
+        arrival_time: ticket.arrival_time instanceof Date ? ticket.arrival_time : new Date(ticket.arrival_time),
+        created_at: ticket.created_at instanceof Date ? ticket.created_at : new Date(ticket.created_at),
+        updated_at: ticket.updated_at instanceof Date ? ticket.updated_at : new Date(ticket.updated_at),
+      }));
+
+      const validatedTickets = TicketSchema.array().parse(transformedTickets);
+      return ServiceResponse.success<Ticket[]>("Cancelled tickets retrieved", validatedTickets);
+    } catch (ex) {
+      logger.error(`Error fetching cancelled tickets: ${(ex as Error).message}`);
+      return ServiceResponse.failure("Error fetching cancelled tickets", null, StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
+  
 }
 
 export const ticketService = new TicketService();
