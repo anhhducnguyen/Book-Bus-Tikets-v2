@@ -41,21 +41,21 @@ export function generateOpenAPIDocument(): OpenAPIDocument {
 		},
 	});
 
-	// document.components = {
-	// 	securitySchemes: {
-	// 		bearerAuth: {
-	// 			type: "http",
-	// 			scheme: "bearer",
-	// 			bearerFormat: "JWT",
-	// 		},
-	// 	},
-	// };
+	document.components = {
+		securitySchemes: {
+			bearerAuth: {
+				type: "http",
+				scheme: "bearer",
+				bearerFormat: "JWT",
+			},
+		},
+	};
 
-	// document.security = [
-	// 	{
-	// 		bearerAuth: [],
-	// 	},
-	// ];
+	document.security = [
+		{
+			bearerAuth: [],
+		},
+	];
 
 	return document;
 }
