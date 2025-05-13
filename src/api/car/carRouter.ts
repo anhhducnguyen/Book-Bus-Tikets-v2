@@ -7,8 +7,13 @@ import { GetCarSchema, CarSchema, CreateCarSchema, UpdateCarSchema } from "@/api
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { carController } from "./carController";
 
+import { permission } from "@/common/middleware/auth/permission";
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
+
 export const carRegistry = new OpenAPIRegistry();
 export const carRouter: Router = express.Router();
+
+carRouter.use(authenticate);
 
 carRegistry.register("Car", CarSchema);
 
@@ -33,7 +38,11 @@ carRegistry.registerPath({
     responses: createApiResponse(z.array(CarSchema), "Success"),
 });
 
-carRouter.get("/", carController.getCars);
+carRouter.get(
+  "/",
+  permission, 
+  carController.getCars
+);
 
 carRegistry.registerPath({
     method: "get",
@@ -46,7 +55,11 @@ carRegistry.registerPath({
     responses: createApiResponse(GetCarSchema, "Success"),
 });
 
-carRouter.get("/:id", validateRequest(GetCarSchema), carController.getCar);
+carRouter.get(
+  "/:id", 
+  permission,
+  validateRequest(GetCarSchema), 
+  carController.getCar);
 
 carRegistry.registerPath({
     method: "delete",
@@ -59,7 +72,12 @@ carRegistry.registerPath({
     responses: createApiResponse(GetCarSchema, "Success"),
 });
 
-carRouter.delete("/:id", validateRequest(GetCarSchema), carController.deleteCar);
+carRouter.delete(
+  "/:id",
+  permission, 
+  validateRequest(GetCarSchema), 
+  carController.deleteCar
+);
 
 carRegistry.registerPath({
 	method: "post",
@@ -80,7 +98,12 @@ carRegistry.registerPath({
 	responses: createApiResponse(CarSchema, "Car created successfully", 201),
 });
   
-carRouter.post("/", validateRequest(CreateCarSchema), carController.createCar);
+carRouter.post(
+  "/", 
+  permission,
+  validateRequest(CreateCarSchema), 
+  carController.createCar
+);
 
 carRegistry.registerPath({
   method: "put",
@@ -107,7 +130,12 @@ carRegistry.registerPath({
   responses: createApiResponse(CarSchema, "Car updated successfully", 200),
 });
 
-carRouter.put("/:id", validateRequest(UpdateCarSchema), carController.updateCar);
+carRouter.put(
+  "/:id", 
+  permission,
+  validateRequest(UpdateCarSchema), 
+  carController.updateCar
+);
 
 carRegistry.registerPath({
     method: "post",
@@ -119,7 +147,12 @@ carRegistry.registerPath({
     responses: createApiResponse(GetCarSchema, "Success"),
 });
 
-carRouter.post("/:id/seats", validateRequest(GetCarSchema), carController.generateSeatByCarId);
+carRouter.post(
+  "/:id/seats", 
+  permission,
+  validateRequest(GetCarSchema), 
+  carController.generateSeatByCarId
+);
 
 
 

@@ -8,11 +8,16 @@ import { routesController } from "@/api/routes/routesController"; // Controller 
 import { BusReviewSchema, CreateBusReviewSchema } from "@/api/bus_reviews/busReviewModel"; // Schema Zod cho routes
 import { busReviewController } from "./busReviewController";
 
+import { permission } from "@/common/middleware/auth/permission";
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
+
 // Khởi tạo OpenAPI registry
 export const busReviewRegistry = new OpenAPIRegistry();
 
 // Khởi tạo router
 export const busReviewRouter: Router = express.Router();
+
+busReviewRouter.use(authenticate);
 
 // Đăng ký schema OpenAPI cho Routes
 busReviewRegistry.register("BusReview", BusReviewSchema);

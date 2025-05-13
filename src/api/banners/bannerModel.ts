@@ -10,7 +10,6 @@ export const BannerSchema = z.object({
     id: z.number(),
     banner_url: z.string().url(), 
     position:z.string(),
-
 });
 
 export const CreateBannerSchema = z.object({
