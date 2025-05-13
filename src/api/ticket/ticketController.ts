@@ -84,6 +84,12 @@ class TicketController {
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
 
+  // Hiển thị danh sách thông tin hủy theo vé xe
+  public getCancelledTickets: RequestHandler = async (_req: Request, res: Response) => {
+    const serviceResponse = await ticketService.getCancelledTickets();
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
+
 }
 
 export const ticketController = new TicketController();

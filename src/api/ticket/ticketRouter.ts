@@ -91,7 +91,7 @@ ticketRegistry.registerPath({
 });
 ticketRouter.get("/history_status/:status", ticketController.getTicketsByStatus);
 
-// Thêm route mới: Lịch sử đặt vé theo nhà xe
+// Lịch sử đặt vé theo nhà xe
 ticketRegistry.registerPath({
   method: "get",
   path: "/history_companyid/:companyId",
@@ -112,7 +112,6 @@ ticketRegistry.registerPath({
   tags: ["Ticket"],
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
-
 ticketRouter.get("/history", ticketController.getTicketHistory);
 
 // Thêm mới thông tin hủy vé xe dành cho admin
@@ -135,8 +134,6 @@ ticketRegistry.registerPath({
 });
 ticketRouter.post("/cancel_ticket/add", ticketController.createCancelTicket);
 
-ticketRouter.get("/history", ticketController.getTicketHistory);
-
 // Hiển thi danh sách thông tin hủy theo vé xe
 ticketRegistry.registerPath({
   method: "get",
@@ -147,4 +144,5 @@ ticketRegistry.registerPath({
   },
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
-// ticketRouter.get("/cancelled", ticketController.getCancelledTickets);
+ticketRouter.get("/cancelled", ticketController.getCancelledTickets);
+

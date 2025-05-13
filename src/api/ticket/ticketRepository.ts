@@ -134,6 +134,10 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
   async getCancelledTickets(ticketId: number): Promise<void> {
     await db("tickets")
       .where({ id: ticketId })
-      .update({ status: "CANCELLED", updated_at: new Date() });
+      .update({
+        status: "CANCELLED",
+        updated_at: db.fn.now(),
+      });
   }
+
 }

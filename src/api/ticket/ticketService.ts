@@ -204,7 +204,8 @@ export class TicketService {
       return ServiceResponse.failure("Error creating cancellation information", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
-      // Hiển thi danh sách thông tin hủy theo vé xe
+
+  // Hiển thi danh sách thông tin hủy theo vé xe
   async getCancelledTickets(): Promise<ServiceResponse<Ticket[] | null>> {
     try {
       const tickets = await this.ticketRepository.getTicketsByStatus("CANCELLED");
@@ -228,7 +229,6 @@ export class TicketService {
       return ServiceResponse.failure("Error fetching cancelled tickets", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
-  
-}
 
+}
 export const ticketService = new TicketService();
