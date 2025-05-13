@@ -22,7 +22,7 @@ bannerRegistry.registerPath({
   path: "/banners",
   operationId: "getAllBanners",
   summary: "Lấy danh sách banner có hỗ trợ phân trang, tìm kiếm và lọc",
-  tags: ["banners"],
+  tags: ["Banners"],
   parameters: [
     {
       name: "page",
@@ -83,7 +83,7 @@ bannerRouter.get("/", bannerController.getAllBanner);
 bannerRegistry.registerPath({
     method: "post",
     path: "/banners",
-    tags: ["banners"],
+    tags: ["Banners"],
     operationId: "createBanner",  // Thay 'operation' bằng 'operationId'
     summary: "Create a new Banner",  // Thêm phần mô tả ngắn gọn về API
     requestBody: {
@@ -133,7 +133,7 @@ bannerRegistry.registerPath({
   path: "/banners/{id}",
   operationId: "deleteBanner",
   summary: "Xóa banner theo ID",
-  tags: ["banners"],
+  tags: ["Banners"],
   parameters: [
     {
       name: "id",

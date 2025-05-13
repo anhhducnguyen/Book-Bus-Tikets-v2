@@ -18,7 +18,7 @@ ticketOrderRegistry.register("TicketOrder", TicketOrderSchema);
 ticketOrderRegistry.registerPath({
   method: "get",
   path: "/ticket-orders",
-  tags: ["TicketOrder"],
+  tags: ["Ticket order"],
   request: { query: GetAllTicketOrdersSchema.shape.query },
   responses: createApiResponse(z.array(TicketOrderSchema), "Success"),
 });
@@ -30,7 +30,7 @@ ticketOrderRouter.get("/", validateRequest(GetAllTicketOrdersSchema), ticketOrde
 ticketOrderRegistry.registerPath({
   method: "get",
   path: "/ticket-orders/company/{companyId}",
-  tags: ["TicketOrder"],
+  tags: ["Ticket order"],
   request: { params: GetTicketOrdersByCompanySchema.shape.params },
   responses: createApiResponse(z.array(TicketOrderSchema), "Success"),
 });
@@ -43,7 +43,7 @@ ticketOrderRouter.get("/company/:companyId", validateRequest(GetTicketOrdersByCo
 ticketOrderRegistry.registerPath({
   method: "get",
   path: "/ticket-orders/status/{status}",
-  tags: ["TicketOrder"],
+  tags: ["Ticket order"],
   request: { params: GetTicketOrdersByStatusSchema.shape.params },
   responses: createApiResponse(z.array(TicketOrderSchema), "Success"),
 });

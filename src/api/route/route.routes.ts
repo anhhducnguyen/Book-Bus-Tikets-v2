@@ -19,7 +19,7 @@ routeRegistry.register("RouteDetail", RouteDetailSchema);
 routeRegistry.registerPath({
   method: "get",
   path: "/routes",
-  tags: ["Route"],
+  tags: ["Routes"],
   responses: createApiResponse(z.array(RouteListItemSchema), "Success"),
 });
 
@@ -30,7 +30,7 @@ routeRouter.get("/", routeController.getRoutes);
 routeRegistry.registerPath({
   method: "get",
   path: "/routes/{id}",
-  tags: ["Route"],
+  tags: ["Routes"],
   request: { params: GetRouteByIdSchema.shape.params },
   responses: createApiResponse(RouteDetailSchema, "Success"),
 });
