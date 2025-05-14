@@ -147,7 +147,7 @@ CREATE TABLE `buses` (
   PRIMARY KEY (`id`),
   KEY `company_id` (`company_id`),
   CONSTRAINT `buses_ibfk_1` FOREIGN KEY (`company_id`) REFERENCES `bus_companies` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -156,7 +156,7 @@ CREATE TABLE `buses` (
 
 LOCK TABLES `buses` WRITE;
 /*!40000 ALTER TABLE `buses` DISABLE KEYS */;
-INSERT INTO `buses` VALUES (1,'Bus 101','Luxury bus for long routes','AB123CD',50,1,'2025-05-11 08:15:34','2025-05-11 08:15:34'),(2,'Bus 202','Economy bus','XY987ZT',40,2,'2025-05-11 08:15:34','2025-05-11 08:15:34'),(3,'Bus 303','Express bus for daily commuters','LM234GH',60,3,'2025-05-11 08:15:34','2025-05-11 08:15:34'),(4,'Bus 404','VIP bus','JK567MN',30,4,'2025-05-11 08:15:34','2025-05-11 08:15:34'),(5,'Bus 505','Sustainable bus with eco-friendly features','GH890XY',45,5,'2025-05-11 08:15:34','2025-05-11 08:15:34');
+INSERT INTO `buses` VALUES (1,'Ford Transit','A comfortable 16-seat van used for intercity travel.','51B-123.45',16,2,'2025-05-11 08:15:34','2025-05-11 08:15:34'),(2,'Bus 202','Economy bus','XY987ZT',40,2,'2025-05-11 08:15:34','2025-05-11 08:15:34'),(3,'Bus 303','Express bus for daily commuters','LM234GH',60,3,'2025-05-11 08:15:34','2025-05-11 08:15:34'),(4,'Bus 404','VIP bus','JK567MN',30,4,'2025-05-11 08:15:34','2025-05-11 08:15:34'),(5,'Bus 505','Sustainable bus with eco-friendly features','GH890XY',45,5,'2025-05-11 08:15:34','2025-05-11 08:15:34');
 /*!40000 ALTER TABLE `buses` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -570,4 +570,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-13 15:46:04
+-- Dump completed on 2025-05-14 21:16:47
