@@ -1,77 +1,78 @@
 import { StatusCodes } from "http-status-codes";
-
-import type { BusCompany } from "@/api/busCompanies/busCompanyModel";
-import { BusCompanyRepository } from "@/api/busCompanies/busCompanyRepository";
+import type { BusCompany } from "./busCompanyModel";
+import { BusCompanyRepository } from "./busCompanyRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
 
 export class BusCompanyService {
-  private busCompanyRepository: BusCompanyRepository;
+  private repository = new BusCompanyRepository();
 
-  constructor(repository: BusCompanyRepository = new BusCompanyRepository()) {
-    this.busCompanyRepository = repository;
-  }
-
-  async findAll(page: number, limit: number, search?: string, sortBy?: string, order?: string) {
+  // 🔍 Lấy danh sách nhà xe
+  async findAll(page: number, limit: number, search?: string, sortBy?: string, order?: string): Promise<ServiceResponse<BusCompany[] | null>> {
     try {
-      const busCompanies = await this.busCompanyRepository.findAllAsync(page, limit, search, sortBy, order);
-      if (!busCompanies.length) {
-        return ServiceResponse.failure("No Bus Companies found", null, StatusCodes.NOT_FOUND);
+      const data = await this.repository.findAllAsync(page, limit, search, sortBy, order);
+
+      if (!data || data.length === 0) {
+        return ServiceResponse.failure("Không tìm thấy nhà xe nào", null, StatusCodes.NOT_FOUND);
       }
-      return ServiceResponse.success("Bus Companies found", busCompanies);
-    } catch (ex) {
-      logger.error(`Error finding all bus companies: ${(ex as Error).message}`);
-      return ServiceResponse.failure("Error retrieving bus companies.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+
+      return ServiceResponse.success("Danh sách nhà xe", data);
+    } catch (error) {
+      logger.error(`❌ Lỗi lấy danh sách nhà xe: ${(error as Error).message}`);
+      return ServiceResponse.failure("Lỗi hệ thống", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async findById(id: number) {
+  // 🔍 Lấy chi tiết theo ID
+  async findById(id: number): Promise<ServiceResponse<BusCompany | null>> {
     try {
-      const busCompany = await this.busCompanyRepository.findByIdAsync(id);
-      if (!busCompany) {
-        return ServiceResponse.failure("Bus Company not found", null, StatusCodes.NOT_FOUND);
+      const company = await this.repository.findByIdAsync(id);
+      if (!company) {
+        return ServiceResponse.failure("Không tìm thấy nhà xe", null, StatusCodes.NOT_FOUND);
       }
-      return ServiceResponse.success("Bus Company found", busCompany);
-    } catch (ex) {
-      logger.error(`Error finding bus company with id ${id}: ${(ex as Error).message}`);
-      return ServiceResponse.failure("Error finding bus company.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+      return ServiceResponse.success("Thông tin nhà xe", company);
+    } catch (error) {
+      logger.error(`❌ Lỗi lấy nhà xe ID ${id}: ${(error as Error).message}`);
+      return ServiceResponse.failure("Lỗi hệ thống", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async create(busCompany: Omit<BusCompany, "id">) {
+  // 🆕 Tạo mới
+  async create(data: Omit<BusCompany, "id">): Promise<ServiceResponse<number | null>> {
     try {
-        const newId = await this.busCompanyRepository.createAsync(busCompany);
-        const createdCompany = await this.busCompanyRepository.findByIdAsync(newId);
-        return ServiceResponse.success("Bus Company created successfully", createdCompany);        
-    } catch (ex) {
-      logger.error(`Error creating bus company: ${(ex as Error).message}`);
-      return ServiceResponse.failure("Error creating bus company.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+      const newId = await this.repository.createAsync(data);
+      return ServiceResponse.success("Tạo nhà xe thành công", newId);
+    } catch (error) {
+      logger.error(`❌ Lỗi tạo nhà xe: ${(error as Error).message}`);
+      return ServiceResponse.failure("Lỗi hệ thống", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async update(id: number, busCompany: Partial<BusCompany>): Promise<ServiceResponse<boolean>> {
+  // ✏️ Cập nhật
+  async update(id: number, data: Partial<BusCompany>): Promise<ServiceResponse<boolean>> {
     try {
-      const isUpdated = await this.busCompanyRepository.updateAsync(id, busCompany);
-      if (!isUpdated) {
-        return ServiceResponse.failure("Bus Company not found or not updated", false, StatusCodes.NOT_FOUND);
+      const updated = await this.repository.updateAsync(id, data);
+      if (!updated) {
+        return ServiceResponse.failure("Không tìm thấy hoặc không thể cập nhật nhà xe", false, StatusCodes.NOT_FOUND);
       }
-      return ServiceResponse.success<boolean>("Bus Company updated successfully", true);
-    } catch (ex) {
-      logger.error(`Error updating bus company with id ${id}: ${(ex as Error).message}`);
-      return ServiceResponse.failure("An error occurred while updating bus company.", false, StatusCodes.INTERNAL_SERVER_ERROR);
+      return ServiceResponse.success("Cập nhật thành công", true);
+    } catch (error) {
+      logger.error(`❌ Lỗi cập nhật nhà xe ID ${id}: ${(error as Error).message}`);
+      return ServiceResponse.failure("Lỗi hệ thống", false, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async delete(id: number) {
+  // ❌ Xóa
+  async delete(id: number): Promise<ServiceResponse<boolean>> {
     try {
-      const isDeleted = await this.busCompanyRepository.deleteAsync(id);
-      if (!isDeleted) {
-        return ServiceResponse.failure("Bus Company not found", false, StatusCodes.NOT_FOUND);
+      const deleted = await this.repository.deleteAsync(id);
+      if (!deleted) {
+        return ServiceResponse.failure("Không tìm thấy hoặc không thể xóa nhà xe", false, StatusCodes.NOT_FOUND);
       }
-      return ServiceResponse.success("Bus Company deleted successfully", true);
-    } catch (ex) {
-      logger.error(`Error deleting bus company: ${(ex as Error).message}`);
-      return ServiceResponse.failure("Error deleting bus company.", false, StatusCodes.INTERNAL_SERVER_ERROR);
+      return ServiceResponse.success("Xóa nhà xe thành công", true);
+    } catch (error) {
+      logger.error(`❌ Lỗi xóa nhà xe ID ${id}: ${(error as Error).message}`);
+      return ServiceResponse.failure("Lỗi hệ thống", false, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 }

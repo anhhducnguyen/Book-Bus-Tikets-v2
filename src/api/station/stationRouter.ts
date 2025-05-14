@@ -11,84 +11,101 @@ import {
   StationQuerySchema 
 } from "@/api/station/stationModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
-import { stationController } from "./stationController";
+import { stationController } from "@/api/station/stationController";
 
 export const stationRegistry = new OpenAPIRegistry();
 export const stationRouter: Router = express.Router();
 
-// Đăng ký model cho OpenAPI
+/** 
+ * 📌 Đăng ký schema cho OpenAPI 
+ */
 stationRegistry.register("Station", StationSchema);
 
-// Lấy tất cả các bến xe (có phân trang, tìm kiếm, sắp xếp)
+/** 
+ * 📌 Lấy danh sách bến xe (Phân trang, Tìm kiếm, Sắp xếp)
+ */
 stationRegistry.registerPath({
   method: "get",
   path: "/stations",
   tags: ["Station"],
   summary: "Lấy tất cả các bến xe với phân trang, tìm kiếm và sắp xếp",
   request: {
-    query: StationQuerySchema,
+    query: StationQuerySchema.shape.query,
   },
-  responses: createApiResponse(z.array(StationSchema), "Success"),
+  responses: createApiResponse(z.array(StationSchema), "Danh sách các bến xe"),
 });
 stationRouter.get("/", validateRequest(StationQuerySchema), stationController.getStations);
 
-// Lấy thông tin chi tiết một bến xe theo ID
+/** 
+ * 📌 Lấy thông tin chi tiết của một bến xe
+ */
 stationRegistry.registerPath({
   method: "get",
   path: "/stations/{id}",
   tags: ["Station"],
   summary: "Lấy thông tin chi tiết một bến xe theo ID",
-  request: { params: GetStationSchema.shape.params },
-  responses: createApiResponse(StationSchema, "Success"),
+  request: {
+    params: GetStationSchema.shape.params,
+  },
+  responses: createApiResponse(StationSchema, "Thông tin chi tiết của bến xe"),
 });
 stationRouter.get("/:id", validateRequest(GetStationSchema), stationController.getStation);
 
-// Tạo mới một bến xe
+/** 
+ * 📌 Tạo mới một bến xe
+ */
 stationRegistry.registerPath({
   method: "post",
   path: "/stations",
   tags: ["Station"],
   summary: "Tạo mới một bến xe",
-  request: { 
+  request: {
     body: {
       content: {
         "application/json": {
-          schema: CreateStationSchema.shape.body
-        }
-      }
-    }
+          schema: CreateStationSchema.shape.body,
+        },
+      },
+    },
   },
   responses: createApiResponse(StationSchema, "Tạo mới bến xe thành công"),
 });
-stationRouter.post("/", validateRequest(CreateStationSchema), stationController.createStation);    
+stationRouter.post("/", validateRequest(CreateStationSchema), stationController.createStation);
 
-// Cập nhật thông tin bến xe theo ID
+/** 
+ * 📌 Cập nhật thông tin một bến xe
+ */
 stationRegistry.registerPath({
   method: "put",
   path: "/stations/{id}",
   tags: ["Station"],
   summary: "Cập nhật thông tin bến xe",
-  request: { 
+  request: {
     params: UpdateStationSchema.shape.params,
     body: {
       content: {
         "application/json": {
-          schema: UpdateStationSchema.shape.body
-        }
-      }
-    }
+          schema: UpdateStationSchema.shape.body,
+        },
+      },
+    },
   },
-  responses: createApiResponse(StationSchema, "Cập nhật bến xe thành công"),
+  responses: createApiResponse(StationSchema, "Cập nhật thông tin bến xe thành công"),
 });
 stationRouter.put("/:id", validateRequest(UpdateStationSchema), stationController.updateStation);
 
-// Xóa một bến xe theo ID
+/** 
+ * 📌 Xóa một bến xe theo ID
+ */
 stationRegistry.registerPath({
   method: "delete",
   path: "/stations/{id}",
   tags: ["Station"],
-  summary: "Xóa một bến xe",
-  request: { params: GetStationSchema.shape.params }, 
+  summary: "Xóa một bến xe theo ID",
+  request: {
+    params: GetStationSchema.shape.params,
+  },
   responses: createApiResponse(z.object({ success: z.boolean() }), "Xóa bến xe thành công"),
 });
 stationRouter.delete("/:id", validateRequest(GetStationSchema), stationController.deleteStation);
+
