@@ -4,7 +4,7 @@ import { z } from "zod";
 import { commonValidations } from "@/common/utils/commonValidation";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { BookTicketInputSchema, CancelTicketSchema, RouteSchema, BusSchema, SeatSchema, TicketSchema } from "@/api/ticket/ticketModel";
+import { BookTicketInputSchema, CancelTicketSchema, RouteSchema, BusSchema, SeatSchema, TicketSchema, PaymentSchema } from "@/api/ticket/ticketModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { ticketController } from "./ticketController";
 
@@ -105,3 +105,28 @@ ticketRegistry.registerPath({
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
 ticketRouter.get("/tickets/history", ticketController.getTicketHistory);
+
+// Chọn phương thức thanh toán
+ticketRegistry.registerPath({
+  method: "post",
+  path: "/payment/:ticketId",
+  tags: ["Ticket"],
+  request: {
+    params: z.object({
+      ticketId: z.string().regex(/^\d+$/, "Ticket ID must be a numeric string"),
+    }),
+    body: {
+      content: {
+        "application/json": {
+          schema: z.object({
+            paymentMethod: z.enum(["ONLINE", "CASH"]),
+            userId: z.number(),
+            amount: z.number().positive(),
+          }),
+        },
+      },
+    },
+  },
+  responses: createApiResponse(PaymentSchema, "Success"),
+});
+ticketRouter.post("/payment/:ticketId", ticketController.selectPaymentMethod);

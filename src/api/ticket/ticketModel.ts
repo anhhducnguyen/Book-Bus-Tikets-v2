@@ -82,6 +82,20 @@ export const BookTicketInputSchema = z.object({
 });
 export type BookTicketInput = z.infer<typeof BookTicketInputSchema>;
 
+// Schema cho Payment
+export const PaymentSchema = z.object({
+  id: z.number(),
+  payment_provider_id: z.number().optional(),
+  user_id: z.number().optional(),
+  ticket_id: z.number(),
+  payment_method: z.enum(["ONLINE", "CASH"]),
+  amount: z.number(),
+  status: z.enum(["PENDING", "COMPLETED", "FAILED"]),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
+export type Payment = z.infer<typeof PaymentSchema>;
+
 export const CancelTicketSchema = z.object({
   params: z.object({ ticketId: commonValidations.id }),
 });

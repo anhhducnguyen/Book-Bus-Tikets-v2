@@ -54,17 +54,56 @@ class TicketController {
       return; 
     }
     const serviceResponse = await ticketService.getTicketsByStatus(status as "BOOKED" | "CANCELLED");
+    res.status(serviceResponse.statusCode).send(serviceResponse);
   }
 
   // Hiển thị lịch sử đặt vé theo nhà xe
   public getTicketsByCompany: RequestHandler = async (req, res) => {
     const { companyId } = req.params;
     const serviceResponse = await ticketService.getTicketsByCompany(Number(companyId));
+    res.status(serviceResponse.statusCode).send(serviceResponse);
   }
 
   // Xem tất cả lịch sử đặt vé
   public getTicketHistory: RequestHandler = async (req, res) => {
     const serviceResponse = await ticketService.getTicketHistory();
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
+
+  // Chọn phương thức thanh toán
+  public selectPaymentMethod: RequestHandler = async (req: Request, res: Response) => {
+    const ticketId = Number.parseInt(req.params.ticketId as string, 10);
+    const { paymentMethod, userId, amount } = req.body;
+
+    if (isNaN(ticketId)) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid ticketId. Must be a number", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    if (!paymentMethod || !["ONLINE", "CASH"].includes(paymentMethod)) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid payment method. Must be ONLINE or CASH", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    if (isNaN(userId)) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid userId. Must be a number", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    if (isNaN(amount) || amount <= 0) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid amount. Must be a positive number", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    const serviceResponse = await ticketService.selectPaymentMethod(ticketId, paymentMethod, userId, amount);
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
 }

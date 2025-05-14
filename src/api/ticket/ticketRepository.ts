@@ -1,4 +1,4 @@
-import type { Route, Bus, Seat, Schedule, Ticket } from "@/api/ticket/ticketModel";
+import type { Route, Bus, Seat, Schedule, Ticket, Payment } from "@/api/ticket/ticketModel";
 import { db } from "@/common/config/database";
 
 export class TicketRepository {
@@ -110,4 +110,24 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
   async getAllTickets(): Promise<Ticket[]> {
     return await db("tickets").select("*");
   }
+
+  // Chọn phương thức thanh toán
+  async createOrUpdatePayment(paymentData: Omit<Payment, "id" | "created_at" | "updated_at">): Promise<Payment> {
+    const [payment] = await db("payments")
+      .insert({
+        ...paymentData,
+        created_at: new Date(),
+        updated_at: new Date(),
+      })
+      .onConflict("ticket_id")
+      .merge()
+      .returning("*");
+    return payment;
+  }
+  async getPaymentByTicketId(ticketId: number): Promise<Payment | undefined> {
+    return await db("payments")
+      .where({ ticket_id: ticketId })
+      .first();
+  }
+
 }
