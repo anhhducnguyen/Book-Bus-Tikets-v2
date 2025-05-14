@@ -49,6 +49,21 @@ export class PaymentProviderService {
             return ServiceResponse.failure("Đã xảy ra lỗi khi tạo nhà cung cấp thanh toán", null, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // Xóa một nhà cung cấp thanh toán theo ID
+    async deletePaymentProvider(id: number): Promise<ServiceResponse<any>> {
+        try {
+            const deleted = await this.paymentProviderRepository.deletePaymentProviderAsync(id);
+            if (!deleted) {
+                return ServiceResponse.failure("Payment provider not found", null, StatusCodes.NOT_FOUND);
+            }
+            return ServiceResponse.success("Payment provider deleted successfully", null);
+        } catch (error) {
+            logger.error(`Error deleting payment provider with id ${id}: ${(error as Error).message}`);
+            return ServiceResponse.failure("An error occurred while deleting payment provider.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
 
 export const paymentProviderService = new PaymentProviderService();
