@@ -110,4 +110,18 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
   async getAllTickets(): Promise<Ticket[]> {
     return await db("tickets").select("*");
   }
+
+  async getTicketById(ticketId: number): Promise<Ticket | undefined> {
+    return await db("tickets")
+      .where({ id: ticketId })
+      .first();
+  }
+
+  // Xóa thông tin hủy vé xe
+  async deleteCancelledTicket(ticketId: number): Promise<void> {
+    await db("tickets")
+      .where({ id: ticketId, status: "CANCELLED" })
+      .del();
+  }
+  
 }
