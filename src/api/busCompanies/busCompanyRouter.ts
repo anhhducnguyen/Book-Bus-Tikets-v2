@@ -2,93 +2,91 @@ import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import express, { type Router } from "express";
 import { z } from "zod";
 
-import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { 
-  GetBusCompanySchema, 
-  BusCompanySchema, 
-  CreateBusCompanySchema, 
-  UpdateBusCompanySchema, 
-  BusCompanyQuerySchema 
-} from "@/api/busCompanies/busCompanyModel";
+import {
+  BusCompanySchema,
+  GetBusCompanySchema,
+  CreateBusCompanySchema,
+  UpdateBusCompanySchema,
+  BusCompanyQuerySchema
+} from "./busCompanyModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
+import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { busCompanyController } from "./busCompanyController";
 
 export const busCompanyRegistry = new OpenAPIRegistry();
 export const busCompanyRouter: Router = express.Router();
 
-// Đăng ký model cho OpenAPI
+// 🗂️ Đăng ký model cho OpenAPI
 busCompanyRegistry.register("BusCompany", BusCompanySchema);
 
-// Lấy tất cả các nhà xe (có phân trang, tìm kiếm, sắp xếp)
+// 🚀 GET /bus-companies
 busCompanyRegistry.registerPath({
   method: "get",
   path: "/bus-companies",
   tags: ["BusCompany"],
-  summary: "Lấy tất cả các nhà xe với phân trang, tìm kiếm và sắp xếp",
-  request: {
-    query: BusCompanyQuerySchema,
-  },
-  responses: createApiResponse(z.array(BusCompanySchema), "Success"),
+  summary: "Lấy danh sách nhà xe",
+  request: { query: BusCompanyQuerySchema.shape.query },
+  responses: createApiResponse(z.array(BusCompanySchema), "Danh sách nhà xe"),
 });
-busCompanyRouter.get("/", validateRequest(BusCompanyQuerySchema), busCompanyController.getBusCompanies);
+busCompanyRouter.get("/", validateRequest(BusCompanyQuerySchema), busCompanyController.getCompanies);
 
-// Lấy thông tin chi tiết một nhà xe theo ID
+// 🚀 GET /bus-companies/:id
 busCompanyRegistry.registerPath({
   method: "get",
   path: "/bus-companies/{id}",
   tags: ["BusCompany"],
-  summary: "Lấy thông tin chi tiết một nhà xe theo ID",
+  summary: "Lấy thông tin nhà xe",
   request: { params: GetBusCompanySchema.shape.params },
-  responses: createApiResponse(BusCompanySchema, "Success"),
+  responses: createApiResponse(BusCompanySchema, "Chi tiết nhà xe"),
 });
-busCompanyRouter.get("/:id", validateRequest(GetBusCompanySchema), busCompanyController.getBusCompany);
+busCompanyRouter.get("/:id", validateRequest(GetBusCompanySchema), busCompanyController.getCompany);
 
-// Tạo mới một nhà xe
+// 🚀 POST /bus-companies
 busCompanyRegistry.registerPath({
   method: "post",
   path: "/bus-companies",
   tags: ["BusCompany"],
-  summary: "Tạo mới một nhà xe",
-  request: { 
+  summary: "Tạo mới nhà xe",
+  request: {
     body: {
       content: {
         "application/json": {
-          schema: CreateBusCompanySchema.shape.body
-        }
-      }
-    }
+          schema: CreateBusCompanySchema.shape.body,
+        },
+      },
+    },
   },
-  responses: createApiResponse(BusCompanySchema, "Tạo mới nhà xe thành công"),
+  responses: createApiResponse(BusCompanySchema, "Tạo nhà xe thành công"),
 });
-busCompanyRouter.post("/", validateRequest(CreateBusCompanySchema), busCompanyController.createBusCompany);    
+busCompanyRouter.post("/", validateRequest(CreateBusCompanySchema), busCompanyController.createCompany);
 
-// Cập nhật thông tin nhà xe theo ID
+// 🚀 PUT /bus-companies/:id
 busCompanyRegistry.registerPath({
   method: "put",
   path: "/bus-companies/{id}",
   tags: ["BusCompany"],
-  summary: "Cập nhật thông tin nhà xe",
-  request: { 
+  summary: "Cập nhật nhà xe",
+  request: {
     params: UpdateBusCompanySchema.shape.params,
     body: {
       content: {
         "application/json": {
-          schema: UpdateBusCompanySchema.shape.body
-        }
-      }
-    }
+          schema: UpdateBusCompanySchema.shape.body,
+        },
+      },
+    },
   },
-  responses: createApiResponse(BusCompanySchema, "Cập nhật nhà xe thành công"),
+  responses: createApiResponse(BusCompanySchema, "Cập nhật thành công"),
 });
-busCompanyRouter.put("/:id", validateRequest(UpdateBusCompanySchema), busCompanyController.updateBusCompany);
+busCompanyRouter.put("/:id", validateRequest(UpdateBusCompanySchema), busCompanyController.updateCompany);
 
-// Xóa một nhà xe theo ID
+// 🚀 DELETE /bus-companies/:id
 busCompanyRegistry.registerPath({
   method: "delete",
   path: "/bus-companies/{id}",
   tags: ["BusCompany"],
-  summary: "Xóa một nhà xe",
-  request: { params: GetBusCompanySchema.shape.params }, 
-  responses: createApiResponse(z.object({ success: z.boolean() }), "Xóa nhà xe thành công"),
+  summary: "Xóa nhà xe",
+  request: { params: GetBusCompanySchema.shape.params },
+  responses: createApiResponse(z.object({ success: z.boolean() }), "Xóa thành công"),
 });
-busCompanyRouter.delete("/:id", validateRequest(GetBusCompanySchema), busCompanyController.deleteBusCompany);
+busCompanyRouter.delete("/:id", validateRequest(GetBusCompanySchema), busCompanyController.deleteCompany);
