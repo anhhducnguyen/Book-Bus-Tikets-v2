@@ -8,13 +8,13 @@ extendZodWithOpenApi(z);
 // Schema cho Route
 export const RouteSchema = z.object({
   id: z.number(),
-  departureStationId: z.number(),
-  arrivalStationId: z.number(),
+  departure_station_id: z.number(),
+  arrival_station_id: z.number(),
   price: z.number(),
   duration: z.number(),
   distance: z.number(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  created_at: z.date(),
+  updated_at: z.date(),
 });
 export type Route = z.infer<typeof RouteSchema>;
 
@@ -22,39 +22,39 @@ export type Route = z.infer<typeof RouteSchema>;
 export const BusSchema = z.object({
   id: z.number(),
   name: z.string(),
-  licensePlate: z.string(),
+  license_plate: z.string(),
   capacity: z.number(),
-  companyId: z.number(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  company_id: z.number(),
+  created_at: z.date(),
+  updated_at: z.date(),
 });
 export type Bus = z.infer<typeof BusSchema>;
 
 // Schema cho Seat
 export const SeatSchema = z.object({
   id: z.number(),
-  busId: z.number(),
-  seatNumber: z.string(),
-  seatType: z.enum(["LUXURY", "VIP", "STANDARD"]),
+  bus_id: z.number(),
+  seat_number: z.string(),
+  seat_type: z.enum(["LUXURY", "VIP", "STANDARD"]),
   status: z.enum(["AVAILABLE", "BOOKED"]),
-  priceForTypeSeat: z.number(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  price_for_type_seat: z.number(),
+  created_at: z.date(),
+  updated_at: z.date(),
 });
 export type Seat = z.infer<typeof SeatSchema>;
 
 // Schema cho Schedule
 export const ScheduleSchema = z.object({
   id: z.number(),
-  routeId: z.number(),
-  busId: z.number(),
-  departureTime: z.date(),
-  arrivalTime: z.date(),
-  availableSeats: z.number(),
-  totalSeats: z.number(),
+  route_id: z.number(),
+  bus_id: z.number(),
+  departure_time: z.date(),
+  arrival_time: z.date(),
+  available_seats: z.number(),
+  total_seats: z.number(),
   status: z.enum(["AVAILABLE", "FULL", "CANCELLED"]),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  created_at: z.date(),
+  updated_at: z.date(),
 });
 export type Schedule = z.infer<typeof ScheduleSchema>;
 
@@ -75,10 +75,10 @@ export type Ticket = z.infer<typeof TicketSchema>;
 
 // Validation cho các endpoint
 export const BookTicketInputSchema = z.object({
-  userId: z.number().int().positive(),
-  routeId: z.number().int().positive(),
-  busId: z.number().int().positive(),
-  seatId: z.number().int().positive(),
+  user_id: z.number().int().positive(),
+  route_id: z.number().int().positive(),
+  bus_id: z.number().int().positive(),
+  seat_id: z.number().int().positive(),
 });
 export type BookTicketInput = z.infer<typeof BookTicketInputSchema>;
 
