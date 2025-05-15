@@ -224,6 +224,25 @@ export class TicketService {
       return ServiceResponse.failure("Error selecting payment method", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
+
+  // Xóa thông tin hủy vé xe
+  async deleteCancelledTicket(ticketId: number): Promise<ServiceResponse<null>> {
+    try {
+      const ticket = await this.ticketRepository.getTicketById(ticketId);
+      if (!ticket) {
+        return ServiceResponse.failure("Ticket not found", null, StatusCodes.NOT_FOUND);
+      }
+      if (ticket.status !== "CANCELLED") {
+        return ServiceResponse.failure("Only cancelled tickets can be deleted", null, StatusCodes.BAD_REQUEST);
+      }
+
+      await this.ticketRepository.deleteCancelledTicket(ticketId);
+      return ServiceResponse.success<null>("Cancelled ticket deleted successfully", null);
+    } catch (ex) {
+      logger.error(`Error deleting cancelled ticket: ${(ex as Error).message}`);
+      return ServiceResponse.failure("Error deleting cancelled ticket", null, StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
 
 export const ticketService = new TicketService();

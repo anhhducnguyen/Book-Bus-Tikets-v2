@@ -106,6 +106,20 @@ class TicketController {
     const serviceResponse = await ticketService.selectPaymentMethod(ticketId, paymentMethod, userId, amount);
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
+
+  // Xóa thông tin hủy vé xe
+  public deleteCancelledTicket: RequestHandler = async (req: Request, res: Response) => {
+    const ticketId = Number.parseInt(req.params.ticketId as string, 10);
+    if (isNaN(ticketId)) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid ticketId. Must be a number", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    const serviceResponse = await ticketService.deleteCancelledTicket(ticketId);
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
 }
 
 export const ticketController = new TicketController();

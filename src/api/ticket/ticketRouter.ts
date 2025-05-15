@@ -7,6 +7,7 @@ import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { BookTicketInputSchema, CancelTicketSchema, RouteSchema, BusSchema, SeatSchema, TicketSchema, PaymentSchema } from "@/api/ticket/ticketModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { ticketController } from "./ticketController";
+import { permission } from "@/common/middleware/auth/permission";
 
 export const ticketRegistry = new OpenAPIRegistry();
 export const ticketRouter: Router = express.Router();
@@ -131,3 +132,18 @@ ticketRegistry.registerPath({
   responses: createApiResponse(PaymentSchema, "Success"),
 });
 ticketRouter.post("/payment/:ticketId", ticketController.selectPaymentMethod);
+
+// Xóa thông tin hủy vé
+ticketRegistry.registerPath({
+  method: "delete",
+  path: "/tickets/cancel_ticket/delete/{ticketId}",
+  tags: ["Ticket"],
+  summary: "Xóa thông tin hủy vé",
+  request: {
+    params: z.object({
+      ticketId: z.string().regex(/^\d+$/, "Ticket ID must be a numeric string"),
+    }),
+  },
+  responses: createApiResponse(z.any(), "Success"),
+});
+ticketRouter.delete("/cancel_ticket/delete/:ticketId", permission, ticketController.deleteCancelledTicket);
