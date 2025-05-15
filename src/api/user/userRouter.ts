@@ -77,3 +77,16 @@ userRouter.post("/",
 	validateRequest(CreateUserSchema),
 	userController.createUser
 );
+
+
+userRegistry.registerPath({
+  method: "delete",
+  path: "/users/{id}",
+  tags: ["User"],
+  summary: "Xóa người dùng theo id",
+  request: {
+	params: GetUserSchema.shape.params,
+  },
+  responses: createApiResponse(z.object({ success: z.boolean() }), "Xóa bến xe thành công"),
+});
+userRouter.delete("/:id", validateRequest(GetUserSchema), userController.deleteStation);

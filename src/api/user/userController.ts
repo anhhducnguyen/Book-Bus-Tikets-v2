@@ -46,6 +46,12 @@ class UserController {
 		}
 	};
 
+	public deleteStation: RequestHandler = async (req, res) => {
+		const id = Number(req.params.id);
+		const serviceResponse = await userService.delete(id);
+		res.status(serviceResponse.statusCode).send(serviceResponse);
+	  };
+
 }
 
 export const userController = new UserController();

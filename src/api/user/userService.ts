@@ -47,6 +47,22 @@ export class UserService {
 			return ServiceResponse.failure("An error occurred while creating user.", null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	async delete(id: number): Promise<ServiceResponse<boolean>> {
+    try {
+      const isDeleted = await this.userRepository.deleteAsync(id);
+
+      if (!isDeleted) {
+        return ServiceResponse.failure("User does not exist or cannot be deleted", false, StatusCodes.NOT_FOUND);
+      }
+
+      return ServiceResponse.success<boolean>("User deleted successfully", true);
+    } catch (error) {
+      const errorMessage = `Error deleted user ${id}: ${(error as Error).message}`;
+      logger.error(errorMessage);
+      return ServiceResponse.failure("An error occurred while delete user.", false, StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
 
 
