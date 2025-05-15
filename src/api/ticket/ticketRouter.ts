@@ -7,6 +7,7 @@ import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { BookTicketInputSchema, CancelTicketSchema, RouteSchema, BusSchema, SeatSchema, TicketSchema, PaymentSchema } from "@/api/ticket/ticketModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { ticketController } from "./ticketController";
+import { permission } from "@/common/middleware/auth/permission";
 
 export const ticketRegistry = new OpenAPIRegistry();
 export const ticketRouter: Router = express.Router();
@@ -145,4 +146,4 @@ ticketRegistry.registerPath({
   },
   responses: createApiResponse(z.any(), "Success"),
 });
-ticketRouter.delete("/cancel_ticket/delete/:ticketId", ticketController.deleteCancelledTicket);
+ticketRouter.delete("/cancel_ticket/delete/:ticketId", permission, ticketController.deleteCancelledTicket);
