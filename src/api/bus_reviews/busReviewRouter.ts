@@ -8,11 +8,16 @@ import { routesController } from "@/api/routes/routesController"; // Controller 
 import { BusReviewSchema, CreateBusReviewSchema } from "@/api/bus_reviews/busReviewModel"; // Schema Zod cho routes
 import { busReviewController } from "./busReviewController";
 
+import { permission } from "@/common/middleware/auth/permission";
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
+
 // Khởi tạo OpenAPI registry
 export const busReviewRegistry = new OpenAPIRegistry();
 
 // Khởi tạo router
 export const busReviewRouter: Router = express.Router();
+
+busReviewRouter.use(authenticate);
 
 // Đăng ký schema OpenAPI cho Routes
 busReviewRegistry.register("BusReview", BusReviewSchema);
@@ -24,7 +29,7 @@ busReviewRegistry.registerPath({
   path: "/bus-reviews",
   operationId: "getAllBusReview",
   summary: "Lấy danh sách review có hỗ trợ phân trang, tìm kiếm và lọc",
-  tags: ["bus-reviews"],
+  tags: ["Bus reviews"],
   parameters: [
     {
       name: "page",
@@ -99,12 +104,12 @@ busReviewRegistry.registerPath({
   responses: createApiResponse(z.array(BusReviewSchema), "Thành công"),
 });
 // Đăng ký handler cho GET /routes
-busReviewRouter.get("/", busReviewController.getAllBusReview);
+busReviewRouter.get("/", permission, busReviewController.getAllBusReview);
 //them moi review
 busReviewRegistry.registerPath({
     method: "post",
     path: "/bus-reviews",
-     tags: ["bus-reviews"],
+     tags: ["Bus reviews"],
     operationId: "createBusReview",  // Thay 'operation' bằng 'operationId'
     summary: "Create a new BusReview",  // Thêm phần mô tả ngắn gọn về API
     requestBody: {
@@ -156,7 +161,7 @@ busReviewRegistry.registerPath({
  busReviewRegistry.registerPath({
    method: "delete",
    path: "/bus-reviews/{id}",
-    tags: ["bus-reviews"],
+    tags: ["Bus reviews"],
    operationId: "deleteBusReview",
    summary: "Xóa busReview theo ID",
    

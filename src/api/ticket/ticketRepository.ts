@@ -93,9 +93,11 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
 
   // Hiển thị lịch sử đặt vé theo trạng thái
   async getTicketsByStatus(status: "BOOKED" | "CANCELLED"): Promise<Ticket[]> {
-    return await db("tickets")
+    const data = await db("tickets")
       .where("status", status)
       .select("*");
+    // console.log(data);
+    return data;
   }
 
   // Hiển thị lịch sử đặt vé theo nhà xe (companyId)
@@ -106,6 +108,8 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
       .where("buses.company_id", companyId)
       .select("tickets.*");
   }
+
+  
   // Xem lại tất cả lịch sử đặt vé
   async getAllTickets(): Promise<Ticket[]> {
     return await db("tickets").select("*");
@@ -128,6 +132,41 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
     return await db("payments")
       .where({ ticket_id: ticketId })
       .first();
+  }
+
+
+  
+  async getTicketById(ticketId: number): Promise<Ticket | undefined> {
+    return await db("tickets")
+      .where({ id: ticketId })
+      .first();
+  }
+
+  // Xóa thông tin hủy vé xe
+  async deleteCancelledTicket(ticketId: number): Promise<void> {
+    await db("tickets")
+      .where({ id: ticketId, status: "CANCELLED" })
+      .del();
+  }
+  
+  // Thêm mới thông tin hủy vé xe dành cho admin
+  async createCancelTicket(ticketId: number): Promise<void> {
+    await db("tickets")
+      .where({ id: ticketId })
+      .update({
+        status: "CANCELLED",
+        updated_at: new Date(),
+      });
+  }
+
+  // Hiển thi danh sách thông tin hủy theo vé xe
+  async getCancelledTickets(ticketId: number): Promise<void> {
+    await db("tickets")
+      .where({ id: ticketId })
+      .update({
+        status: "CANCELLED",
+        updated_at: db.fn.now(),
+      });
   }
 
 }

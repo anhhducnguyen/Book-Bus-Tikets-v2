@@ -60,6 +60,7 @@ class TicketController {
   // Hiển thị lịch sử đặt vé theo nhà xe
   public getTicketsByCompany: RequestHandler = async (req, res) => {
     const { companyId } = req.params;
+    console.log("Id", companyId);
     const serviceResponse = await ticketService.getTicketsByCompany(Number(companyId));
     res.status(serviceResponse.statusCode).send(serviceResponse);
   }
@@ -75,6 +76,9 @@ class TicketController {
     const ticketId = Number.parseInt(req.params.ticketId as string, 10);
     const { paymentMethod, userId, amount } = req.body;
 
+  // Xóa thông tin hủy vé xe
+  public deleteCancelledTicket: RequestHandler = async (req: Request, res: Response) => {
+    const ticketId = Number.parseInt(req.params.ticketId as string, 10);
     if (isNaN(ticketId)) {
       res.status(StatusCodes.BAD_REQUEST).send(
         ServiceResponse.failure("Invalid ticketId. Must be a number", null, StatusCodes.BAD_REQUEST)
@@ -104,6 +108,9 @@ class TicketController {
     }
 
     const serviceResponse = await ticketService.selectPaymentMethod(ticketId, paymentMethod, userId, amount);
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
+    const serviceResponse = await ticketService.deleteCancelledTicket(ticketId);
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
 }
