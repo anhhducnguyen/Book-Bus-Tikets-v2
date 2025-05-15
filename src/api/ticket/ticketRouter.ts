@@ -109,7 +109,7 @@ ticketRouter.get("/tickets/history", ticketController.getTicketHistory);
 // Chọn phương thức thanh toán
 ticketRegistry.registerPath({
   method: "post",
-  path: "/payment/:ticketId",
+  path: "/tickets/payment/{ticketId}",
   tags: ["Ticket"],
   request: {
     params: z.object({
