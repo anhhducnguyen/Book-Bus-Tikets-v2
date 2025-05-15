@@ -94,7 +94,7 @@ bannerRegistry.registerPath({
     path: "/banners",
     tags: ["Banners"],
     operationId: "createBanner",  // Thay 'operation' bằng 'operationId'
-    summary: "Create a new Banner",  // Thêm phần mô tả ngắn gọn về API
+    summary: "Thêm mới banner",  // Thêm phần mô tả ngắn gọn về API
     requestBody: {
       content: {
         "application/json": {

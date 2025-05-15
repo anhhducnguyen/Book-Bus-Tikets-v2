@@ -28,8 +28,8 @@ routesRegistry.registerPath({
   method: "get",
   path: "/routes",
   operationId: "getAllRoutes",
-  summary: "Lấy danh sách routes có hỗ trợ phân trang, tìm kiếm và lọc",
   tags: ["Routes"],
+  summary: "Lấy danh sách routes có hỗ trợ phân trang, tìm kiếm và lọc",
   parameters: [
     {
       name: "page",
@@ -89,7 +89,7 @@ routesRegistry.registerPath({
     path: "/routes",
     tags: ["Routes"],
     operationId: "createRoutes",  // Thay 'operation' bằng 'operationId'
-    summary: "Create a new Routes",  // Thêm phần mô tả ngắn gọn về API
+    summary: "Thêm mới tuyến đường",  // Thêm phần mô tả ngắn gọn về API
     requestBody: {
       content: {
         "application/json": {
@@ -109,7 +109,7 @@ routesRegistry.registerPath({
     },
     responses: {
       201: {
-        description: "User created successfully",
+        description: "Routes created successfully",
         content: {
           "application/json": {
             schema: {
@@ -142,7 +142,7 @@ routesRegistry.registerPath({
    method: "delete",
    path: "/routes/{id}",
    operationId: "deleteRoutes",
-   summary: "Xóa routes theo ID",
+   summary: "Xóa tuyến đường theo id",
    tags: ["Routes"],
    parameters: [
      {

@@ -28,7 +28,7 @@ busReviewRegistry.registerPath({
   method: "get",
   path: "/bus-reviews",
   operationId: "getAllBusReview",
-  summary: "Lấy danh sách review có hỗ trợ phân trang, tìm kiếm và lọc",
+  summary: "Lấy danh sách đánh giá xe có hỗ trợ phân trang, tìm kiếm và lọc",
   tags: ["Bus reviews"],
   parameters: [
     {
@@ -111,7 +111,7 @@ busReviewRegistry.registerPath({
     path: "/bus-reviews",
      tags: ["Bus reviews"],
     operationId: "createBusReview",  // Thay 'operation' bằng 'operationId'
-    summary: "Create a new BusReview",  // Thêm phần mô tả ngắn gọn về API
+    summary: "Thêm mới đánh giá xe",  // Thêm phần mô tả ngắn gọn về API
     requestBody: {
       content: {
         "application/json": {
@@ -163,7 +163,7 @@ busReviewRegistry.registerPath({
    path: "/bus-reviews/{id}",
     tags: ["Bus reviews"],
    operationId: "deleteBusReview",
-   summary: "Xóa busReview theo ID",
+   summary: "Xóa đánh giá xe theo ID",
    
    parameters: [
      {
