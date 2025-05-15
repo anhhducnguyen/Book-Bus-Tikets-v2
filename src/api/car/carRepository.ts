@@ -35,6 +35,10 @@ export class CarRepository {
         if (filter.name) {
             query.where("name", "like", `%${filter.name}%`);
         }
+
+        if (filter.license_plate) {
+            query.where("license_plate", "like", `%${filter.license_plate}%`);
+        }
     
         const offset = (page - 1) * limit;
     
@@ -44,6 +48,9 @@ export class CarRepository {
             .modify((qb) => {
                 if (filter.name) {
                     qb.where("name", "like", `%${filter.name}%`);
+                }
+                if (filter.license_plate) {
+                    qb.where("license_plate", "like", `%${filter.license_plate}%`);
                 }
             })
             .count("id as count");

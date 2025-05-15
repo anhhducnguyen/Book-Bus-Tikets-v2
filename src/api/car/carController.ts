@@ -6,7 +6,7 @@ import { StatusCodes } from "http-status-codes";
 
 class CarController {
     public getCars: RequestHandler = async (_req: Request, res: Response) => {
-        const filter = pick(_req.query, ['name']);
+        const filter = pick(_req.query, ['name', 'license_plate']);
         const options = pick(_req.query, ['sortBy', 'limit', 'page']);
         const serviceResponse = await carService.findAll(filter, options);     
 

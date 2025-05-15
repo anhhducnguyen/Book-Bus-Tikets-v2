@@ -76,4 +76,9 @@ export class UserRepository {
 
 		return newUser;
 	}
+
+	async deleteAsync(id: number): Promise<boolean> {
+		const deletedRows = await db<User>("users").where({ id }).del();
+		return deletedRows > 0;
+	  }
 }

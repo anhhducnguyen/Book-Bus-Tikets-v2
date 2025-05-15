@@ -37,6 +37,18 @@ export const UpdateCarSchema = z.object({
   }),
 });
 
+export const CarQuerySchema = z.object({
+  query: z.object({
+    page: z.coerce.number().min(1).default(1),
+    limit: z.coerce.number().min(1).default(10),
+    name: z.string().optional(),
+    license_plate: z.string().optional(),
+    sortBy: z
+      .enum(["id:asc", "id:desc", "name:asc", "name:desc", "license_plate:asc", "license_plate:desc"])
+      .default("id:asc"),
+  }),
+});
+
 // export const CreateCarSchema = z.object({
 //     body: z.object({
 //       name: z.string(),

@@ -19,7 +19,7 @@ authRegistry.registerPath({
   method: "get",
   path: "/auth/google",
   tags: ["Auth"],
-  summary: "Login with Google",
+  summary: "Đăng nhập với Google",
   description: "Chuyển hướng người dùng đến Google để xác thực bằng OAuth2.",
   responses: {
     302: {
@@ -49,7 +49,7 @@ authRegistry.registerPath({
 	method: "post",
 	path: "/auth/reset-password",
 	tags: ["Auth"],
-	summary: "Reset-password",
+	summary: "Đặt lại mật khẩu",
     description: "Reset-password",
         request: {
         body: {
@@ -72,7 +72,7 @@ authRegistry.registerPath({
   method: "post",
   path: "/auth/reset-password/confirm",
   tags: ["Auth"],
-  summary: "Confirm reset password",
+  summary: "Xác nhận đặt lại mật khẩu",
   description: "Xác nhận và cập nhật mật khẩu mới sau khi người dùng đã nhận token qua email",
   request: {
     body: {
@@ -118,7 +118,7 @@ authRegistry.registerPath({
 	method: "post",
 	path: "/auth/register",
 	tags: ["Auth"],
-	summary: "Create a new account",
+	summary: "Đăng ký tài khoản",
     description: "Create a new account",
         request: {
         body: {
@@ -142,7 +142,7 @@ authRegistry.registerPath({
 	method: "post",
 	path: "/auth/login",
 	tags: ["Auth"],
-	summary: "Login account",
+	summary: "Đăng nhập",
     description: "Login account",
         request: {
         body: {
