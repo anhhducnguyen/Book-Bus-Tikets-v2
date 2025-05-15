@@ -131,3 +131,18 @@ ticketRegistry.registerPath({
   responses: createApiResponse(PaymentSchema, "Success"),
 });
 ticketRouter.post("/payment/:ticketId", ticketController.selectPaymentMethod);
+
+// Xóa thông tin hủy vé
+ticketRegistry.registerPath({
+  method: "delete",
+  path: "/tickets/cancel_ticket/delete/{ticketId}",
+  tags: ["Ticket"],
+  summary: "Xóa thông tin hủy vé",
+  request: {
+    params: z.object({
+      ticketId: z.string().regex(/^\d+$/, "Ticket ID must be a numeric string"),
+    }),
+  },
+  responses: createApiResponse(z.any(), "Success"),
+});
+ticketRouter.delete("/cancel_ticket/delete/:ticketId", ticketController.deleteCancelledTicket);
