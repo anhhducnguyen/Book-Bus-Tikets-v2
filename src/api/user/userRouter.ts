@@ -7,11 +7,13 @@ import { GetUserSchema, UserSchema, CreateUserSchema } from "@/api/user/userMode
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { userController } from "./userController";
 
-import { ROLES } from "@/common/constants/role";
-import { authenticate, authorize } from "@/common/middleware/auth/authMiddleware";
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
+import { permission } from "@/common/middleware/auth/permission";
 
 export const userRegistry = new OpenAPIRegistry();
 export const userRouter: Router = express.Router();
+
+userRouter.use(authenticate);
 
 userRegistry.register("User", UserSchema);
 
@@ -23,8 +25,7 @@ userRegistry.registerPath({
 });
 
 userRouter.get("/",
-	authenticate,
-	authorize([ROLES.ADMIN]),
+	permission,
 	userController.getUsers
 );
 
@@ -37,8 +38,7 @@ userRegistry.registerPath({
 });
 
 userRouter.get("/:id",
-	authenticate,
-	authorize([ROLES.ADMIN]),
+	permission,
 	validateRequest(GetUserSchema),
 	userController.getUser
 );
@@ -62,8 +62,7 @@ userRegistry.registerPath({
 });
 
 userRouter.post("/",
-	authenticate,
-	authorize([ROLES.ADMIN]),
+	permission,
 	validateRequest(CreateUserSchema),
 	userController.createUser
 );

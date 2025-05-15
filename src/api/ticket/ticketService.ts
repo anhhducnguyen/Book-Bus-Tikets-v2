@@ -138,6 +138,7 @@ export class TicketService {
   async getTicketsByStatus(status: "BOOKED" | "CANCELLED"): Promise<ServiceResponse<Ticket[] | null>> {
     try {
       const tickets = await this.ticketRepository.getTicketsByStatus(status);
+      // console.log(tickets);
       if (!Array.isArray(tickets)) {
         logger.warn("Invalid data format returned from repository");
         return ServiceResponse.success<Ticket[]>("No tickets found for this status", []);
@@ -150,6 +151,7 @@ export class TicketService {
       return ServiceResponse.failure("Error fetching tickets for status", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
+  
     // Hiển thị lịch sử đặt vé theo nhà xe
   async getTicketsByCompany(companyId: number): Promise<ServiceResponse<Ticket[] | null>> {
     try {
@@ -166,6 +168,7 @@ export class TicketService {
       return ServiceResponse.failure("Error fetching tickets for company", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
+
   // Xem lại tất cả lịch sử đặt vé
   async getTicketHistory(): Promise<ServiceResponse<Ticket[] | null>> {
     try {
@@ -204,5 +207,48 @@ export class TicketService {
   }
   
 }
+  // Thêm mới thông tin hủy vé xe dành cho admin
+  async createCancelTicket(ticketId: number): Promise<ServiceResponse<null>> {
+    try {
+      const ticket = await this.ticketRepository.getTicketById(ticketId);
+      if (!ticket) {
+        return ServiceResponse.failure("Ticket not found", null, StatusCodes.NOT_FOUND);
+      }
+      if (ticket.status !== "BOOKED") {
+        return ServiceResponse.failure("Only booked tickets can be cancelled", null, StatusCodes.BAD_REQUEST);
+      }
+      await this.ticketRepository.createCancelTicket(ticketId);
+      return ServiceResponse.success<null>("Ticket cancellation information added successfully", null);
+    } catch (ex) {
+      logger.error(`Error creating cancellation information: ${(ex as Error).message}`);
+      return ServiceResponse.failure("Error creating cancellation information", null, StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
 
+  // Hiển thi danh sách thông tin hủy theo vé xe
+  async getCancelledTickets(): Promise<ServiceResponse<Ticket[] | null>> {
+    try {
+      const tickets = await this.ticketRepository.getTicketsByStatus("CANCELLED");
+      if (!Array.isArray(tickets)) {
+        logger.warn("Invalid data format returned from repository");
+        return ServiceResponse.success<Ticket[]>("No cancelled tickets found", []);
+      }
+
+      const transformedTickets = tickets.map((ticket) => ({
+        ...ticket,
+        departure_time: ticket.departure_time instanceof Date ? ticket.departure_time : new Date(ticket.departure_time),
+        arrival_time: ticket.arrival_time instanceof Date ? ticket.arrival_time : new Date(ticket.arrival_time),
+        created_at: ticket.created_at instanceof Date ? ticket.created_at : new Date(ticket.created_at),
+        updated_at: ticket.updated_at instanceof Date ? ticket.updated_at : new Date(ticket.updated_at),
+      }));
+
+      const validatedTickets = TicketSchema.array().parse(transformedTickets);
+      return ServiceResponse.success<Ticket[]>("Cancelled tickets retrieved", validatedTickets);
+    } catch (ex) {
+      logger.error(`Error fetching cancelled tickets: ${(ex as Error).message}`);
+      return ServiceResponse.failure("Error fetching cancelled tickets", null, StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+}
 export const ticketService = new TicketService();
