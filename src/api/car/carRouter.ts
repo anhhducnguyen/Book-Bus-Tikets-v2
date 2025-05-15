@@ -3,7 +3,13 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { GetCarSchema, CarSchema, CreateCarSchema, UpdateCarSchema } from "@/api/car/carModel";
+import { 
+  GetCarSchema, 
+  CarSchema, 
+  CreateCarSchema, 
+  UpdateCarSchema,
+  CarQuerySchema 
+} from "@/api/car/carModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { carController } from "./carController";
 
@@ -21,7 +27,7 @@ carRegistry.registerPath({
   method: "get",
   path: "/cars/popular-garage",
   tags: ["Car"],
-  summary: "Get the most popular garage",
+  summary: "Nhà xe phổ biến",
   description: "Get the most popular garage",
   responses: createApiResponse(z.object({ garage: z.string() }), "Success"),
 });
@@ -33,8 +39,9 @@ carRegistry.registerPath({
   path: "/cars",
   tags: ["Car"],
   operationId: "getCars",
-  summary: "Get all cars",
+  summary: "Hiển thị tất cả xe (phân trang, sắp xếp, tìm kiếm)",
   description: "Fetch all cars with optional filters and pagination.",
+  request: { query: CarQuerySchema.shape.query },
   responses: createApiResponse(z.array(CarSchema), "Success"),
 });
 
@@ -50,7 +57,7 @@ carRegistry.registerPath({
   path: "/cars/{id}",
   tags: ["Car"],
   operationId: "getCar",
-  summary: "Get a car by ID",
+  summary: "Lấy thông tin xe theo id",
   description: "Fetch a car by its ID.",
   request: { params: GetCarSchema.shape.params },
   responses: createApiResponse(GetCarSchema, "Success"),
@@ -68,7 +75,7 @@ carRegistry.registerPath({
   path: "/cars/{id}",
   tags: ["Car"],
   operationId: "deleteCar",
-  summary: "Delete a car by ID",
+  summary: "Xóa xe",
   description: "Delete a car by its ID.",
   request: { params: GetCarSchema.shape.params },
   responses: createApiResponse(GetCarSchema, "Success"),
@@ -87,7 +94,7 @@ carRegistry.registerPath({
   path: "/cars",
   tags: ["Car"],
   operationId: "createCar",
-  summary: "Create a new car",
+  summary: "Thêm mới xe",
   description: "Create a new car with the provided details.",
   request: {
     body: {
@@ -114,7 +121,7 @@ carRegistry.registerPath({
   path: "/cars/{id}",
   tags: ["Car"],
   operationId: "updateCar",
-  summary: "Update an existing car",
+  summary: "Cập nhật xe",
   description: "Update an existing car with the provided details.",
   request: {
     params: z.object({
@@ -146,7 +153,7 @@ carRegistry.registerPath({
   method: "post",
   path: "/cars/{id}/seats",
   tags: ["Seat"],
-  summary: "Generate seats for a car by bus id",
+  summary: "Thêm mới ghế theo xe",
   description: "Generate seats for a car by bus id",
   request: { params: GetCarSchema.shape.params },
   responses: createApiResponse(GetCarSchema, "Success"),

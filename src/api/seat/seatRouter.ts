@@ -21,7 +21,7 @@ seatRegistry.registerPath({
 	method: "get",
 	path: "/seats",
 	tags: ["Seat"],
-	summary: "Get all seats",
+	summary: "Hiển thị danh sách tất cả chỗ ngồi",
 	responses: createApiResponse(z.array(SeatSchema), "Success"),
 });
 
@@ -31,7 +31,7 @@ seatRegistry.registerPath({
 	method: "get",
 	path: "/seats/{id}",
 	tags: ["Seat"],
-	summary: "Get seat by id",
+	summary: "Hiển thị danh sách ghế theo xe",
 	request: { params: GetSeatSchema.shape.params },
 	responses: createApiResponse(SeatSchema, "Success"),
 });
@@ -42,7 +42,7 @@ seatRegistry.registerPath({
 	method: "delete",
 	path: "/seats/{id}",
 	tags: ["Seat"],
-	summary: "Delete seat by bus id",
+	summary: "Xóa ghế theo xe",
 	request: { params: GetSeatSchema.shape.params },
 	responses: createApiResponse(SeatSchema, "Success"),
 });

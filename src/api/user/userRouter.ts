@@ -3,7 +3,13 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { GetUserSchema, UserSchema, CreateUserSchema } from "@/api/user/userModel";
+import { 
+	GetUserSchema,
+	UserSchema, 
+	CreateUserSchema,
+	UserQuerySchema,
+	PaginatedUsersResponseSchema
+} from "@/api/user/userModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { userController } from "./userController";
 
@@ -21,7 +27,11 @@ userRegistry.registerPath({
 	method: "get",
 	path: "/users",
 	tags: ["User"],
-	responses: createApiResponse(z.array(UserSchema), "Success"),
+	summary: "Hiển thị tất cả người dùng (phân trang, sắp xếp theo id hoặc email, tìm kiếm theo email)",
+	request: { query: UserQuerySchema.shape.query },
+	// responses: createApiResponse(z.array(UserSchema), "Success"),
+	responses: createApiResponse(PaginatedUsersResponseSchema, "Success"),
+
 });
 
 userRouter.get("/",
@@ -33,6 +43,7 @@ userRegistry.registerPath({
 	method: "get",
 	path: "/users/{id}",
 	tags: ["User"],
+	summary: "Lấy thông tin người dùng theo id",
 	request: { params: GetUserSchema.shape.params },
 	responses: createApiResponse(UserSchema, "Success"),
 });
@@ -48,7 +59,7 @@ userRegistry.registerPath({
 	path: "/users",
 	tags: ["User"],
 	operationId: "createUser",
-	summary: "Create a new user",
+	summary: "Thêm mới người dùng",
 	request: {
 		body: {
 			content: {
