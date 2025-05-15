@@ -14,6 +14,19 @@ import { stationRegistry } from "@/api/station/stationRouter";
 import { busReviewRegistry } from "@/api/bus_reviews/busReviewRouter";
 import { ticketRegistry } from "@/api/ticket/ticketRouter";
 import { paymentProviderRegistry } from "@/api/paymentProvider/paymentProvider.routes";
+import { getBus_reviewRegistry } from "@/api/getBus_review/getBus_reviewRouter";
+import { getStationPassengerRegistry } from "@/api/getStationPassenger/getStationPassengerRouter";
+import { getStatusTicketRegistry } from "@/api/getStatusTicket/getStatusTicketRouter";
+import { getPaymentProviderRegistry } from "@/api/getPaymentProvider/getPaymentProviderRouter";
+// home
+import { getPopularStationRegistry } from "@/api/getPopularStation/stationRouter";
+import { popularRouteRegistry } from "@/api/popularRoute/popularRouteRouter";
+import { getTopReviewRegistry } from "@/api/getTopReview/busReviewRouter";
+// import { getRevenueRegistry } from "@/api/getRevenue/getRevenueRouter";
+import { getCustomerRegistry } from "@/api/getCustomer/getCustomerRouter";
+import { findArrivalRegistry } from "@/api/findArrival/findArrivalRouter";
+import { get } from "http";
+import { discountBannerRegistry } from "@/api/discountBanner/bannerRouter";
 
 export type OpenAPIDocument = ReturnType<OpenApiGeneratorV3["generateDocument"]>;
 
@@ -34,7 +47,19 @@ export function generateOpenAPIDocument(): OpenAPIDocument {
 		routeRegistry,
 		stationRegistry,
 		busCompanyRegistry,
-		stationRegistry
+		stationRegistry,
+		getBus_reviewRegistry,
+		getStationPassengerRegistry,
+		getStatusTicketRegistry,
+		getPaymentProviderRegistry,
+		// getRevenueRegistry,
+		getCustomerRegistry,
+		findArrivalRegistry,
+
+		getPopularStationRegistry,
+		popularRouteRegistry,
+		getTopReviewRegistry,
+		discountBannerRegistry
 	]);
 
 	const generator = new OpenApiGeneratorV3(registry.definitions);
