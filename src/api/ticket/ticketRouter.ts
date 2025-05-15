@@ -111,6 +111,7 @@ ticketRegistry.registerPath({
   method: "post",
   path: "/tickets/payment/{ticketId}",
   tags: ["Ticket"],
+  summary: "Chọn phương thức thanh toán",
   request: {
     params: z.object({
       ticketId: z.string().regex(/^\d+$/, "Ticket ID must be a numeric string"),
