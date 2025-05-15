@@ -1,6 +1,6 @@
 import type { Request, RequestHandler, Response } from "express";
 import { authService } from "@/api/auth/authService";
-
+// Hello
 class AuthController {
   public register: RequestHandler = async (req, res) => {
     const serviceResponse = await authService.register(req.body);
