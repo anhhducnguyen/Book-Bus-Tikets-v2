@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { BookTicketInputSchema, Route, Bus, Seat, Schedule, Ticket, TicketSchema, RouteSchema, Payment, PaymentSchema } from "@/api/ticket/ticketModel";
+import { BookTicketInputSchema, Route, Bus, Seat, Schedule, Ticket, TicketSchema, RouteSchema, BusSchema, SeatSchema, Payment, PaymentSchema } from "@/api/ticket/ticketModel";
 import { TicketRepository } from "@/api/ticket/ticketRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
@@ -20,9 +20,14 @@ export class TicketService {
         logger.warn("Invalid data format returned from repository");
         return ServiceResponse.success<Route[]>("No routes found", []);
       }
-  
-      // Validate dữ liệu với RouteSchema
-      const validatedRoutes = RouteSchema.array().parse(routes);
+
+      const transformedRoutes = routes.map(route => ({
+        ...route,
+        created_at: new Date(route.created_at),
+        updated_at: new Date(route.updated_at),
+      }));
+
+      const validatedRoutes = RouteSchema.array().parse(transformedRoutes);
       return ServiceResponse.success<Route[]>("Routes retrieved", validatedRoutes);
     } catch (ex) {
       logger.error(`Error fetching routes: ${(ex as Error).message}`);
@@ -34,7 +39,19 @@ export class TicketService {
   async getBusesByRoute(routeId: number): Promise<ServiceResponse<Bus[] | null>> {
     try {
       const buses = await this.ticketRepository.getBusesByRoute(routeId);
-      return ServiceResponse.success<Bus[]>("Buses retrieved", buses);
+      if (!Array.isArray(buses)) {
+        logger.warn("Invalid data format returned from repository");
+        return ServiceResponse.success<Bus[]>("No buses found", []);
+      }
+
+      const transformedBuses = buses.map(bus => ({
+        ...bus,
+        created_it: new Date(bus.created_at),
+        updated_it: new Date(bus.updated_at),
+      }));
+
+      const validatedBuses = BusSchema.array().parse(transformedBuses);
+      return ServiceResponse.success<Bus[]>("Buses retrieved", validatedBuses);
     } catch (ex) {
       logger.error(`Error fetching buses: ${(ex as Error).message}`);
       return ServiceResponse.failure("Error fetching buses", null, StatusCodes.INTERNAL_SERVER_ERROR);
@@ -45,7 +62,19 @@ export class TicketService {
   async getAvailableSeats(busId: number): Promise<ServiceResponse<Seat[] | null>> {
     try {
       const seats = await this.ticketRepository.getAvailableSeats(busId);
-      return ServiceResponse.success<Seat[]>("Seats retrieved", seats);
+      if (!Array.isArray(seats)) {
+        logger.warn("Invalid data format returned from repository");
+        return ServiceResponse.success<Seat[]>("No seats found", []);
+      }
+
+      const transformedSeats = seats.map(seat => ({
+        ...seat,
+        created_at: new Date(seat.created_at),
+        updated_at: new Date(seat.updated_at),
+      }));
+
+      const validatedSeats = SeatSchema.array().parse(transformedSeats);
+      return ServiceResponse.success<Seat[]>("Seats retrieved", validatedSeats);
     } catch (ex) {
       logger.error(`Error fetching seats: ${(ex as Error).message}`);
       return ServiceResponse.failure("Error fetching seats", null, StatusCodes.INTERNAL_SERVER_ERROR);
@@ -57,15 +86,15 @@ export class TicketService {
     const trx = await db.transaction();
     try {
       const parsedInput = BookTicketInputSchema.parse(input);
-      const { userId, routeId, busId, seatId } = parsedInput;
+      const { user_id, route_id, bus_id, seat_id } = parsedInput;
   
       // Kiểm tra tuyến đường
-      const route = await trx("routes").where({ id: routeId }).first();
+      const route = await trx("routes").where({ id: route_id }).first();
       if (!route) return ServiceResponse.failure("Route not found", null, StatusCodes.NOT_FOUND);
   
       // Lấy schedule
       const schedule = await trx("schedules")
-        .where({ route_id: routeId, bus_id: busId, status: "AVAILABLE" })
+        .where({ route_id: route_id, bus_id: bus_id, status: "AVAILABLE" })
         .andWhere("departure_time", ">", new Date())
         .orderBy("departure_time", "asc")
         .first();
@@ -75,17 +104,26 @@ export class TicketService {
       }
   
       // Kiểm tra ghế và xe
-      const seat = await trx("seats").where({ id: seatId, bus_id: busId, status: "AVAILABLE" }).first();
+      const seat = await trx("seats").where({ id: seat_id, bus_id: bus_id, status: "AVAILABLE" }).first();
       if (!seat) {
         await trx.rollback();
         return ServiceResponse.failure("Seat not available", null, StatusCodes.BAD_REQUEST);
+      }
+
+      const existingTicket = await trx("tickets")
+        .where({ seat_id: seat_id, schedule_id: schedule.id })
+        .andWhere("status", "BOOKED")
+        .first();
+      if (existingTicket) {
+        await trx.rollback();
+        return ServiceResponse.failure("Seat is already booked", null, StatusCodes.BAD_REQUEST);
       }
   
       const totalPrice = route.price + seat.price_for_type_seat;
   
       // Tạo ticket
       const ticketData = {
-      seat_id: seatId,
+      seat_id: seat_id,
       schedule_id: schedule.id,
       departure_time: schedule.departure_time,
       arrival_time: schedule.arrival_time,
@@ -100,7 +138,7 @@ export class TicketService {
       const ticket = { id: ticketId, ...ticketData };
   
       // Cập nhật trạng thái
-      await trx("seats").where({ id: seatId }).update({ status: "BOOKED" });
+      await trx("seats").where({ id: seat_id }).update({ status: "BOOKED" });
       await trx("schedules").where({ id: schedule.id }).decrement("available_seats", 1);
   
       await trx.commit();
@@ -241,6 +279,47 @@ export class TicketService {
     } catch (ex) {
       logger.error(`Error deleting cancelled ticket: ${(ex as Error).message}`);
       return ServiceResponse.failure("Error deleting cancelled ticket", null, StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  // Hiển thi danh sách thông tin hủy theo vé xe
+  async getCancelledTickets(): Promise<ServiceResponse<Ticket[] | null>> {
+    try {
+      const tickets = await this.ticketRepository.getTicketsByStatus("CANCELLED");
+      if (!Array.isArray(tickets)) {
+        logger.warn("Invalid data format returned from repository");
+        return ServiceResponse.success<Ticket[]>("No cancelled tickets found", []);
+      }
+
+      const transformedTickets = tickets.map((ticket) => ({
+        ...ticket,
+        departure_time: ticket.departure_time instanceof Date ? ticket.departure_time : new Date(ticket.departure_time),
+        arrival_time: ticket.arrival_time instanceof Date ? ticket.arrival_time : new Date(ticket.arrival_time),
+        created_at: ticket.created_at instanceof Date ? ticket.created_at : new Date(ticket.created_at),
+        updated_at: ticket.updated_at instanceof Date ? ticket.updated_at : new Date(ticket.updated_at),
+      }));
+
+      const validatedTickets = TicketSchema.array().parse(transformedTickets);
+      return ServiceResponse.success<Ticket[]>("Cancelled tickets retrieved", validatedTickets);
+    } catch (ex) {
+      logger.error(`Error fetching cancelled tickets: ${(ex as Error).message}`);
+      return ServiceResponse.failure("Error fetching cancelled tickets", null, StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+
+  //  Tra cứu vé xe bằng mã vé với số điện thoại
+  async searchTicketByIdAndPhone(ticketId: number, phoneNumber: string): Promise<ServiceResponse<Ticket | null>> {
+    try {
+      const ticket = await this.ticketRepository.searchTicketByIdAndPhone(ticketId, phoneNumber);
+      if (!ticket) {
+        return ServiceResponse.failure("No tickets found with this ticket code and phone number.", null, StatusCodes.NOT_FOUND);
+      }
+      const validatedTicket = TicketSchema.parse(ticket);
+      return ServiceResponse.success<Ticket>("Successfully found the ticket", validatedTicket);
+    } catch (ex) {
+      logger.error(`Error when checking the ticket: ${(ex as Error).message}`);
+      return ServiceResponse.failure("Error when checking the ticket", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 }

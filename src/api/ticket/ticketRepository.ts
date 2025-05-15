@@ -5,28 +5,38 @@ export class TicketRepository {
   // Lấy danh sách tuyến đường
   async getRoutes(): Promise<Route[]> {
     return await db<Route>("routes").select("*");
-    // const rows = await db<Route>('routes').select('*');
-    //     return rows as Route[];
-    // return routes;
   }
 
-// Lấy danh sách xe theo tuyến đường (dùng join để truy vấn 1 lần)
-async getBusesByRoute(routeId: number): Promise<Bus[]> {
-  return await db("buses")
-    .join("schedules", "buses.id", "schedules.bus_id")
-    .where("schedules.route_id", routeId)
-    .andWhere("schedules.status", "AVAILABLE")
-    .select("buses.*")
-    .distinct(); // nếu 1 xe có nhiều lịch trình, tránh trùng lặp
-}
+  // Lấy danh sách xe theo tuyến đường (dùng join để truy vấn 1 lần)
+  async getBusesByRoute(routeId: number): Promise<Bus[]> {
+    return await db("buses")
+      .join("schedules", "buses.id", "schedules.bus_id")
+      .where("schedules.route_id", routeId)
+      .andWhere("schedules.status", "AVAILABLE")
+      .andWhere("schedules.departure_time", ">", new Date()) // Chỉ lấy lịch trình trong tương lai
+      .select("buses.*")
+      .distinct(); // nếu 1 xe có nhiều lịch trình, tránh trùng lặp
+  }
 
   // Lấy danh sách ghế trống theo xe
-  async getAvailableSeats(scheduleId: number): Promise<Seat[]> {
-    const bookedSeats = await db("tickets") 
-      .where({ schedule_id: scheduleId }) //  join thêm bảng tickets để loại các ghế đã được đặt (tránh tình trạng ghế còn "AVAILABLE" nhưng đã có vé)
-      .pluck("seat_id");
-  
+  async getAvailableSeats(busId: number): Promise<Seat[]> {
+    const schedules = await db("schedules")
+      .where({ bus_id: busId, status: "AVAILABLE" })
+      .andWhere("departure_time", ">", new Date())
+      .select("id");
+
+    const scheduleIds = schedules.map(schedule => schedule.id);
+
+    let bookedSeats: number[] = [];
+    if (scheduleIds.length > 0) {
+      bookedSeats = await db("tickets")
+        .whereIn("schedule_id", scheduleIds)
+        .andWhere("status", "BOOKED") // Chỉ lấy các vé chưa bị hủy
+        .pluck("seat_id");
+    }
+
     return db<Seat>("seats")
+      .where({ bus_id: busId }) // Lọc theo bus_id
       .whereNotIn("id", bookedSeats)
       .andWhere("status", "AVAILABLE")
       .select("*");
@@ -41,7 +51,6 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
     .andWhere("departure_time", ">", new Date())
     .orderBy("departure_time", "asc")
     .first();
-
   }
 
 // Đặt vé
@@ -93,11 +102,9 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
 
   // Hiển thị lịch sử đặt vé theo trạng thái
   async getTicketsByStatus(status: "BOOKED" | "CANCELLED"): Promise<Ticket[]> {
-    const data = await db("tickets")
+    return await db("tickets")
       .where("status", status)
       .select("*");
-    // console.log(data);
-    return data;
   }
 
   // Hiển thị lịch sử đặt vé theo nhà xe (companyId)
@@ -167,6 +174,38 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
         status: "CANCELLED",
         updated_at: db.fn.now(),
       });
+  }
+
+  //  Tra cứu vé xe bằng mã vé với số điện thoại
+  async searchTicketByIdAndPhone(ticketId: number, phoneNumber: string): Promise<Ticket | null> {
+    const ticket = await db("tickets")
+      .join("payments", "tickets.id", "payments.ticket_id")
+      .join("users", "payments.user_id", "users.id")
+      .where("tickets.id", ticketId)
+      .andWhere("users.phone", phoneNumber)
+      .select(
+        "tickets.id",
+        "tickets.seat_id",
+        "tickets.schedule_id",
+        "tickets.departure_time",
+        "tickets.arrival_time",
+        "tickets.seat_type",
+        "tickets.price",
+        "tickets.status",
+        "tickets.created_at",
+        "tickets.updated_at"
+      )
+      .first();
+
+    if (!ticket) return null;
+
+    return {
+      ...ticket,
+      departure_time: new Date(ticket.departure_time),
+      arrival_time: new Date(ticket.arrival_time),
+      created_at: new Date(ticket.created_at),
+      updated_at: new Date(ticket.updated_at),
+    };
   }
 
 }
