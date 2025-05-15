@@ -29,7 +29,7 @@ ticketRouter.get("/routes", ticketController.getRoutes);
 // Lựa chọn xe đi
 ticketRegistry.registerPath({
   method: "get",
-  path: "/tickets/routes/:routeId/buses",
+  path: "/tickets/routes/{routeId}/buses",
   tags: ["Ticket"],
   summary: "Lựa chọn xe đi",
   request: { params: z.object({ routeId: commonValidations.id }) },
@@ -40,7 +40,7 @@ ticketRouter.get("/routes/:routeId/buses", ticketController.getBusesByRoute);
 // Lựa chọn ghế đi
 ticketRegistry.registerPath({
   method: "get",
-  path: "/tickets/buses/:busId/seats",
+  path: "/tickets/buses/{busId}/seats",
   tags: ["Ticket"],
   summary: "Lựa chọn ghế đi",
   request: { params: z.object({ busId: commonValidations.id }) },
@@ -70,7 +70,7 @@ ticketRouter.post("/booking", ticketController.bookTicket);
 // Hủy vé
 ticketRegistry.registerPath({
   method: "delete",
-  path: "/tickets/cancel/:ticketId",
+  path: "/tickets/cancel/{ticketId}",
   tags: ["Ticket"],
   summary: "Hủy vé",
   request: { params: CancelTicketSchema.shape.params },
@@ -85,7 +85,7 @@ ticketRouter.delete("/cancel/:ticketId", validateRequest(CancelTicketSchema), ti
 // Lịch sử đặt vé theo trạng thái
 ticketRegistry.registerPath({
   method: "get",
-  path: "/tickets/history_status/:status",
+  path: "/tickets/history_status/{status}",
   tags: ["Ticket"],
   summary: "Lịch sử đặt vé theo trạng thái",
   request: {
@@ -100,7 +100,7 @@ ticketRouter.get("/history_status/:status", ticketController.getTicketsByStatus)
 // Lịch sử đặt vé theo nhà xe
 ticketRegistry.registerPath({
   method: "get",
-  path: "/tickets/history_companyid/:companyId",
+  path: "/tickets/history_companyid/{companyId}",
   tags: ["Ticket"],
   summary: "Lịch sử đặt vé theo nhà xe",
   request: {
