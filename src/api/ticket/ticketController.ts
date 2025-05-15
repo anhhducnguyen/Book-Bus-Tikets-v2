@@ -71,6 +71,11 @@ class TicketController {
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
 
+  // Chọn phương thức thanh toán
+  public selectPaymentMethod: RequestHandler = async (req: Request, res: Response) => {
+    const ticketId = Number.parseInt(req.params.ticketId as string, 10);
+    const { paymentMethod, userId, amount } = req.body;
+
   // Xóa thông tin hủy vé xe
   public deleteCancelledTicket: RequestHandler = async (req: Request, res: Response) => {
     const ticketId = Number.parseInt(req.params.ticketId as string, 10);
@@ -81,10 +86,33 @@ class TicketController {
       return;
     }
 
+    if (!paymentMethod || !["ONLINE", "CASH"].includes(paymentMethod)) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid payment method. Must be ONLINE or CASH", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    if (isNaN(userId)) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid userId. Must be a number", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    if (isNaN(amount) || amount <= 0) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid amount. Must be a positive number", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    const serviceResponse = await ticketService.selectPaymentMethod(ticketId, paymentMethod, userId, amount);
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
     const serviceResponse = await ticketService.deleteCancelledTicket(ticketId);
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
-
 }
 
 export const ticketController = new TicketController();

@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { BookTicketInputSchema, Route, Bus, Seat, Schedule, Ticket, TicketSchema, RouteSchema } from "@/api/ticket/ticketModel";
+import { BookTicketInputSchema, Route, Bus, Seat, Schedule, Ticket, TicketSchema, RouteSchema, Payment, PaymentSchema } from "@/api/ticket/ticketModel";
 import { TicketRepository } from "@/api/ticket/ticketRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
@@ -186,6 +186,48 @@ export class TicketService {
       return ServiceResponse.failure("Error fetching tickets", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
+
+  // Chọn phương thức thanh toán
+  async selectPaymentMethod(ticketId: number, paymentMethod: "ONLINE" | "CASH", userId: number, amount: number): Promise<ServiceResponse<Payment | null>> {
+    const trx = await db.transaction();
+    try {
+      const ticket = await trx<Ticket>("tickets").where({ id: ticketId }).first();
+      if (!ticket) {
+        await trx.rollback();
+        return ServiceResponse.failure("Ticket not found", null, StatusCodes.NOT_FOUND);
+      }
+      if (ticket.status === "CANCELLED") {
+        await trx.rollback();
+        return ServiceResponse.failure("Cannot select payment method for cancelled ticket", null, StatusCodes.BAD_REQUEST);
+      }
+
+      const existingPayment = await this.ticketRepository.getPaymentByTicketId(ticketId);
+      if (existingPayment && existingPayment.status === "COMPLETED") {
+        await trx.rollback();
+        return ServiceResponse.failure("Ticket already paid", null, StatusCodes.BAD_REQUEST);
+      }
+
+      const paymentData = {
+        payment_provider_id: undefined, // Có thể thêm logic chọn provider sau
+        user_id: userId,
+        ticket_id: ticketId,
+        payment_method: paymentMethod,
+        amount: amount || ticket.price, // Sử dụng giá vé làm amount mặc định
+        status: "PENDING" as const,
+      };
+
+      const payment = await this.ticketRepository.createOrUpdatePayment(paymentData);
+      await trx.commit();
+
+      const validatedPayment = PaymentSchema.parse(payment);
+      return ServiceResponse.success<Payment>("Payment method selected successfully", validatedPayment);
+    } catch (ex) {
+      await trx.rollback();
+      logger.error(`Error selecting payment method: ${(ex as Error).message}`);
+      return ServiceResponse.failure("Error selecting payment method", null, StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
+}
 
   // Xóa thông tin hủy vé xe
   async deleteCancelledTicket(ticketId: number): Promise<ServiceResponse<null>> {
