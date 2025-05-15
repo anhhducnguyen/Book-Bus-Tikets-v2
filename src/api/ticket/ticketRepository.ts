@@ -147,4 +147,36 @@ export class TicketRepository {
       });
   }
 
+  //  Tra cứu vé xe bằng mã vé với số điện thoại
+  async searchTicketByIdAndPhone(ticketId: number, phoneNumber: string): Promise<Ticket | null> {
+    const ticket = await db("tickets")
+      .join("payments", "tickets.id", "payments.ticket_id")
+      .join("users", "payments.user_id", "users.id")
+      .where("tickets.id", ticketId)
+      .andWhere("users.phone", phoneNumber)
+      .select(
+        "tickets.id",
+        "tickets.seat_id",
+        "tickets.schedule_id",
+        "tickets.departure_time",
+        "tickets.arrival_time",
+        "tickets.seat_type",
+        "tickets.price",
+        "tickets.status",
+        "tickets.created_at",
+        "tickets.updated_at"
+      )
+      .first();
+
+    if (!ticket) return null;
+
+    return {
+      ...ticket,
+      departure_time: new Date(ticket.departure_time),
+      arrival_time: new Date(ticket.arrival_time),
+      created_at: new Date(ticket.created_at),
+      updated_at: new Date(ticket.updated_at),
+    };
+  }
+
 }

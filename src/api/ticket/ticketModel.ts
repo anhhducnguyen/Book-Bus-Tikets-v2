@@ -85,3 +85,14 @@ export type BookTicketInput = z.infer<typeof BookTicketInputSchema>;
 export const CancelTicketSchema = z.object({
   params: z.object({ ticketId: commonValidations.id }),
 });
+
+export const TicketSearchQueryOnly = z.object({
+  ticketId: z.string().regex(/^\d+$/, "The ticket code must be a number."),
+  phoneNumber: z.string().regex(/^0\d{9}$/, "The phone number must be a 10-digit number starting with 0."),
+});
+export const TicketSearchSchema = z.object({
+  query: TicketSearchQueryOnly,
+  body: z.any().optional(),
+  params: z.any().optional(),
+});
+export type TicketSearchQuery = z.infer<typeof TicketSearchQueryOnly>;

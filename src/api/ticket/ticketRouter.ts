@@ -4,7 +4,7 @@ import { z } from "zod";
 import { commonValidations } from "@/common/utils/commonValidation";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { BookTicketInputSchema, CancelTicketSchema, RouteSchema, BusSchema, SeatSchema, TicketSchema } from "@/api/ticket/ticketModel";
+import { BookTicketInputSchema, CancelTicketSchema, RouteSchema, BusSchema, SeatSchema, TicketSchema, TicketSearchSchema, TicketSearchQueryOnly } from "@/api/ticket/ticketModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { ticketController } from "./ticketController";
 
@@ -21,6 +21,7 @@ ticketRegistry.registerPath({
   method: "get",
   path: "/tickets/routes",
   tags: ["Ticket"],
+  summary: "Lựa chọn tuyến đường đi",
   responses: createApiResponse(z.array(RouteSchema), "Success"),
 });
 ticketRouter.get("/routes", ticketController.getRoutes);
@@ -30,6 +31,7 @@ ticketRegistry.registerPath({
   method: "get",
   path: "/tickets/routes/:routeId/buses",
   tags: ["Ticket"],
+  summary: "Lựa chọn xe đi",
   request: { params: z.object({ routeId: commonValidations.id }) },
   responses: createApiResponse(z.array(BusSchema), "Success"),
 });
@@ -40,6 +42,7 @@ ticketRegistry.registerPath({
   method: "get",
   path: "/tickets/buses/:busId/seats",
   tags: ["Ticket"],
+  summary: "Lựa chọn ghế đi",
   request: { params: z.object({ busId: commonValidations.id }) },
   responses: createApiResponse(z.array(SeatSchema), "Success"),
 });
@@ -50,6 +53,7 @@ ticketRegistry.registerPath({
   method: "post",
   path: "/tickets/booking",
   tags: ["Ticket"],
+  summary: "Đặt vé",
   request: {
     body: {
       content: {
@@ -68,6 +72,7 @@ ticketRegistry.registerPath({
   method: "delete",
   path: "/tickets/cancel/:ticketId",
   tags: ["Ticket"],
+  summary: "Hủy vé",
   request: { params: CancelTicketSchema.shape.params },
   responses: createApiResponse(
     z.null().openapi({ description: "No content" }),
@@ -82,6 +87,7 @@ ticketRegistry.registerPath({
   method: "get",
   path: "/tickets/history_status/:status",
   tags: ["Ticket"],
+  summary: "Lịch sử đặt vé theo trạng thái",
   request: {
     params: z.object({
       status: z.enum(["BOOKED", "CANCELLED"]),
@@ -96,6 +102,7 @@ ticketRegistry.registerPath({
   method: "get",
   path: "/tickets/history_companyid/:companyId",
   tags: ["Ticket"],
+  summary: "Lịch sử đặt vé theo nhà xe",
   request: {
     params: z.object({
       companyId: z.string().regex(/^\d+$/, "Company ID must be a numeric string"),
@@ -110,6 +117,7 @@ ticketRegistry.registerPath({
   method: "get",
   path: "/tickets/history",
   tags: ["Ticket"],
+  summary: "Xem tất cả lịch sử đặt vé",
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
 ticketRouter.get("/history", ticketController.getTicketHistory);
@@ -119,6 +127,7 @@ ticketRegistry.registerPath({
   method: "post",
   path: "/tickets/cancel_ticket/add",
   tags: ["Ticket"],
+  summary: "Thêm mới thông tin hủy vé xe dành cho admin",
   request: {
     body: {
       content: {
@@ -139,6 +148,7 @@ ticketRegistry.registerPath({
   method: "get",
   path: "/tickets/cancel_ticket/list",
   tags: ["Ticket"],
+  summary: "Hiển thi danh sách thông tin hủy theo vé xe cho admin",
   request: {
     params: z.object({}).strict(), // Không cần tham số
   },
@@ -146,3 +156,18 @@ ticketRegistry.registerPath({
 });
 ticketRouter.get("/cancel_ticket/list", ticketController.getCancelledTickets);
 
+//  Tra cứu vé xe bằng mã vé với số điện thoại
+ticketRegistry.registerPath({
+  method: "get",
+  path: "/tickets/search",
+  tags: ["Ticket"],
+  operationId: "searchTicket",
+  summary: "Tra cứu vé xe bằng mã vé và số điện thoại",
+  request: {
+    query: TicketSearchQueryOnly,
+  },
+  responses: createApiResponse(TicketSchema, "Successfully found the ticket", 200),
+});
+
+// Trong router:
+ticketRouter.get("/search", validateRequest(TicketSearchSchema), ticketController.searchTicketByIdAndPhone);

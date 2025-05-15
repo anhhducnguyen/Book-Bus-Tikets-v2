@@ -268,5 +268,20 @@ export class TicketService {
     }
   }
 
+  //  Tra cứu vé xe bằng mã vé với số điện thoại
+  async searchTicketByIdAndPhone(ticketId: number, phoneNumber: string): Promise<ServiceResponse<Ticket | null>> {
+    try {
+      const ticket = await this.ticketRepository.searchTicketByIdAndPhone(ticketId, phoneNumber);
+      if (!ticket) {
+        return ServiceResponse.failure("No tickets found with this ticket code and phone number.", null, StatusCodes.NOT_FOUND);
+      }
+      const validatedTicket = TicketSchema.parse(ticket);
+      return ServiceResponse.success<Ticket>("Successfully found the ticket", validatedTicket);
+    } catch (ex) {
+      logger.error(`Error when checking the ticket: ${(ex as Error).message}`);
+      return ServiceResponse.failure("Error when checking the ticket", null, StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
+
 }
 export const ticketService = new TicketService();

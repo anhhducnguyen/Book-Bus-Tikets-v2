@@ -90,6 +90,37 @@ class TicketController {
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
 
+  // Tra cứu vé xe bằng mã vé với số điện thoại
+  public searchTicketByIdAndPhone: RequestHandler = async (req: Request, res: Response) => {
+    const { ticketId, phoneNumber } = req.query;
+
+    if (!ticketId || !phoneNumber) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Ticket code and phone number are required.", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    const ticketIdNum = Number.parseInt(ticketId as string, 10);
+    if (isNaN(ticketIdNum)) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("The ticket code must be a number.", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    const phoneRegex = /^0\d{9}$/; // Định dạng số điện thoại Việt Nam: bắt đầu bằng 0, 10 chữ số
+    if (!phoneRegex.test(phoneNumber as string)) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("The phone number is invalid.", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    const serviceResponse = await ticketService.searchTicketByIdAndPhone(ticketIdNum, phoneNumber as string);
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
+
 }
 
 export const ticketController = new TicketController();
