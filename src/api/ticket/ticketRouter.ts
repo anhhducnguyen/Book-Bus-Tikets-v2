@@ -141,7 +141,7 @@ ticketRegistry.registerPath({
   },
   responses: createApiResponse(z.any(), "Success"),
 });
-ticketRouter.post("/cancel_ticket/add", ticketController.createCancelTicket);
+ticketRouter.post("/cancel_ticket/add", permission, ticketController.createCancelTicket);
 
 // Hiển thi danh sách thông tin hủy theo vé xe
 ticketRegistry.registerPath({
@@ -154,7 +154,7 @@ ticketRegistry.registerPath({
   },
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
-ticketRouter.get("/cancel_ticket/list", ticketController.getCancelledTickets);
+ticketRouter.get("/cancel_ticket/list", permission, ticketController.getCancelledTickets);
 
 //  Tra cứu vé xe bằng mã vé với số điện thoại
 ticketRegistry.registerPath({
