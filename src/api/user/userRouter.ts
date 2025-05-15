@@ -3,15 +3,23 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { GetUserSchema, UserSchema, CreateUserSchema } from "@/api/user/userModel";
+import { 
+	GetUserSchema,
+	UserSchema, 
+	CreateUserSchema,
+	UserQuerySchema,
+	PaginatedUsersResponseSchema
+} from "@/api/user/userModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { userController } from "./userController";
 
-import { ROLES } from "@/common/constants/role";
-import { authenticate, authorize } from "@/common/middleware/auth/authMiddleware";
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
+import { permission } from "@/common/middleware/auth/permission";
 
 export const userRegistry = new OpenAPIRegistry();
 export const userRouter: Router = express.Router();
+
+userRouter.use(authenticate);
 
 userRegistry.register("User", UserSchema);
 
@@ -19,12 +27,15 @@ userRegistry.registerPath({
 	method: "get",
 	path: "/users",
 	tags: ["User"],
-	responses: createApiResponse(z.array(UserSchema), "Success"),
+	summary: "Hiển thị tất cả người dùng (phân trang, sắp xếp theo id hoặc email, tìm kiếm theo email)",
+	request: { query: UserQuerySchema.shape.query },
+	// responses: createApiResponse(z.array(UserSchema), "Success"),
+	responses: createApiResponse(PaginatedUsersResponseSchema, "Success"),
+
 });
 
 userRouter.get("/",
-	authenticate,
-	authorize([ROLES.ADMIN]),
+	permission,
 	userController.getUsers
 );
 
@@ -32,13 +43,13 @@ userRegistry.registerPath({
 	method: "get",
 	path: "/users/{id}",
 	tags: ["User"],
+	summary: "Lấy thông tin người dùng theo id",
 	request: { params: GetUserSchema.shape.params },
 	responses: createApiResponse(UserSchema, "Success"),
 });
 
 userRouter.get("/:id",
-	authenticate,
-	authorize([ROLES.ADMIN]),
+	permission,
 	validateRequest(GetUserSchema),
 	userController.getUser
 );
@@ -48,7 +59,7 @@ userRegistry.registerPath({
 	path: "/users",
 	tags: ["User"],
 	operationId: "createUser",
-	summary: "Create a new user",
+	summary: "Thêm mới người dùng",
 	request: {
 		body: {
 			content: {
@@ -62,8 +73,20 @@ userRegistry.registerPath({
 });
 
 userRouter.post("/",
-	authenticate,
-	authorize([ROLES.ADMIN]),
+	permission,
 	validateRequest(CreateUserSchema),
 	userController.createUser
 );
+
+
+userRegistry.registerPath({
+  method: "delete",
+  path: "/users/{id}",
+  tags: ["User"],
+  summary: "Xóa người dùng theo id",
+  request: {
+	params: GetUserSchema.shape.params,
+  },
+  responses: createApiResponse(z.object({ success: z.boolean() }), "Xóa bến xe thành công"),
+});
+userRouter.delete("/:id", validateRequest(GetUserSchema), userController.deleteStation);

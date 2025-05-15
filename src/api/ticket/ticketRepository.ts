@@ -1,32 +1,42 @@
-import type { Route, Bus, Seat, Schedule, Ticket } from "@/api/ticket/ticketModel";
+import type { Route, Bus, Seat, Schedule, Ticket, Payment } from "@/api/ticket/ticketModel";
 import { db } from "@/common/config/database";
 
 export class TicketRepository {
   // Lấy danh sách tuyến đường
   async getRoutes(): Promise<Route[]> {
     return await db<Route>("routes").select("*");
-    const rows = await db<Route>('routes').select('*');
-        return rows as Route[];
-    // return routes;
   }
 
-// Lấy danh sách xe theo tuyến đường (dùng join để truy vấn 1 lần)
-async getBusesByRoute(routeId: number): Promise<Bus[]> {
-  return await db("buses")
-    .join("schedules", "buses.id", "schedules.bus_id")
-    .where("schedules.route_id", routeId)
-    .andWhere("schedules.status", "AVAILABLE")
-    .select("buses.*")
-    .distinct(); // nếu 1 xe có nhiều lịch trình, tránh trùng lặp
-}
+  // Lấy danh sách xe theo tuyến đường (dùng join để truy vấn 1 lần)
+  async getBusesByRoute(routeId: number): Promise<Bus[]> {
+    return await db("buses")
+      .join("schedules", "buses.id", "schedules.bus_id")
+      .where("schedules.route_id", routeId)
+      .andWhere("schedules.status", "AVAILABLE")
+      .andWhere("schedules.departure_time", ">", new Date()) // Chỉ lấy lịch trình trong tương lai
+      .select("buses.*")
+      .distinct(); // nếu 1 xe có nhiều lịch trình, tránh trùng lặp
+  }
 
   // Lấy danh sách ghế trống theo xe
-  async getAvailableSeats(scheduleId: number): Promise<Seat[]> {
-    const bookedSeats = await db("tickets") 
-      .where({ schedule_id: scheduleId }) //  join thêm bảng tickets để loại các ghế đã được đặt (tránh tình trạng ghế còn "AVAILABLE" nhưng đã có vé)
-      .pluck("seat_id");
-  
+  async getAvailableSeats(busId: number): Promise<Seat[]> {
+    const schedules = await db("schedules")
+      .where({ bus_id: busId, status: "AVAILABLE" })
+      .andWhere("departure_time", ">", new Date())
+      .select("id");
+
+    const scheduleIds = schedules.map(schedule => schedule.id);
+
+    let bookedSeats: number[] = [];
+    if (scheduleIds.length > 0) {
+      bookedSeats = await db("tickets")
+        .whereIn("schedule_id", scheduleIds)
+        .andWhere("status", "BOOKED") // Chỉ lấy các vé chưa bị hủy
+        .pluck("seat_id");
+    }
+
     return db<Seat>("seats")
+      .where({ bus_id: busId }) // Lọc theo bus_id
       .whereNotIn("id", bookedSeats)
       .andWhere("status", "AVAILABLE")
       .select("*");
@@ -41,7 +51,6 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
     .andWhere("departure_time", ">", new Date())
     .orderBy("departure_time", "asc")
     .first();
-
   }
 
 // Đặt vé
@@ -90,4 +99,113 @@ async getBusesByRoute(routeId: number): Promise<Bus[]> {
       .where({ id: ticketId })
       .update({ status: "CANCELLED", updated_at: new Date() });
   }
+
+  // Hiển thị lịch sử đặt vé theo trạng thái
+  async getTicketsByStatus(status: "BOOKED" | "CANCELLED"): Promise<Ticket[]> {
+    return await db("tickets")
+      .where("status", status)
+      .select("*");
+  }
+
+  // Hiển thị lịch sử đặt vé theo nhà xe (companyId)
+  async getTicketsByCompany(companyId: number): Promise<Ticket[]> {
+    return await db("tickets")
+      .join("schedules", "tickets.schedule_id", "schedules.id")
+      .join("buses", "schedules.bus_id", "buses.id")
+      .where("buses.company_id", companyId)
+      .select("tickets.*");
+  }
+
+  
+  // Xem lại tất cả lịch sử đặt vé
+  async getAllTickets(): Promise<Ticket[]> {
+    return await db("tickets").select("*");
+  }
+
+  // Chọn phương thức thanh toán
+  async createOrUpdatePayment(paymentData: Omit<Payment, "id" | "created_at" | "updated_at">): Promise<Payment> {
+    const [payment] = await db("payments")
+      .insert({
+        ...paymentData,
+        created_at: new Date(),
+        updated_at: new Date(),
+      })
+      .onConflict("ticket_id")
+      .merge()
+      .returning("*");
+    return payment;
+  }
+  async getPaymentByTicketId(ticketId: number): Promise<Payment | undefined> {
+    return await db("payments")
+      .where({ ticket_id: ticketId })
+      .first();
+  }
+
+
+  
+  async getTicketById(ticketId: number): Promise<Ticket | undefined> {
+    return await db("tickets")
+      .where({ id: ticketId })
+      .first();
+  }
+
+  // Xóa thông tin hủy vé xe
+  async deleteCancelledTicket(ticketId: number): Promise<void> {
+    await db("tickets")
+      .where({ id: ticketId, status: "CANCELLED" })
+      .del();
+  }
+  
+  // Thêm mới thông tin hủy vé xe dành cho admin
+  async createCancelTicket(ticketId: number): Promise<void> {
+    await db("tickets")
+      .where({ id: ticketId })
+      .update({
+        status: "CANCELLED",
+        updated_at: new Date(),
+      });
+  }
+
+  // Hiển thi danh sách thông tin hủy theo vé xe
+  async getCancelledTickets(ticketId: number): Promise<void> {
+    await db("tickets")
+      .where({ id: ticketId })
+      .update({
+        status: "CANCELLED",
+        updated_at: db.fn.now(),
+      });
+  }
+
+  //  Tra cứu vé xe bằng mã vé với số điện thoại
+  async searchTicketByIdAndPhone(ticketId: number, phoneNumber: string): Promise<Ticket | null> {
+    const ticket = await db("tickets")
+      .join("payments", "tickets.id", "payments.ticket_id")
+      .join("users", "payments.user_id", "users.id")
+      .where("tickets.id", ticketId)
+      .andWhere("users.phone", phoneNumber)
+      .select(
+        "tickets.id",
+        "tickets.seat_id",
+        "tickets.schedule_id",
+        "tickets.departure_time",
+        "tickets.arrival_time",
+        "tickets.seat_type",
+        "tickets.price",
+        "tickets.status",
+        "tickets.created_at",
+        "tickets.updated_at"
+      )
+      .first();
+
+    if (!ticket) return null;
+
+    return {
+      ...ticket,
+      departure_time: new Date(ticket.departure_time),
+      arrival_time: new Date(ticket.arrival_time),
+      created_at: new Date(ticket.created_at),
+      updated_at: new Date(ticket.updated_at),
+    };
+  }
+
 }

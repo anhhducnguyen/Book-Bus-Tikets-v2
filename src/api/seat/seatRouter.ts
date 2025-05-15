@@ -7,8 +7,13 @@ import { GetSeatSchema, SeatSchema } from "@/api/seat/seatModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { seatController } from "./seatController";
 
+import { permission } from "@/common/middleware/auth/permission";
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
+
 export const seatRegistry = new OpenAPIRegistry();
 export const seatRoter: Router = express.Router();
+
+seatRoter.use(authenticate);
 
 seatRegistry.register("User", SeatSchema);
 
@@ -16,33 +21,33 @@ seatRegistry.registerPath({
 	method: "get",
 	path: "/seats",
 	tags: ["Seat"],
-	summary: "Get all seats",
+	summary: "Hiển thị danh sách tất cả chỗ ngồi",
 	responses: createApiResponse(z.array(SeatSchema), "Success"),
 });
 
-seatRoter.get("/", seatController.getSeats);
+seatRoter.get("/", permission, seatController.getSeats);
 
 seatRegistry.registerPath({
 	method: "get",
 	path: "/seats/{id}",
 	tags: ["Seat"],
-	summary: "Get seat by id",
+	summary: "Hiển thị danh sách ghế theo xe",
 	request: { params: GetSeatSchema.shape.params },
 	responses: createApiResponse(SeatSchema, "Success"),
 });
 
-seatRoter.get("/:id", validateRequest(GetSeatSchema), seatController.getSeat);
+seatRoter.get("/:id", permission, validateRequest(GetSeatSchema), seatController.getSeat);
 
 seatRegistry.registerPath({
 	method: "delete",
 	path: "/seats/{id}",
 	tags: ["Seat"],
-	summary: "Delete seat by bus id",
+	summary: "Xóa ghế theo xe",
 	request: { params: GetSeatSchema.shape.params },
 	responses: createApiResponse(SeatSchema, "Success"),
 });
 
-seatRoter.delete("/:id", validateRequest(GetSeatSchema), seatController.deleteSeat);
+seatRoter.delete("/:id", permission, validateRequest(GetSeatSchema), seatController.deleteSeat);
 
 
 

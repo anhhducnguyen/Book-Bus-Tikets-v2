@@ -7,26 +7,29 @@ import { validateRequest } from "@/common/utils/httpHandlers"; // Nếu bạn mu
 import { routesController } from "@/api/routes/routesController"; // Controller để xử lý logic route
 import { RoutesSchema, CreateRoutesSchema } from "./routesModel"; // Schema Zod cho routes
 
+import { permission } from "@/common/middleware/auth/permission";
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
+
 // Khởi tạo OpenAPI registry
 export const routesRegistry = new OpenAPIRegistry();
 
 // Khởi tạo router
 export const routesRouter: Router = express.Router();
 
+// routesRouter.use(authenticate);
+
 // Đăng ký schema OpenAPI cho Routes
 routesRegistry.register("Routes", RoutesSchema);
 
 // Đăng ký đường dẫn cho OpenAPI với method 'get'
-// 
-
 
 // Đăng ký handler cho GET /routes
 routesRegistry.registerPath({
   method: "get",
   path: "/routes",
   operationId: "getAllRoutes",
+  tags: ["Routes"],
   summary: "Lấy danh sách routes có hỗ trợ phân trang, tìm kiếm và lọc",
-  tags: ["routes"],
   parameters: [
     {
       name: "page",
@@ -84,9 +87,9 @@ routesRouter.get("/", routesController.getAllRoutes);
 routesRegistry.registerPath({
     method: "post",
     path: "/routes",
-    tags: ["routes"],
+    tags: ["Routes"],
     operationId: "createRoutes",  // Thay 'operation' bằng 'operationId'
-    summary: "Create a new Routes",  // Thêm phần mô tả ngắn gọn về API
+    summary: "Thêm mới tuyến đường",  // Thêm phần mô tả ngắn gọn về API
     requestBody: {
       content: {
         "application/json": {
@@ -106,7 +109,7 @@ routesRegistry.registerPath({
     },
     responses: {
       201: {
-        description: "User created successfully",
+        description: "Routes created successfully",
         content: {
           "application/json": {
             schema: {
@@ -131,16 +134,16 @@ routesRegistry.registerPath({
       },
     },
   });
- routesRouter.post("/", validateRequest(CreateRoutesSchema), routesController.createRoutes);
+ routesRouter.post("/", authenticate, permission, validateRequest(CreateRoutesSchema), routesController.createRoutes);
  //update tuyen duong theo id
- routesRouter.put("/:id", validateRequest(CreateRoutesSchema), routesController.updateRoutes);
+ routesRouter.put("/:id", authenticate, permission, validateRequest(CreateRoutesSchema), routesController.updateRoutes);
  //Xoa tuyen duong
  routesRegistry.registerPath({
    method: "delete",
    path: "/routes/{id}",
    operationId: "deleteRoutes",
-   summary: "Xóa routes theo ID",
-   tags: ["routes"],
+   summary: "Xóa tuyến đường theo id",
+   tags: ["Routes"],
    parameters: [
      {
        name: "id",
@@ -167,4 +170,4 @@ routesRegistry.registerPath({
      },
    },
  });
- routesRouter.delete("/:id", routesController.deleteRoutes);
+ routesRouter.delete("/:id", permission, routesController.deleteRoutes);

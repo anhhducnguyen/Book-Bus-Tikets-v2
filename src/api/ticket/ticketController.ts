@@ -1,5 +1,7 @@
 import type { Request, RequestHandler, Response } from "express";
 import { ticketService } from "@/api/ticket/ticketService";
+import { StatusCodes } from "http-status-codes";
+import { ServiceResponse } from "@/common/models/serviceResponse";
 
 class TicketController {
   // Lựa chọn tuyến đường đi
@@ -34,6 +36,142 @@ class TicketController {
     const serviceResponse = await ticketService.cancelTicket(ticketId);
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
+
+  // Thêm mới thông tin hủy vé xe dành cho admin
+  public createCancelTicket: RequestHandler = async (req: Request, res: Response) => {
+    const ticketId = Number.parseInt(req.body.ticketId as string, 10);
+    if (isNaN(ticketId)) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid ticketId. Must be a number", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+    const serviceResponse = await ticketService.createCancelTicket(ticketId);
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
+
+  // Hiển thị lịch sử đặt vé theo trạng thái
+  public getTicketsByStatus: RequestHandler = async (req: Request, res: Response) => {
+    const { status } = req.params as { status?: string };
+    if (!status) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Status is required", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+    console.log("Received status:", status);
+    if (status !== "BOOKED" && status !== "CANCELLED") {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid status. Must be 'BOOKED' or 'CANCELLED'", null, StatusCodes.BAD_REQUEST)
+      );
+      return; 
+    }
+    const serviceResponse = await ticketService.getTicketsByStatus(status as "BOOKED" | "CANCELLED");
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  }
+
+  // Hiển thị lịch sử đặt vé theo nhà xe
+  public getTicketsByCompany: RequestHandler = async (req, res) => {
+    const { companyId } = req.params;
+    const serviceResponse = await ticketService.getTicketsByCompany(Number(companyId));
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  }
+
+  // Xem tất cả lịch sử đặt vé
+  public getTicketHistory: RequestHandler = async (req, res) => {
+    const serviceResponse = await ticketService.getTicketHistory();
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
+
+  // Chọn phương thức thanh toán
+  public selectPaymentMethod: RequestHandler = async (req: Request, res: Response) => {
+    const ticketId = Number.parseInt(req.params.ticketId as string, 10);
+    const { paymentMethod, userId, amount } = req.body;
+
+    if (isNaN(ticketId)) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid ticketId. Must be a number", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    if (!paymentMethod || !["ONLINE", "CASH"].includes(paymentMethod)) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid payment method. Must be ONLINE or CASH", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    if (isNaN(userId)) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid userId. Must be a number", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    if (isNaN(amount) || amount <= 0) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid amount. Must be a positive number", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    const serviceResponse = await ticketService.selectPaymentMethod(ticketId, paymentMethod, userId, amount);
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
+
+  // Xóa thông tin hủy vé xe
+  public deleteCancelledTicket: RequestHandler = async (req: Request, res: Response) => {
+    const ticketId = Number.parseInt(req.params.ticketId as string, 10);
+    if (isNaN(ticketId)) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid ticketId. Must be a number", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    const serviceResponse = await ticketService.deleteCancelledTicket(ticketId);
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
+
+  // Tra cứu vé xe bằng mã vé với số điện thoại
+  public searchTicketByIdAndPhone: RequestHandler = async (req: Request, res: Response) => {
+    const { ticketId, phoneNumber } = req.query;
+
+    if (!ticketId || !phoneNumber) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Ticket code and phone number are required.", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    const ticketIdNum = Number.parseInt(ticketId as string, 10);
+    if (isNaN(ticketIdNum)) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("The ticket code must be a number.", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    const phoneRegex = /^0\d{9}$/; // Định dạng số điện thoại Việt Nam: bắt đầu bằng 0, 10 chữ số
+    if (!phoneRegex.test(phoneNumber as string)) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("The phone number is invalid.", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+
+    const serviceResponse = await ticketService.searchTicketByIdAndPhone(ticketIdNum, phoneNumber as string);
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
+
+  // Hiển thị danh sách thông tin hủy theo vé xe
+  public getCancelledTickets: RequestHandler = async (_req: Request, res: Response) => {
+    const serviceResponse = await ticketService.getCancelledTickets();
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
+
+
 }
 
 export const ticketController = new TicketController();

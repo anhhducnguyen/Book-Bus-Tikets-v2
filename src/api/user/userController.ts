@@ -1,4 +1,3 @@
-import { StatusCodes } from "http-status-codes";  // Đảm bảo import StatusCodes
 import type { Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { userService } from "@/api/user/userService";
@@ -46,6 +45,12 @@ class UserController {
 			});
 		}
 	};
+
+	public deleteStation: RequestHandler = async (req, res) => {
+		const id = Number(req.params.id);
+		const serviceResponse = await userService.delete(id);
+		res.status(serviceResponse.statusCode).send(serviceResponse);
+	  };
 
 }
 
