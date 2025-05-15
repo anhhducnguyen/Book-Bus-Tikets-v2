@@ -19,6 +19,20 @@ import { carRouter } from "@/api/car/carRouter";
 import { seatRoter } from "./api/seat/seatRouter";
 import { ticketRouter } from "@/api/ticket/ticketRouter";
 import { paymentProviderRouter } from "@/api/paymentProvider/paymentProvider.routes";
+import { getBus_reviewRouter } from "@/api/getBus_review/getBus_reviewRouter";
+import { getStationPassengerRouter } from "@/api/getStationPassenger/getStationPassengerRouter";
+import { getStatusTicketRouter } from "@/api/getStatusTicket/getStatusTicketRouter";
+import { getPaymentProviderRouter } from "@/api/getPaymentProvider/getPaymentProviderRouter";
+// import { getRevenueRouter } from "@/api/getRevenue/getRevenueRouter";
+import { getCustomerRouter } from "./api/getCustomer/getCustomerRouter";
+import { findArrivalRouter } from "@/api/findArrival/findArrivalRouter";
+
+import { getPopularStationRouter } from "@/api/getPopularStation/stationRouter";
+import { popularRouteRouter } from "./api/popularRoute/popularRouteRouter";
+import { getTopReviewRouter } from "@/api/getTopReview/busReviewRouter";
+import { discountBannerRouter } from "./api/discountBanner/bannerRouter";
+
+
 import errorHandler from "@/common/middleware/errorHandler";
 import rateLimiter from "@/common/middleware/rateLimiter";
 import requestLogger from "@/common/middleware/requestLogger";
@@ -74,6 +88,21 @@ app.use("/cars", carRouter);
 app.use("/seats", seatRoter);
 app.use("/tickets", ticketRouter);
 app.use("/payment-providers", paymentProviderRouter);
+app.use("/", getBus_reviewRouter);
+app.use("/getstationpassenger", getStationPassengerRouter);
+app.use("/", getStatusTicketRouter);
+app.use("/getPaymentProvider", getPaymentProviderRouter);
+// app.use("/revenue", getRevenueRouter);
+app.use("/get-customer", getCustomerRouter);
+app.use("/search", findArrivalRouter);
+
+// Home route
+app.use("/", getPopularStationRouter);
+app.use("/", popularRouteRouter);
+app.use("/", getTopReviewRouter);
+app.use("/discount-banner", discountBannerRouter);
+
+
 
 // Swagger UI
 app.use(openAPIRouter);
