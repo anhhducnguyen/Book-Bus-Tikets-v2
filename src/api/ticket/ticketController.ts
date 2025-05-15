@@ -37,6 +37,19 @@ class TicketController {
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
 
+  // Thêm mới thông tin hủy vé xe dành cho admin
+  public createCancelTicket: RequestHandler = async (req: Request, res: Response) => {
+    const ticketId = Number.parseInt(req.body.ticketId as string, 10);
+    if (isNaN(ticketId)) {
+      res.status(StatusCodes.BAD_REQUEST).send(
+        ServiceResponse.failure("Invalid ticketId. Must be a number", null, StatusCodes.BAD_REQUEST)
+      );
+      return;
+    }
+    const serviceResponse = await ticketService.createCancelTicket(ticketId);
+    res.status(serviceResponse.statusCode).send(serviceResponse);
+  };
+
   // Hiển thị lịch sử đặt vé theo trạng thái
   public getTicketsByStatus: RequestHandler = async (req: Request, res: Response) => {
     const { status } = req.params as { status?: string };

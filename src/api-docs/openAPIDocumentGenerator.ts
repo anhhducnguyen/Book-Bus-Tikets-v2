@@ -28,7 +28,7 @@ export function generateOpenAPIDocument(): OpenAPIDocument {
 		bannerRegistry,
 		busReviewRegistry,
 		ticketOrderRegistry,
-		// ticketRegistry,
+		ticketRegistry,
 		ticketOrderRegistry,
 		paymentProviderRegistry,
 		routeRegistry,

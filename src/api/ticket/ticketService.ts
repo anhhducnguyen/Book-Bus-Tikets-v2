@@ -322,6 +322,25 @@ export class TicketService {
       return ServiceResponse.failure("Error when checking the ticket", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
+
+  // Thêm mới thông tin hủy vé xe dành cho admin
+  async createCancelTicket(ticketId: number): Promise<ServiceResponse<null>> {
+    try {
+      const ticket = await this.ticketRepository.getTicketById(ticketId);
+      if (!ticket) {
+        return ServiceResponse.failure("Ticket not found", null, StatusCodes.NOT_FOUND);
+      }
+      if (ticket.status !== "BOOKED") {
+        return ServiceResponse.failure("Only booked tickets can be cancelled", null, StatusCodes.BAD_REQUEST);
+      }
+      await this.ticketRepository.createCancelTicket(ticketId);
+      return ServiceResponse.success<null>("Ticket cancellation information added successfully", null);
+    } catch (ex) {
+      logger.error(`Error creating cancellation information: ${(ex as Error).message}`);
+      return ServiceResponse.failure("Error creating cancellation information", null, StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
+
 }
 
 export const ticketService = new TicketService();
