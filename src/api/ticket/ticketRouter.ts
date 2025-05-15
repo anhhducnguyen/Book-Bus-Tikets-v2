@@ -109,7 +109,7 @@ ticketRouter.get("/tickets/history", ticketController.getTicketHistory);
 // Xóa thông tin hủy vé
 ticketRegistry.registerPath({
   method: "delete",
-  path: "/cancel_ticket/delete/:ticketId",
+  path: "/tickets/cancel_ticket/delete/{ticketId}",
   tags: ["Ticket"],
   request: {
     params: z.object({
