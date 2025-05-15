@@ -74,6 +74,11 @@ vehicleScheduleRouter.post(
   vehicleScheduleController.createSchedule
 );
 
+// {
+//   "available_seats": 25,
+//   "status": "FULL"
+// }
+
 vehicleScheduleRegistry.registerPath({
   method: "put",
   path: "/vehicle-schedules/{id}",
