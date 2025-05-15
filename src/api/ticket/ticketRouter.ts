@@ -111,6 +111,7 @@ ticketRegistry.registerPath({
   method: "delete",
   path: "/tickets/cancel_ticket/delete/{ticketId}",
   tags: ["Ticket"],
+  summary: "Xóa thông tin hủy vé",
   request: {
     params: z.object({
       ticketId: z.string().regex(/^\d+$/, "Ticket ID must be a numeric string"),
