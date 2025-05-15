@@ -10,7 +10,7 @@ import { carRegistry } from "@/api/car/carRouter";
 import { seatRegistry } from "@/api/seat/seatRouter";
 import { routesRegistry } from "@/api/routes/routesRouter";
 import { bannerRegistry } from "@/api/banners/bannerRouter";
-import { stationRegistry } from "@/api/stations/stationRouter";
+import { stationRegistry } from "@/api/station/stationRouter";
 import { busReviewRegistry } from "@/api/bus_reviews/busReviewRouter";
 import { ticketRegistry } from "@/api/ticket/ticketRouter";
 import { paymentProviderRegistry } from "@/api/paymentProvider/paymentProvider.routes";
@@ -27,13 +27,14 @@ export function generateOpenAPIDocument(): OpenAPIDocument {
 		routesRegistry,
 		bannerRegistry,
 		busReviewRegistry,
-		ticketOrderRegistry, 
+		ticketOrderRegistry,
 		// ticketRegistry,
 		ticketOrderRegistry,
 		paymentProviderRegistry,
 		routeRegistry,
 		stationRegistry,
-		busCompanyRegistry
+		busCompanyRegistry,
+		stationRegistry
 	]);
 
 	const generator = new OpenApiGeneratorV3(registry.definitions);

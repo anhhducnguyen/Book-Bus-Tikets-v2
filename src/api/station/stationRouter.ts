@@ -13,8 +13,12 @@ import {
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { stationController } from "@/api/station/stationController";
 
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
+import { permission } from "@/common/middleware/auth/permission";
+
 export const stationRegistry = new OpenAPIRegistry();
 export const stationRouter: Router = express.Router();
+
 
 /** 
  * 📌 Đăng ký schema cho OpenAPI 
@@ -70,7 +74,7 @@ stationRegistry.registerPath({
   },
   responses: createApiResponse(StationSchema, "Tạo mới bến xe thành công"),
 });
-stationRouter.post("/", validateRequest(CreateStationSchema), stationController.createStation);
+stationRouter.post("/", authenticate, permission, validateRequest(CreateStationSchema), stationController.createStation);
 
 /** 
  * 📌 Cập nhật thông tin một bến xe
@@ -92,7 +96,7 @@ stationRegistry.registerPath({
   },
   responses: createApiResponse(StationSchema, "Cập nhật thông tin bến xe thành công"),
 });
-stationRouter.put("/:id", validateRequest(UpdateStationSchema), stationController.updateStation);
+stationRouter.put("/:id", authenticate, permission, validateRequest(UpdateStationSchema), stationController.updateStation);
 
 /** 
  * 📌 Xóa một bến xe theo ID
@@ -107,5 +111,5 @@ stationRegistry.registerPath({
   },
   responses: createApiResponse(z.object({ success: z.boolean() }), "Xóa bến xe thành công"),
 });
-stationRouter.delete("/:id", validateRequest(GetStationSchema), stationController.deleteStation);
+stationRouter.delete("/:id", authenticate, permission, validateRequest(GetStationSchema), stationController.deleteStation);
 

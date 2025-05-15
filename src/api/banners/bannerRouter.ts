@@ -16,7 +16,7 @@ export const bannerRegistry = new OpenAPIRegistry();
 // Khởi tạo router
 export const bannerRouter: Router = express.Router();
 
-bannerRouter.use(authenticate);
+// bannerRouter.use(authenticate);
 
 // Đăng ký schema OpenAPI cho Routes
 bannerRegistry.register("Routes", BannerSchema);
@@ -84,60 +84,60 @@ bannerRegistry.registerPath({
 // Đăng ký handler cho GET /banner
 bannerRouter.get(
   "/",
-  permission, 
+  // permission, 
   bannerController.getAllBanner
 );
 //them moi banner
 
 bannerRegistry.registerPath({
-    method: "post",
-    path: "/banners",
-    tags: ["Banners"],
-    operationId: "createBanner",  // Thay 'operation' bằng 'operationId'
-    summary: "Thêm mới banner",  // Thêm phần mô tả ngắn gọn về API
-    requestBody: {
+  method: "post",
+  path: "/banners",
+  tags: ["Banners"],
+  operationId: "createBanner",  // Thay 'operation' bằng 'operationId'
+  summary: "Thêm mới banner",  // Thêm phần mô tả ngắn gọn về API
+  requestBody: {
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          properties: {
+            banner_url: { type: "string" },
+            position: { type: "string" },
+
+          },
+          required: ["banner_url", "position"],
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: "banner created successfully",
       content: {
         "application/json": {
           schema: {
             type: "object",
             properties: {
+              id: { type: "number" },
               banner_url: { type: "string" },
-              position:{type:"string"},
-              
-            },
-            required: ["banner_url", "position"],
-          },
-        },
-      },
-    },
-    responses: {
-      201: {
-        description: "banner created successfully",
-        content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: {
-                id: { type: "number" },
-                banner_url: { type: "string" },
-                position: { type: "string" },
-               
-              },
-            },
-          },
-        },
-      },
-      400: {
-        description: "Invalid input data",
-      },
-      500: {
-        description: "Internal server error",
-      },
-    },
-  });
+              position: { type: "string" },
 
- bannerRouter.post("/", permission, validateRequest(CreateBannerSchema), bannerController.createBanner);
- bannerRegistry.registerPath({
+            },
+          },
+        },
+      },
+    },
+    400: {
+      description: "Invalid input data",
+    },
+    500: {
+      description: "Internal server error",
+    },
+  },
+});
+
+bannerRouter.post("/", authenticate, permission, validateRequest(CreateBannerSchema), bannerController.createBanner);
+bannerRegistry.registerPath({
   method: "delete",
   path: "/banners/{id}",
   operationId: "deleteBanner",
@@ -170,4 +170,4 @@ bannerRegistry.registerPath({
   },
 });
 //xoa 1 banner
- bannerRouter.delete("/:id", permission, bannerController.deleteBanner);
+bannerRouter.delete("/:id", authenticate, permission, bannerController.deleteBanner);

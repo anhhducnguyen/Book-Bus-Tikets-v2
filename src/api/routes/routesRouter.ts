@@ -16,7 +16,7 @@ export const routesRegistry = new OpenAPIRegistry();
 // Khởi tạo router
 export const routesRouter: Router = express.Router();
 
-routesRouter.use(authenticate);
+// routesRouter.use(authenticate);
 
 // Đăng ký schema OpenAPI cho Routes
 routesRegistry.register("Routes", RoutesSchema);
@@ -82,7 +82,7 @@ routesRegistry.registerPath({
   ],
   responses: createApiResponse(z.array(RoutesSchema), "Thành công"),
 });
-routesRouter.get("/", permission, routesController.getAllRoutes);
+routesRouter.get("/", routesController.getAllRoutes);
 //them moi tuyen duong 
 routesRegistry.registerPath({
     method: "post",
@@ -134,9 +134,9 @@ routesRegistry.registerPath({
       },
     },
   });
- routesRouter.post("/", permission, validateRequest(CreateRoutesSchema), routesController.createRoutes);
+ routesRouter.post("/", authenticate, permission, validateRequest(CreateRoutesSchema), routesController.createRoutes);
  //update tuyen duong theo id
- routesRouter.put("/:id", permission, validateRequest(CreateRoutesSchema), routesController.updateRoutes);
+ routesRouter.put("/:id", authenticate, permission, validateRequest(CreateRoutesSchema), routesController.updateRoutes);
  //Xoa tuyen duong
  routesRegistry.registerPath({
    method: "delete",

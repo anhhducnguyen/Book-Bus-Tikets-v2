@@ -23,6 +23,7 @@ paymentProviderRegistry.registerPath({
     method: "get",
     path: "/payment-providers",
     tags: ["PaymentProvider"],
+    summary: "Hiển thị thông tin nhà cung cấp thanh toán",
     responses: createApiResponse(z.array(PaymentProviderSchema), "Lấy danh sách nhà cung cấp thanh toán thành công"),
 });
 

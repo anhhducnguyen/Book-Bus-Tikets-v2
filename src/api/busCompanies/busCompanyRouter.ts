@@ -13,13 +13,16 @@ import { validateRequest } from "@/common/utils/httpHandlers";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { busCompanyController } from "./busCompanyController";
 
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
+import { permission } from "@/common/middleware/auth/permission";
+
 export const busCompanyRegistry = new OpenAPIRegistry();
 export const busCompanyRouter: Router = express.Router();
 
-// 🗂️ Đăng ký model cho OpenAPI
+//  Đăng ký model cho OpenAPI
 busCompanyRegistry.register("BusCompany", BusCompanySchema);
 
-// 🚀 GET /bus-companies
+//  GET /bus-companies
 busCompanyRegistry.registerPath({
   method: "get",
   path: "/bus-companies",
@@ -30,7 +33,7 @@ busCompanyRegistry.registerPath({
 });
 busCompanyRouter.get("/", validateRequest(BusCompanyQuerySchema), busCompanyController.getCompanies);
 
-// 🚀 GET /bus-companies/:id
+//  GET /bus-companies/:id
 busCompanyRegistry.registerPath({
   method: "get",
   path: "/bus-companies/{id}",
@@ -41,7 +44,7 @@ busCompanyRegistry.registerPath({
 });
 busCompanyRouter.get("/:id", validateRequest(GetBusCompanySchema), busCompanyController.getCompany);
 
-// 🚀 POST /bus-companies
+//  POST /bus-companies
 busCompanyRegistry.registerPath({
   method: "post",
   path: "/bus-companies",
@@ -58,9 +61,9 @@ busCompanyRegistry.registerPath({
   },
   responses: createApiResponse(BusCompanySchema, "Tạo nhà xe thành công"),
 });
-busCompanyRouter.post("/", validateRequest(CreateBusCompanySchema), busCompanyController.createCompany);
+busCompanyRouter.post("/", authenticate, permission, validateRequest(CreateBusCompanySchema), busCompanyController.createCompany);
 
-// 🚀 PUT /bus-companies/:id
+//  PUT /bus-companies/:id
 busCompanyRegistry.registerPath({
   method: "put",
   path: "/bus-companies/{id}",
@@ -78,9 +81,9 @@ busCompanyRegistry.registerPath({
   },
   responses: createApiResponse(BusCompanySchema, "Cập nhật thành công"),
 });
-busCompanyRouter.put("/:id", validateRequest(UpdateBusCompanySchema), busCompanyController.updateCompany);
+busCompanyRouter.put("/:id", authenticate, permission, validateRequest(UpdateBusCompanySchema), busCompanyController.updateCompany);
 
-// 🚀 DELETE /bus-companies/:id
+//  DELETE /bus-companies/:id
 busCompanyRegistry.registerPath({
   method: "delete",
   path: "/bus-companies/{id}",
@@ -89,4 +92,4 @@ busCompanyRegistry.registerPath({
   request: { params: GetBusCompanySchema.shape.params },
   responses: createApiResponse(z.object({ success: z.boolean() }), "Xóa thành công"),
 });
-busCompanyRouter.delete("/:id", validateRequest(GetBusCompanySchema), busCompanyController.deleteCompany);
+busCompanyRouter.delete("/:id", authenticate, permission, validateRequest(GetBusCompanySchema), busCompanyController.deleteCompany);

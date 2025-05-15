@@ -24,6 +24,7 @@ ticketOrderRegistry.registerPath({
   method: "get",
   path: "/ticket-orders",
   tags: ["Ticket order"],
+  summary: "Hiển thị tất cả đơn đặt vé của tất cả người dùng",
   request: { query: GetAllTicketOrdersSchema.shape.query },
   responses: createApiResponse(z.array(TicketOrderSchema), "Success"),
 });
@@ -36,6 +37,7 @@ ticketOrderRegistry.registerPath({
   method: "get",
   path: "/ticket-orders/company/{companyId}",
   tags: ["Ticket order"],
+  summary: "Hiển thị tất cả đơn đặt hàng theo nhà xe",
   request: { params: GetTicketOrdersByCompanySchema.shape.params },
   responses: createApiResponse(z.array(TicketOrderSchema), "Success"),
 });
@@ -49,6 +51,7 @@ ticketOrderRegistry.registerPath({
   method: "get",
   path: "/ticket-orders/status/{status}",
   tags: ["Ticket order"],
+  summary: "Hiển thị tất cả đơn hàng theo trạng thái của vé",
   request: { params: GetTicketOrdersByStatusSchema.shape.params },
   responses: createApiResponse(z.array(TicketOrderSchema), "Success"),
 });

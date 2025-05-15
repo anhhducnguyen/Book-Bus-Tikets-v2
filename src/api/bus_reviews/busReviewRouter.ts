@@ -17,7 +17,7 @@ export const busReviewRegistry = new OpenAPIRegistry();
 // Khởi tạo router
 export const busReviewRouter: Router = express.Router();
 
-busReviewRouter.use(authenticate);
+// busReviewRouter.use(authenticate);
 
 // Đăng ký schema OpenAPI cho Routes
 busReviewRegistry.register("BusReview", BusReviewSchema);
@@ -104,7 +104,7 @@ busReviewRegistry.registerPath({
   responses: createApiResponse(z.array(BusReviewSchema), "Thành công"),
 });
 // Đăng ký handler cho GET /routes
-busReviewRouter.get("/", permission, busReviewController.getAllBusReview);
+busReviewRouter.get("/", busReviewController.getAllBusReview);
 //them moi review
 busReviewRegistry.registerPath({
     method: "post",
@@ -192,4 +192,4 @@ busReviewRegistry.registerPath({
    },
  });
  //xoa review
- busReviewRouter.delete("/:id", busReviewController.deleteBusReview);
+ busReviewRouter.delete("/:id", authenticate, permission, busReviewController.deleteBusReview);
