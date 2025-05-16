@@ -57,6 +57,29 @@ stationRouter.get("/:id", validateRequest(GetStationSchema), stationController.g
 /** 
  *  Tạo mới một bến xe
  */
+// stationRegistry.registerPath({
+//   method: "post",
+//   path: "/stations",
+//   tags: ["Station"],
+//   summary: "Tạo mới một bến xe",
+//   request: {
+//     body: {
+//       content: {
+//         "multipart/form-data": {
+//           schema: z.object({
+//             name: z.string(),
+//             descriptions: z.string().optional(),
+//             location: z.string(),
+//             image: z.any().optional(),        // Đây là phần upload file
+//             wallpaper: z.any().optional(),    // Đây là phần upload file
+//           }),
+//         },
+//       },
+//     },
+//   },
+//   responses: createApiResponse(StationSchema, "Tạo mới bến xe thành công"),
+// });
+
 stationRegistry.registerPath({
   method: "post",
   path: "/stations",
@@ -66,15 +89,51 @@ stationRegistry.registerPath({
     body: {
       content: {
         "multipart/form-data": {
-          schema: CreateStationSchema.shape.body,
+          schema: z.object({
+            name: z.string(),
+            descriptions: z.string().optional(),
+            location: z.string(),
+            image: z.any().optional(),        
+            wallpaper: z.any().optional(),    
+          }).openapi({
+            properties: {
+              name: {
+                type: "string",
+                description: "Tên bến xe",
+              },
+              descriptions: {
+                type: "string",
+                description: "Mô tả bến xe",
+              },
+              location: {
+                type: "string",
+                description: "Vị trí bến xe",
+              },
+              image: {
+                type: "string",
+                format: "binary",
+                description: "Ảnh đại diện bến xe",
+              },
+              wallpaper: {
+                type: "string",
+                format: "binary",
+                description: "Ảnh nền của bến xe",
+              },
+            },
+            required: ["name", "location"]
+          }),
         },
       },
     },
   },
   responses: createApiResponse(StationSchema, "Tạo mới bến xe thành công"),
 });
+
+
 stationRouter.post(
   "/",
+  // authenticate,
+  // permission,
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "wallpaper", maxCount: 1 },
@@ -94,15 +153,57 @@ stationRegistry.registerPath({
     params: UpdateStationSchema.shape.params,
     body: {
       content: {
-        "application/json": {
-          schema: UpdateStationSchema.shape.body,
+        "multipart/form-data": {
+          schema: z.object({
+            name: z.string().optional(),
+            descriptions: z.string().optional(),
+            location: z.string().optional(),
+            image: z.any().optional(),
+            wallpaper: z.any().optional(),
+          }).openapi({
+            properties: {
+              name: {
+                type: "string",
+                description: "Tên bến xe",
+              },
+              descriptions: {
+                type: "string",
+                description: "Mô tả bến xe",
+              },
+              location: {
+                type: "string",
+                description: "Vị trí bến xe",
+              },
+              image: {
+                type: "string",
+                format: "binary",
+                description: "Ảnh đại diện bến xe",
+              },
+              wallpaper: {
+                type: "string",
+                format: "binary",
+                description: "Ảnh nền của bến xe",
+              },
+            },
+          }),
         },
       },
     },
   },
   responses: createApiResponse(StationSchema, "Cập nhật thông tin bến xe thành công"),
 });
-stationRouter.put("/:id", authenticate, permission, validateRequest(UpdateStationSchema), stationController.updateStation);
+
+stationRouter.put(
+  "/:id",
+  // authenticate,
+  // permission,
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "wallpaper", maxCount: 1 },
+  ]),
+  stationController.updateStation
+);
+
 
 /** 
  *  Xóa một bến xe theo ID
