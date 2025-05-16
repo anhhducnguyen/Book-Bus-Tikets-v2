@@ -1,9 +1,9 @@
 import { StatusCodes } from "http-status-codes";
 
-import { TicketOrderRepository } from "@/api/ticketOrder/ticketOrder.repository";
+import { TicketOrderRepository } from "@/api/ticketOrder/ticketOrderRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
-import { TicketOrder } from "@/api/ticketOrder/ticketOrder.model";
+import { TicketOrder } from "@/api/ticketOrder/ticketOrderModel";
 
 export class TicketOrderService {
   private ticketOrderRepository: TicketOrderRepository;
@@ -26,7 +26,7 @@ export class TicketOrderService {
       console.log("limit", limit);
       console.log("sortBy", sortBy);
       console.log("order", order);
-      console.log("search", search);      
+      console.log("search", search);
       const ticketOrders = await this.ticketOrderRepository.getAllTicketOrders({
         page,
         limit,
