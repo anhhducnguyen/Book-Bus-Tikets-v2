@@ -3,8 +3,8 @@ import { OpenAPIRegistry, OpenApiGeneratorV3 } from "@asteasolutions/zod-to-open
 import { healthCheckRegistry } from "@/api/healthCheck/healthCheckRouter";
 import { userRegistry } from "@/api/user/userRouter";
 import { busCompanyRegistry } from "@/api/busCompanies/busCompanyRouter";
-import { routeRegistry } from "@/api/route/route.routes";
-import { ticketOrderRegistry } from "@/api/ticketOrder/ticketOrder.routes";
+import { routeRegistry } from "@/api/route/routeRoutes";
+import { ticketOrderRegistry } from "@/api/ticketOrder/ticketOrderRoutes";
 import { authRegistry } from "@/api/auth/authRouter";
 import { carRegistry } from "@/api/car/carRouter";
 import { seatRegistry } from "@/api/seat/seatRouter";
@@ -18,7 +18,6 @@ import { getBus_reviewRegistry } from "@/api/getBus_review/getBus_reviewRouter";
 import { getStationPassengerRegistry } from "@/api/getStationPassenger/getStationPassengerRouter";
 import { getStatusTicketRegistry } from "@/api/getStatusTicket/getStatusTicketRouter";
 import { getPaymentProviderRegistry } from "@/api/getPaymentProvider/getPaymentProviderRouter";
-// home
 import { getPopularStationRegistry } from "@/api/getPopularStation/stationRouter";
 import { popularRouteRegistry } from "@/api/popularRoute/popularRouteRouter";
 import { getTopReviewRegistry } from "@/api/getTopReview/busReviewRouter";
@@ -27,6 +26,8 @@ import { getCustomerRegistry } from "@/api/getCustomer/getCustomerRouter";
 import { findArrivalRegistry } from "@/api/findArrival/findArrivalRouter";
 import { get } from "http";
 import { discountBannerRegistry } from "@/api/discountBanner/bannerRouter";
+import { vehicleScheduleRegistry } from "@/api/vehicleSchedule/vehicleSchedule.routes";
+
 
 export type OpenAPIDocument = ReturnType<OpenApiGeneratorV3["generateDocument"]>;
 
@@ -59,11 +60,11 @@ export function generateOpenAPIDocument(): OpenAPIDocument {
 		getPopularStationRegistry,
 		popularRouteRegistry,
 		getTopReviewRegistry,
-		discountBannerRegistry
+		discountBannerRegistry,
+		vehicleScheduleRegistry
 	]);
 
 	const generator = new OpenApiGeneratorV3(registry.definitions);
-
 	const document = generator.generateDocument({
 		openapi: "3.0.0",
 		info: {

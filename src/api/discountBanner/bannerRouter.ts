@@ -1,67 +1,57 @@
-import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import express, { type Router } from "express";
 import { z } from "zod";
+import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 
-import { createApiResponse } from "@/api-docs/openAPIResponseBuilders"; // Bạn đã xây dựng hàm này cho OpenAPI response
-import { validateRequest } from "@/common/utils/httpHandlers"; // Nếu bạn muốn validate request data
-import { bannerController } from "./bannerController"; // Controller để xử lý logic route
-import { BannerSchema, CreateBannerSchema } from "./bannerModel"; // Schema Zod cho routes
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
+import { permission } from "@/common/middleware/auth/permission";
+import { validateRequest } from "@/common/utils/httpHandlers";
+import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 
-// Khởi tạo OpenAPI registry
+import { bannerController } from "./bannerController";
+import { BannerSchema } from "./bannerModel";
+
 export const discountBannerRegistry = new OpenAPIRegistry();
-
-// Khởi tạo router
 export const discountBannerRouter: Router = express.Router();
 
-// Đăng ký schema OpenAPI cho Routes
-discountBannerRegistry.register("Routes", BannerSchema);
+// Đăng ký schema với OpenAPI
+discountBannerRegistry.register("Banner", BannerSchema);
 
-//Đăng ký đường dẫn cho OpenAPI với method 'get' getLatestBannerById
+/**
+ * GET /banners/featured
+ * Lấy danh sách banner ưu đãi nổi bật theo vị trí (position)
+ */
 discountBannerRegistry.registerPath({
   method: "get",
-  path: "/discount-banner/{position}",
-  tags: ["Statistical"],
-  operationId: "getLatestBannerById",
-  summary: "Lấy vị trí mới nhất của banner",
+  path: "/disount-banners",
+  tags: ["Banner"],
+  summary: "Lấy danh sách banner ưu đãi nổi bật theo vị trí",
   parameters: [
     {
       name: "position",
-      in: "path",
-      required: true,
-      description: "Position of the banner (e.g., homepage, footer, sidebar)",
+      in: "query",
+      required: false,
       schema: {
         type: "string",
-        example: "homepage"
-      }
-    }
+      },
+      description: "Vị trí banner để lọc (TOP, BOTTOM, LEFT, RIGHT)",
+    },
   ],
-  responses: {
-    200: {
-      description: "Banner fetched successfully",
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              id: { type: "number", example: 101 },
-              banner_url: { type: "string" },
-              position: { type: "string" },
-              created_at: { type: "string" }
-            }
-          }
-        }
-      }
-    },
-    404: {
-      description: "No banner found for the specified position"
-    },
-    500: {
-      description: "Internal server error"
-    }
-  }
+
+  responses: createApiResponse(
+    z.array(BannerSchema),
+    "Danh sách banner ưu đãi nổi bật"
+  ),
 });
-// Đăng ký handler cho GET /banners/:id
-discountBannerRouter.get("/:position", bannerController.getLatestBannerById);
 
 
-
+// Router định nghĩa route
+discountBannerRouter.get(
+  "/disount-banners",
+  // authenticate,
+  // permission,
+  // Nếu cần validate query param, có thể dùng validateRequest ở đây
+  // validateRequest({
+  //   query: z.object({ position: z.string().optional() }),
+  // }),
+  bannerController.getFeaturedBanners
+);

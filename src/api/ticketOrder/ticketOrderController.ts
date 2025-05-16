@@ -1,5 +1,5 @@
 import type { Request, RequestHandler, Response } from "express";
-import { ticketOrderService } from "@/api/ticketOrder/ticketOrder.service";
+import { ticketOrderService } from "@/api/ticketOrder/ticketOrderService";
 
 class TicketOrderController {
   public getTicketOrders: RequestHandler = async (req: Request, res: Response) => {

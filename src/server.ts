@@ -1,6 +1,7 @@
 import cors from "cors";
 import express, { type Express } from "express";
 import helmet from "helmet";
+import path from "path";
 import { pino } from "pino";
 
 import { openAPIRouter } from "@/api-docs/openAPIRouter";
@@ -8,8 +9,8 @@ import { healthCheckRouter } from "@/api/healthCheck/healthCheckRouter";
 import { userRouter } from "@/api/user/userRouter";
 import { stationRouter } from "@/api/station/stationRouter";
 import { busCompanyRouter } from "@/api/busCompanies/busCompanyRouter";
-import { routeRouter } from "@/api/route/route.routes";
-import { ticketOrderRouter } from "@/api/ticketOrder/ticketOrder.routes";
+import { routeRouter } from "@/api/route/routeRoutes";
+import { ticketOrderRouter } from "@/api/ticketOrder/ticketOrderRoutes";
 import { authRouter } from "@/api/auth/authRouter";
 import { routesRouter } from "./api/routes/routesRouter";
 import { bannerRouter } from "./api/banners/bannerRouter";
@@ -31,7 +32,7 @@ import { popularRouteRouter } from "./api/popularRoute/popularRouteRouter";
 import { getTopReviewRouter } from "@/api/getTopReview/busReviewRouter";
 import { discountBannerRouter } from "./api/discountBanner/bannerRouter";
 
-
+import { vehicleScheduleRouter } from "./api/vehicleSchedule/vehicleSchedule.routes";
 import errorHandler from "@/common/middleware/errorHandler";
 import rateLimiter from "@/common/middleware/rateLimiter";
 import requestLogger from "@/common/middleware/requestLogger";
@@ -98,9 +99,10 @@ app.use("/search", findArrivalRouter);
 app.use("/", getPopularStationRouter);
 app.use("/", popularRouteRouter);
 app.use("/", getTopReviewRouter);
-app.use("/discount-banner", discountBannerRouter);
+app.use("/", discountBannerRouter);
 
 
+app.use("/vehicle-schedules", vehicleScheduleRouter);
 
 // Swagger UI
 app.use(openAPIRouter);
@@ -109,3 +111,5 @@ app.use(openAPIRouter);
 app.use(errorHandler());
 
 export { app, logger };
+
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));

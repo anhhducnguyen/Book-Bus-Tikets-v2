@@ -3,27 +3,12 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { GetRouteByIdSchema, RouteListItemSchema, RouteDetailSchema } from "@/api/route/route.model";
+import { GetRouteByIdSchema, RouteListItemSchema, RouteDetailSchema } from "@/api/route/routeModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
-import { routeController } from "./route.controller";
+import { routeController } from "./routeController";
 
 export const routeRegistry = new OpenAPIRegistry();
 export const routeRouter: Router = express.Router();
-
-// // Đăng ký các schema
-// routeRegistry.register("RouteListItem", RouteListItemSchema);
-// routeRegistry.register("RouteDetail", RouteDetailSchema);
-
-// // Đăng ký endpoint lấy danh sách tuyến đường
-// // http://localhost:3000/routes
-// routeRegistry.registerPath({
-//   method: "get",
-//   path: "/routes",
-//   tags: ["Routes"],
-//   responses: createApiResponse(z.array(RouteListItemSchema), "Success"),
-// });
-
-// routeRouter.get("/", routeController.getRoutes);
 
 // Đăng ký endpoint lấy chi tiết tuyến đường theo ID
 // http://localhost:3000/routes/:id

@@ -1,27 +1,20 @@
-import { Request, Response, RequestHandler } from 'express';
-import { BannerService } from './bannerService';
+import type { Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
+import { bannerService } from "./bannerService";
 
-export const bannerService = new BannerService();
-
-export class BannerController {
-    async getLatestBannerById(req: Request, res: Response) {
+class BannerController {
+    // Lấy banner ưu đãi nổi bật (có thể filter theo position query param)
+    public getFeaturedBanners: RequestHandler = async (req: Request, res: Response) => {
         try {
-            const position = req.params.position as string;
-            const banner = await bannerService.getLatestBannerById(position);
-
-            if (banner) {
-                res.status(StatusCodes.OK).json(banner);
-            } else {
-                res.status(StatusCodes.NOT_FOUND).json({ message: "Banner not found" });
-            }
+            const position = req.query.position as string | undefined;
+            const serviceResponse = await bannerService.getFeaturedBanners(position);
+            res.status(serviceResponse.statusCode).json(serviceResponse);
+        } catch (ex) {
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                message: "An error occurred while getting featured banners.",
+            });
         }
-        catch (error) {
-            console.error(error);
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
-        }
-    }
-
+    };
 }
-// 1124
+
 export const bannerController = new BannerController();

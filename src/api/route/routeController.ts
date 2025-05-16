@@ -1,5 +1,5 @@
 import type { Request, RequestHandler, Response } from "express";
-import { routeService } from "@/api/route/route.service";
+import { routeService } from "@/api/route/routeService";
 
 class RouteController {
   // Lấy danh sách tuyến đường

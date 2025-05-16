@@ -1,8 +1,8 @@
 import { StatusCodes } from "http-status-codes";
-import { RouteRepository } from "@/api/route/route.repository";
+import { RouteRepository } from "@/api/route/routeRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
-import type { RouteListItem, RouteDetail } from "./route.model";
+import type { RouteListItem, RouteDetail } from "./routeModel";
 
 export class RouteService {
   private routeRepository: RouteRepository;

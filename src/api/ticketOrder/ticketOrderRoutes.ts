@@ -3,9 +3,9 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { TicketOrderSchema, GetAllTicketOrdersSchema, GetTicketOrdersByCompanySchema, GetTicketOrdersByStatusSchema } from "@/api/ticketOrder/ticketOrder.model";
+import { TicketOrderSchema, GetAllTicketOrdersSchema, GetTicketOrdersByCompanySchema, GetTicketOrdersByStatusSchema } from "@/api/ticketOrder/ticketOrderModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
-import { ticketOrderController } from "./ticketOrder.controller";
+import { ticketOrderController } from "./ticketOrderController";
 
 import { authenticate } from "@/common/middleware/auth/authMiddleware";
 import { permission } from "@/common/middleware/auth/permission";

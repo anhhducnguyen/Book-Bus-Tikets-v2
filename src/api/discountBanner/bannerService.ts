@@ -1,42 +1,32 @@
-import { Banner } from '@/api/banners/bannerModel';
 import { StatusCodes } from "http-status-codes";
-
-
 import { BannerRepository } from "./bannerRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
-
-
+import { Banner } from "./bannerModel";
 
 export class BannerService {
   private bannerRepository: BannerRepository;
 
-  constructor() {
-    this.bannerRepository = new BannerRepository();
+  constructor(repository: BannerRepository = new BannerRepository()) {
+    this.bannerRepository = repository;
   }
 
-  async getLatestBannerById(position: string): Promise<ServiceResponse<Banner | null>> {
+  // Lấy banner ưu đãi nổi bật, có thể lọc theo vị trí và giới hạn 5 banner
+  async getFeaturedBanners(position?: string): Promise<ServiceResponse<Banner[] | null>> {
     try {
-      const banner = await this.bannerRepository.getLatestBannerById(position);
-      return ServiceResponse.success<Banner | null>(
-        'Fetched latest banner successfully',
-        banner,
-        StatusCodes.OK
-      );
+      const banners = await this.bannerRepository.findByPosition(position, 5);
+      return ServiceResponse.success("Lấy banner ưu đãi nổi bật thành công", banners);
     } catch (error) {
-      const errorMessage = `Error fetching latest banner: ${(error as Error).message}`;
-      logger.error(errorMessage);
-      return ServiceResponse.failure<null>(
-        'An error occurred while fetching latest banner.',
-        null,
+      const message = `Error fetching featured banners: ${(error as Error).message}`;
+      logger.error(message);
+      return ServiceResponse.failure(
+        "Lấy banner ưu đãi thất bại",
+        null, // null hợp lệ vì Promise trả về kiểu Banner[] | null
         StatusCodes.INTERNAL_SERVER_ERROR
       );
     }
   }
 
-
-
-
-
 }
 
+export const bannerService = new BannerService();

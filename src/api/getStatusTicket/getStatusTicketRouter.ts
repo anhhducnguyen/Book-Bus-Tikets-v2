@@ -25,7 +25,7 @@ getStatusTicketRegistry.register("TicketStatusStatistic", TicketStatsSchema);
  */
 getStatusTicketRegistry.registerPath({
     method: "get",
-    path: "/tickets/status-statistics",
+    path: "/status-statistics",
     tags: ["Statistical"],
     summary: "Thống kê trạng thái vé (BOOKED, CANCELLED)",
     responses: createApiResponse(

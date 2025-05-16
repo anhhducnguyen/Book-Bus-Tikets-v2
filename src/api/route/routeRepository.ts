@@ -1,4 +1,4 @@
-import type { RouteDetail, RouteListItem } from "./route.model";
+import type { RouteDetail, RouteListItem } from "./routeModel";
 import { db } from "@/common/config/database";
 
 export class RouteRepository {
