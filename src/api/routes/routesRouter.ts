@@ -170,4 +170,4 @@ routesRegistry.registerPath({
      },
    },
  });
- routesRouter.delete("/:id", permission, routesController.deleteRoutes);
+ routesRouter.delete("/:id", authenticate, permission, routesController.deleteRoutes);
