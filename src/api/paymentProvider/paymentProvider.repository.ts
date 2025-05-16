@@ -67,9 +67,18 @@ export class PaymentProviderRepository {
 
     // Xóa nhà cung cấp thanh toán theo ID
     async deletePaymentProviderAsync(id: number): Promise<boolean> {
-        const affectedRows = await db<PaymentProvider>("payment_providers")
-            .where({ id })
-            .del();
-        return affectedRows > 0;
+        try {
+            // Xoá payments trước (nếu không dùng ON DELETE CASCADE)
+            await db("payments").where({ payment_provider_id: id }).del();
+
+            const affectedRows = await db<PaymentProvider>("payment_providers")
+                .where({ id })
+                .del();
+
+            return affectedRows > 0;
+        } catch (error) {
+            console.error("Error deleting payment provider:", error);
+            return false;
+        }
     }
 }
