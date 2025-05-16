@@ -86,10 +86,25 @@ export class VehicleScheduleRepository {
   }
 
   async deleteAsync(id: number): Promise<VehicleSchedule | null> {
-    const rows = await db("schedules").where("id", id).del().returning("*");
-    if (rows.length === 0) {
-      return null;
-    }
-    return rows[0];
+    return await db.transaction(async trx => {
+    // Lấy danh sách ticket_id thuộc schedule
+      const ticketIds = await trx("tickets")
+        .where("schedule_id", id)
+        .pluck("id");
+
+      if (ticketIds.length > 0) {
+        // Xoá tất cả payments liên quan tới các ticket này
+        await trx("payments").whereIn("ticket_id", ticketIds).del();
+      }
+
+      // Xóa tickets
+      await trx("tickets").where("schedule_id", id).del();
+
+      // Xóa schedule
+      const rows = await trx("schedules").where("id", id).del().returning("*");
+
+      if (rows.length === 0) return null;
+      return rows[0];
+    });
   }
 }
