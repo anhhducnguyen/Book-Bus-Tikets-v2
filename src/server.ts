@@ -1,6 +1,7 @@
 import cors from "cors";
 import express, { type Express } from "express";
 import helmet from "helmet";
+import path from "path";
 import { pino } from "pino";
 
 import { openAPIRouter } from "@/api-docs/openAPIRouter";
@@ -110,3 +111,5 @@ app.use(openAPIRouter);
 app.use(errorHandler());
 
 export { app, logger };
+
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));

@@ -1,7 +1,7 @@
+// src/routes/stationRouter.ts
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import express, { type Router } from "express";
 import { z } from "zod";
-
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { 
   GetStationSchema, 
@@ -12,16 +12,15 @@ import {
 } from "@/api/station/stationModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { stationController } from "@/api/station/stationController";
-
 import { authenticate } from "@/common/middleware/auth/authMiddleware";
 import { permission } from "@/common/middleware/auth/permission";
+import { upload } from "@/common/middleware/uploadMiddleware";
 
 export const stationRegistry = new OpenAPIRegistry();
 export const stationRouter: Router = express.Router();
 
-
 /** 
- * 📌 Đăng ký schema cho OpenAPI 
+ * 🗂 Đăng ký schema cho OpenAPI 
  */
 stationRegistry.register("Station", StationSchema);
 
@@ -66,7 +65,7 @@ stationRegistry.registerPath({
   request: {
     body: {
       content: {
-        "application/json": {
+        "multipart/form-data": {
           schema: CreateStationSchema.shape.body,
         },
       },
@@ -74,7 +73,14 @@ stationRegistry.registerPath({
   },
   responses: createApiResponse(StationSchema, "Tạo mới bến xe thành công"),
 });
-stationRouter.post("/", authenticate, permission, validateRequest(CreateStationSchema), stationController.createStation);
+stationRouter.post(
+  "/",
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "wallpaper", maxCount: 1 },
+  ]),
+  stationController.createStation
+);
 
 /** 
  * 📌 Cập nhật thông tin một bến xe
@@ -112,4 +118,3 @@ stationRegistry.registerPath({
   responses: createApiResponse(z.object({ success: z.boolean() }), "Xóa bến xe thành công"),
 });
 stationRouter.delete("/:id", authenticate, permission, validateRequest(GetStationSchema), stationController.deleteStation);
-
