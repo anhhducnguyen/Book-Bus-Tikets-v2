@@ -31,7 +31,7 @@ import { popularRouteRouter } from "./api/popularRoute/popularRouteRouter";
 import { getTopReviewRouter } from "@/api/getTopReview/busReviewRouter";
 import { discountBannerRouter } from "./api/discountBanner/bannerRouter";
 
-
+import { vehicleScheduleRouter } from "./api/vehicleSchedule/vehicleSchedule.routes";
 import errorHandler from "@/common/middleware/errorHandler";
 import rateLimiter from "@/common/middleware/rateLimiter";
 import requestLogger from "@/common/middleware/requestLogger";
@@ -101,6 +101,7 @@ app.use("/", getTopReviewRouter);
 app.use("/discount-banner", discountBannerRouter);
 
 
+app.use("/vehicle-schedules", vehicleScheduleRouter);
 
 // Swagger UI
 app.use(openAPIRouter);
