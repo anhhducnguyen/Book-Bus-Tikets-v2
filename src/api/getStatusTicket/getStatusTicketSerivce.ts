@@ -14,7 +14,7 @@ export class TicketService {
     async getStatusStatistics(): Promise<ServiceResponse<any>> {
         try {
             const stats = await this.ticketRepository.countByStatus();
-            return ServiceResponse.success("Ticket status statistics fetched successfully", stats);
+            return ServiceResponse.success("Trang thái vé cập nhật thành công", stats);
         } catch (error) {
             const message = `Error fetching ticket status statistics: ${(error as Error).message}`;
             logger.error(message);

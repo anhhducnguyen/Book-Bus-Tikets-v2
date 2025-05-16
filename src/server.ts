@@ -98,7 +98,7 @@ app.use("/search", findArrivalRouter);
 app.use("/", getPopularStationRouter);
 app.use("/", popularRouteRouter);
 app.use("/", getTopReviewRouter);
-app.use("/discount-banner", discountBannerRouter);
+app.use("/", discountBannerRouter);
 
 
 
