@@ -25,7 +25,7 @@ export const stationRouter: Router = express.Router();
 stationRegistry.register("Station", StationSchema);
 
 /** 
- * 📌 Lấy danh sách bến xe (Phân trang, Tìm kiếm, Sắp xếp)
+ *  Lấy danh sách bến xe (Phân trang, Tìm kiếm, Sắp xếp)
  */
 stationRegistry.registerPath({
   method: "get",
@@ -40,7 +40,7 @@ stationRegistry.registerPath({
 stationRouter.get("/", validateRequest(StationQuerySchema), stationController.getStations);
 
 /** 
- * 📌 Lấy thông tin chi tiết của một bến xe
+ *  Lấy thông tin chi tiết của một bến xe
  */
 stationRegistry.registerPath({
   method: "get",
@@ -55,7 +55,7 @@ stationRegistry.registerPath({
 stationRouter.get("/:id", validateRequest(GetStationSchema), stationController.getStation);
 
 /** 
- * 📌 Tạo mới một bến xe
+ *  Tạo mới một bến xe
  */
 stationRegistry.registerPath({
   method: "post",
@@ -83,7 +83,7 @@ stationRouter.post(
 );
 
 /** 
- * 📌 Cập nhật thông tin một bến xe
+ *  Cập nhật thông tin một bến xe
  */
 stationRegistry.registerPath({
   method: "put",
@@ -105,7 +105,7 @@ stationRegistry.registerPath({
 stationRouter.put("/:id", authenticate, permission, validateRequest(UpdateStationSchema), stationController.updateStation);
 
 /** 
- * 📌 Xóa một bến xe theo ID
+ *  Xóa một bến xe theo ID
  */
 stationRegistry.registerPath({
   method: "delete",

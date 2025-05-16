@@ -36,12 +36,20 @@ class StationController {
     try {
       const { name, descriptions, location } = req.body;
 
-      // 👇 Thay đổi cách lấy file:
+      // Thay đổi cách lấy file:
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
-      const image = files["image"] ? files["image"][0]?.path : undefined;
-      const wallpaper = files["wallpaper"] ? files["wallpaper"][0]?.path : undefined;
+      // const image = files["image"] ? files["image"][0]?.path : undefined;
+      // const wallpaper = files["wallpaper"] ? files["wallpaper"][0]?.path : undefined;
 
+      const image = files["image"] ? files["image"][0]?.filename : undefined;
+      const wallpaper = files["wallpaper"] ? files["wallpaper"][0]?.filename : undefined;
+
+      
+      // console.log(image);
+      // console.log(wallpaper);
+      
+      
       const newStation = {
         name,
         descriptions,

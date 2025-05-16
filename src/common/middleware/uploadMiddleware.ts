@@ -6,7 +6,7 @@ import { Request } from "express";
 // Định nghĩa nơi lưu trữ file
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Thư mục lưu trữ file
+    cb(null, "src/public/uploads/"); // Thư mục lưu trữ file
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
