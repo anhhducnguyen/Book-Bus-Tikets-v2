@@ -8,7 +8,8 @@ import {
   CarSchema, 
   CreateCarSchema, 
   UpdateCarSchema,
-  CarQuerySchema 
+  CarQuerySchema,
+  CarDescriptionItemSchema
 } from "@/api/car/carModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { carController } from "./carController";
@@ -28,7 +29,26 @@ carRegistry.registerPath({
   path: "/cars/popular-garage",
   tags: ["Car"],
   summary: "Nhà xe phổ biến",
-  description: "Get the most popular garage",
+  // description: "Trả về top 10 nhà xe phổ biến nhất dựa trên số lượng và điểm đánh giá trung bình.",
+  description: `
+  Trả về top 10 nhà xe phổ biến nhất dựa trên số lượt đánh giá và điểm trung bình.
+
+  - **company_id**: ID của nhà xe
+
+  - **company_name**: Tên của nhà xe
+
+  - **image**: URL ảnh đại diện
+
+  - **descriptions**: Mô tả chi tiết
+
+  - **total_buses**: Tổng số xe thuộc nhà xe này
+
+  - **avg_rating**: Điểm đánh giá trung bình (làm tròn 1 chữ số thập phân)
+
+  - **total_reviews**: Tổng số lượt đánh giá
+
+`,
+
   responses: createApiResponse(z.object({ garage: z.string() }), "Success"),
 });
 
@@ -43,6 +63,7 @@ carRegistry.registerPath({
   description: "Fetch all cars with optional filters and pagination.",
   request: { query: CarQuerySchema.shape.query },
   responses: createApiResponse(z.array(CarSchema), "Success"),
+  // responses: createApiResponse(z.array(CarDescriptionSchema), "Success"),
 });
 
 carRouter.get(
@@ -58,7 +79,20 @@ carRegistry.registerPath({
   tags: ["Car"],
   operationId: "getCar",
   summary: "Lấy thông tin xe theo id",
-  description: "Fetch a car by its ID.",
+  description: `
+Lấy thông tin chi tiết của xe theo id của xe
+
+  - **name**: Tên của xe
+
+  - **descriptions**: Mô tả chi tiết
+
+  - **license_plate**: Biển số xe
+
+  - **capacity**: Sức chứa của xe
+
+  - **company_id**: ID của nhà xe
+
+`,
   request: { params: GetCarSchema.shape.params },
   responses: createApiResponse(GetCarSchema, "Success"),
 });
@@ -76,7 +110,7 @@ carRegistry.registerPath({
   tags: ["Car"],
   operationId: "deleteCar",
   summary: "Xóa xe",
-  description: "Delete a car by its ID.",
+  description: "Xóa xe theo id của xe",
   request: { params: GetCarSchema.shape.params },
   responses: createApiResponse(GetCarSchema, "Success"),
 });
@@ -95,7 +129,21 @@ carRegistry.registerPath({
   tags: ["Car"],
   operationId: "createCar",
   summary: "Thêm mới xe",
-  description: "Create a new car with the provided details.",
+  // description: "Create a new car with the provided details.",
+    description: `
+Thêm mới xe với các trường thông tin bắt buộc 
+
+  - **name**: Tên của xe
+
+  - **descriptions**: Mô tả chi tiết
+
+  - **license_plate**: Biển số xe
+
+  - **capacity**: Sức chứa của xe
+
+  - **company_id**: ID của nhà xe
+
+`,
   request: {
     body: {
       content: {
@@ -122,7 +170,20 @@ carRegistry.registerPath({
   tags: ["Car"],
   operationId: "updateCar",
   summary: "Cập nhật xe",
-  description: "Update an existing car with the provided details.",
+  description: `
+Cập nhật thông tin xe theo id của xe
+
+  - **name**: Tên của xe
+
+  - **descriptions**: Mô tả chi tiết
+
+  - **license_plate**: Biển số xe
+
+  - **capacity**: Sức chứa của xe
+
+  - **company_id**: ID của nhà xe
+
+`,
   request: {
     params: z.object({
       id: z.number().int().openapi({

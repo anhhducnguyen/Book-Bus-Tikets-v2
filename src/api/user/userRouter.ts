@@ -60,6 +60,16 @@ userRegistry.registerPath({
 	tags: ["User"],
 	operationId: "createUser",
 	summary: "Thêm mới người dùng",
+		description: `
+Thêm mới người dùng
+
+  - **name**: Tên người dùng
+
+  - **email**: Email người dùng
+
+  - **age**: Tuổi người dùng
+  
+`,
 	request: {
 		body: {
 			content: {
