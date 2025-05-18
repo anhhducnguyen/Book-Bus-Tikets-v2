@@ -193,7 +193,7 @@ import { z } from "zod";
 import { commonValidations } from "@/common/utils/commonValidation";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { BookTicketInputSchema, CancelTicketSchema, RouteSchema, BusSchema, SeatSchema, TicketSchema, TicketSearchSchema, TicketSearchQueryOnly } from "@/api/ticket/ticketModel";
+import { BookTicketInputSchema, CancelTicketSchema, RouteSchema, BusSchema, SeatSchema, TicketSchema, TicketSearchSchema, TicketSearchQueryOnly, PaymentSchema } from "@/api/ticket/ticketModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { ticketController } from "./ticketController";
 
@@ -212,7 +212,16 @@ ticketRegistry.registerPath({
   tags: ["Ticket"],
   summary: "Lựa chọn tuyến đường đi",
   description: `Lựa chọn tuyến đường đi:<br /> 
-                - Chức năng này sẽ hiển thị danh sách tuyến đường để người dùng có thể lựa chọn tại chức năng đặt vé và để hướng tới đường dẫn cho chức năng lựa chọn xe<br />`,
+                - Chức năng này sẽ hiển thị danh sách tuyến đường để người dùng có thể lựa chọn tại chức năng đặt vé và để hướng tới đường dẫn cho chức năng lựa chọn xe<br />
+                <br />
+                <b>id</b>: Id tuyến đường<br />
+                <b>departure_station_id</b>: Id bến xuất phát<br />
+                <b>arrival_station_id</b>: Id bến đến<br />
+                <b>price</b>: Giá tiền chuyến đi<br />
+                <b>duration</b>: Khoảng thời gian hoàn thành chuyến đi tính bằng (phút)<br />
+                <b>distance</b>: Khoảng cách giữa điểm đi và điểm đến tính bằng (km)<br />
+                <b>created_at</b>: Thời gian tạo tuyến đường<br />
+                <b>updated_at</b>: Thời gian cập nhật tuyến đường<br />`,
   responses: createApiResponse(z.array(RouteSchema), "Success"),
 });
 ticketRouter.get("/routes", ticketController.getRoutes);
@@ -226,7 +235,15 @@ ticketRegistry.registerPath({
   description: `Lựa chọn xe đi:<br /> 
                 - Chức năng này sẽ cho phép người dùng nhập id tuyến đường mình chọn và hiển thị danh sách tất cả các xe khách trên tuyến đường đó<br />
                 - Chức năng này ta cần nhập ID của tuyến đường mình chọn<br />
-                routeId: Id tuyến đường<br />`,
+                routeId: Id tuyến đường<br />
+                <br />
+                <b>id</b>: Id xe khách<br />
+                <b>name</b>: Tên xe<br />
+                <b>license_plate</b>: Biển số xe<br />
+                <b>capacity</b>: Số lượng ghế<br />
+                <b>company_id</b>: Id nhà xe<br />
+                <b>created_at</b>: Thời gian tạo xe<br />
+                <b>updated_at</b>: Thời gian cập nhật xe<br />`,
   request: { params: z.object({ routeId: commonValidations.id }) },
   responses: createApiResponse(z.array(BusSchema), "Success"),
 });
@@ -241,7 +258,16 @@ ticketRegistry.registerPath({
   description: `Lựa chọn ghế đi<br /> 
                 - Tương tự, chức năng này sẽ cho phép người dùng nhập id xe khách mình chọn và hiển thị danh sách tất cả các ghế trên tuyến đường đó<br />
                 - Chức năng này ta cần nhập ID của xe khách mình chọn<br />
-                busId: Id xe khách<br />`,
+                busId: Id xe khách<br />
+                <br />
+                <b>id</b>: Id ghế<br />
+                <b>bus_id</b>: Id xe khách<br />
+                <b>seat_number</b>: Tên số ghế VD: (A1, A2, A3, ...)<br />
+                <b>seat_type</b>: Loại ghế ('LUXURY', 'VIP', 'STANDARD')<br />
+                <b>status</b>: Trạng thái ('AVAILABLE', 'BOOKED')<br />
+                <b>price_for_seat_type</b>: Giá tiền sẽ được cộng vào khi chọn loại ghế (VD: LUXURY + 100k, VIP + 50k, STANDARD + 0k)<br />
+                <b>created_at</b>: Thời gian tạo ghế<br />
+                <b>updated_at</b>: Thời gian cập nhật ghế<br />`,
   request: { params: z.object({ busId: commonValidations.id }) },
   responses: createApiResponse(z.array(SeatSchema), "Success"),
 });
@@ -308,7 +334,18 @@ ticketRegistry.registerPath({
   description: `Lịch sử đặt vé theo trạng thái<br /> 
                 - Chức năng này sẽ cho phép người dùng lựa chọn trạng thái vé xe và hiển thị danh sách lịch sử đặt vé theo trạng thái đó<br />
                 - Chức năng này ta cần nhập ID của xe khách mình chọn<br />
-                status: Trạng thái vé (BOOKED, CANCELLED)<br />`,
+                status: Trạng thái vé (BOOKED, CANCELLED)<br />
+                <br />
+                <b>id</b>: Id vé<br />
+                <b>schedule_id</b>: Id lịch trình<br />
+                <b>seat_id</b>: Id ghế đã lựa chọn<br />
+                <b>departure_time</b>: Thời gian khởi hành<br />
+                <b>arrival_time</b>: Thời gian đến nơi<br />
+                <b>seat_type</b>: Loại ghế đã lựa chọn ('LUXURY', 'VIP', 'STANDARD')<br />
+                <b>price</b>: Giá tiền vé<br />
+                <b>status</b>: Trạng thái của vé ('BOOKED', 'CANCELLED')<br />
+                <b>created_at</b>: Thời gian tạo vé<br />
+                <b>updated_at</b>: Thời gian cập nhật vé<br />`,
   request: {
     params: z.object({
       status: z.enum(["BOOKED", "CANCELLED"]),
@@ -327,7 +364,18 @@ ticketRegistry.registerPath({
   description: `Lịch sử đặt vé theo nhà xe<br /> 
                 - Tương tự, chức năng này sẽ cho phép người dùng nhập id nhà xe mình chọn và hiển thị danh sách lịch sử đặt vé theo nhà xe đó<br />
                 - Chức năng này ta cần nhập ID của xe khách mình chọn<br />
-                companyId: Id nhà xe<br />`,
+                companyId: Id nhà xe<br />
+                <br />
+                <b>id</b>: Id vé<br />
+                <b>schedule_id</b>: Id lịch trình<br />
+                <b>seat_id</b>: Id ghế đã lựa chọn<br />
+                <b>departure_time</b>: Thời gian khởi hành<br />
+                <b>arrival_time</b>: Thời gian đến nơi<br />
+                <b>seat_type</b>: Loại ghế đã lựa chọn ('LUXURY', 'VIP', 'STANDARD')<br />
+                <b>price</b>: Giá tiền vé<br />
+                <b>status</b>: Trạng thái của vé ('BOOKED', 'CANCELLED')<br />
+                <b>created_at</b>: Thời gian tạo vé<br />
+                <b>updated_at</b>: Thời gian cập nhật vé<br />`,
   request: {
     params: z.object({
       companyId: z.string().regex(/^\d+$/, "Company ID must be a numeric string"),
@@ -344,7 +392,18 @@ ticketRegistry.registerPath({
   tags: ["Ticket"],
   summary: "Xem tất cả lịch sử đặt vé",
   description: `Xem tất cả lịch sử đặt vé<br /> 
-                - Chức năng này chỉ hiển thị danh sách lịch sử đặt vé<br />`,
+                - Chức năng này chỉ hiển thị danh sách lịch sử đặt vé<br />
+                <br />
+                <b>id</b>: Id vé<br />
+                <b>schedule_id</b>: Id lịch trình<br />
+                <b>seat_id</b>: Id ghế đã lựa chọn<br />
+                <b>departure_time</b>: Thời gian khởi hành<br />
+                <b>arrival_time</b>: Thời gian đến nơi<br />
+                <b>seat_type</b>: Loại ghế đã lựa chọn ('LUXURY', 'VIP', 'STANDARD')<br />
+                <b>price</b>: Giá tiền vé<br />
+                <b>status</b>: Trạng thái của vé ('BOOKED', 'CANCELLED')<br />
+                <b>created_at</b>: Thời gian tạo vé<br />
+                <b>updated_at</b>: Thời gian cập nhật vé<br />`,
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
 ticketRouter.get("/history", authenticate, ticketController.getTicketHistory);
@@ -384,7 +443,18 @@ ticketRegistry.registerPath({
   tags: ["Ticket"],
   summary: "Hiển thị danh sách thông tin hủy theo vé xe cho admin",
   description: `Hiển thị danh sách thông tin hủy theo vé xe cho admin<br /> 
-                - Chức năng sẽ hiển thị danh sách các vé xe đã bị hủy cho quản trị viên<br />`,
+                - Chức năng sẽ hiển thị danh sách các vé xe đã bị hủy cho quản trị viên<br />
+                <br />
+                <b>id</b>: Id vé<br />
+                <b>schedule_id</b>: Id lịch trình<br />
+                <b>seat_id</b>: Id ghế đã lựa chọn<br />
+                <b>departure_time</b>: Thời gian khởi hành<br />
+                <b>arrival_time</b>: Thời gian đến nơi<br />
+                <b>seat_type</b>: Loại ghế đã lựa chọn ('LUXURY', 'VIP', 'STANDARD')<br />
+                <b>price</b>: Giá tiền vé<br />
+                <b>status</b>: Trạng thái của vé ('CANCELLED')<br />
+                <b>created_at</b>: Thời gian tạo vé<br />
+                <b>updated_at</b>: Thời gian cập nhật vé<br />`,
   request: {
     params: z.object({}).strict(), // Không cần tham số
   },
@@ -405,7 +475,18 @@ ticketRegistry.registerPath({
                 ticketId: Id vé xe<br />
                 phoneNumber: Số điện thoại có người đặt mã vé đó.<br />
                 - VD: Mã vé 1 cửa người dùng 1 đặt với số điện thoại là 0256568962<br />
-                Note: Số điện thoại đăng ký cần có 10 số, mã vé phải được đặt bởi ngời dùng có số điện thoại đó.`,
+                Note: Số điện thoại đăng ký cần có 10 số, mã vé phải được đặt bởi ngời dùng có số điện thoại đó.
+                <br />
+                <b>id</b>: Id vé<br />
+                <b>schedule_id</b>: Id lịch trình<br />
+                <b>seat_id</b>: Id ghế đã lựa chọn<br />
+                <b>departure_time</b>: Thời gian khởi hành<br />
+                <b>arrival_time</b>: Thời gian đến nơi<br />
+                <b>seat_type</b>: Loại ghế đã lựa chọn ('LUXURY', 'VIP', 'STANDARD')<br />
+                <b>price</b>: Giá tiền vé<br />
+                <b>status</b>: Trạng thái của vé ('BOOKED', 'CANCELLED')<br />
+                <b>created_at</b>: Thời gian tạo vé<br />
+                <b>updated_at</b>: Thời gian cập nhật vé<br />`,
   request: {
     query: TicketSearchQueryOnly,
   },
@@ -434,3 +515,40 @@ ticketRegistry.registerPath({
   responses: createApiResponse(z.any(), "Success"),
 });
 ticketRouter.delete("/cancel_ticket/delete/:ticketId", authenticate, permission, ticketController.deleteCancelledTicket);
+
+// Chọn phương thức thanh toán
+ticketRegistry.registerPath({
+  method: "post",
+  path: "tickets/payment/{ticketId}",
+  tags: ["Ticket"],
+  summary: "Chọn phương thức thanh toán",
+  description: `Chọn phương thức thanh toán<br /> 
+                - Chức năng này sẽ cho phép nhập <br />
+                - Chức năng này ta cần nhập body theo dạng sau: <br />
+                {<br />
+                  "paymentMethod": "CASH", <br />
+                  "userId": 1, <br />
+                  "amount": 50 <br />
+                }<br />
+                "paymentMethod": Phương thức thanh toán ('CASH', 'ONLINE')<br />
+                "userId": Id người dùng<br />
+                "amount": Tổng số tiền thanh toán<br />`,
+  request: {
+    params: z.object({
+      ticketId: z.string().regex(/^\d+$/, "Ticket ID must be a numeric string"),
+    }),
+    body: {
+      content: {
+        "application/json": {
+          schema: z.object({
+            paymentMethod: z.enum(["ONLINE", "CASH"]),
+            userId: z.number(),
+            amount: z.number().positive(),
+          }),
+        },
+      },
+    },
+  },
+  responses: createApiResponse(PaymentSchema, "Success"),
+});
+ticketRouter.post("/payment/:ticketId", ticketController.selectPaymentMethod);
