@@ -24,6 +24,11 @@ discountBannerRegistry.registerPath({
   method: "get",
   path: "/disount-banners",
   tags: ["Banner"],
+  description: [
+    "id: ID của banner",
+    "banner_url: URL ảnh banner",
+    "position: Vị trí hiển thị (TOP, BOTTOM, LEFT, RIGHT)"
+  ].join("\n"),
   summary: "Lấy danh sách banner ưu đãi nổi bật theo vị trí",
   parameters: [
     {

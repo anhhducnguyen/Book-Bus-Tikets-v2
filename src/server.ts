@@ -23,7 +23,7 @@ import { getBus_reviewRouter } from "@/api/getBus_review/getBus_reviewRouter";
 import { getStationPassengerRouter } from "@/api/getStationPassenger/getStationPassengerRouter";
 import { getStatusTicketRouter } from "@/api/getStatusTicket/getStatusTicketRouter";
 import { getPaymentProviderRouter } from "@/api/getPaymentProvider/getPaymentProviderRouter";
-// import { getRevenueRouter } from "@/api/getRevenue/getRevenueRouter";
+import { revenueRouter } from "@/api/getRevenue/getRevenueRouter";
 import { getCustomerRouter } from "./api/getCustomer/getCustomerRouter";
 import { findArrivalRouter } from "@/api/findArrival/findArrivalRouter";
 
@@ -91,7 +91,7 @@ app.use("/", getBus_reviewRouter);
 app.use("/getstationpassenger", getStationPassengerRouter);
 app.use("/", getStatusTicketRouter);
 app.use("/getPaymentProvider", getPaymentProviderRouter);
-// app.use("/revenue", getRevenueRouter);
+app.use("/revenues", revenueRouter);
 app.use("/get-customer", getCustomerRouter);
 app.use("/search", findArrivalRouter);
 

@@ -6,7 +6,7 @@ extendZodWithOpenApi(z);
 
 export const BannerSchema = z.object({
     id: z.number().int().optional(),
-    banner_url: z.string(),
+    banner_url: z.string().openapi({ example: "Đường liên kết banner" }),
     position: z.string(),
 });
 

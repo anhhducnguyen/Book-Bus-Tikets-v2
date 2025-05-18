@@ -1,89 +1,34 @@
 import { db } from "@/common/config/database";
 
-type RevenueType = "day" | "week" | "month" | "year";
-
-export class RevenueRepository {
-    async getRevenueByRoute(type: RevenueType, value: any) {
-        const query = db("tickets")
-            .join("schedules", "tickets.schedule_id", "schedules.id")
-            .join("routes", "schedules.route_id", "routes.id")
-            .where("tickets.status", "BOOKED")
-            .groupBy("routes.id", "routes.departure_station_id", "routes.arrival_station_id")
-            .select(
-                "routes.id as routeId",
-                "routes.departure_station_id",
-                "routes.arrival_station_id"
-            )
-            .sum({ totalRevenue: "tickets.price" });
-
-        switch (type) {
-            case "day":
-                // value: string[] (list ngày dạng 'YYYY-MM-DD')
-                query.whereIn(("DATE(tickets.departure_time)"), value);
-                break;
-
-            case "week":
-                query.whereRaw("YEAR(tickets.departure_time) = ? AND WEEK(tickets.departure_time, 1) = ?", [
-                    value.year,
-                    value.week,
-                ]);
-                break;
-
-            case "month":
-                query.whereRaw("YEAR(tickets.departure_time) = ? AND MONTH(tickets.departure_time) = ?", [
-                    value.year,
-                    value.month,
-                ]);
-                break;
-
-            case "year":
-                query.whereRaw("YEAR(tickets.departure_time) = ?", [value]);
-                break;
-
-            default:
-                throw new Error("Unsupported type");
-        }
-
-        return query;
+export class RevenueStatisticRepository {
+    async getRevenueByRoute(startDate: string, endDate: string) {
+        return db("tickets as t")
+            .join("schedules as s", "t.schedule_id", "s.id")
+            .join("routes as r", "s.route_id", "r.id")
+            .where("t.status", "BOOKED")
+            .andWhereBetween("t.created_at", [startDate, endDate])
+            .groupBy("r.id", "r.price")
+            .select([
+                "r.id as route_id",
+                "r.price as route_price",
+                db.raw("SUM(t.price) as total_revenue"),
+                db.raw("COUNT(t.id) as total_tickets"),
+            ]);
     }
 
-    async getRevenueByCompany(type: RevenueType, value: any) {
-        const query = db("tickets")
-            .join("schedules", "tickets.schedule_id", "schedules.id")
-            .join("buses", "schedules.bus_id", "buses.id")
-            .join("bus_companies", "buses.company_id", "bus_companies.id")
-            .where("tickets.status", "BOOKED")
-            .groupBy("bus_companies.id", "bus_companies.company_name")
-            .select("bus_companies.id as companyId", "bus_companies.company_name")
-            .sum({ totalRevenue: "tickets.price" });
-
-        switch (type) {
-            case "day":
-                query.whereIn(("DATE(tickets.departure_time)"), value);
-                break;
-
-            case "week":
-                query.whereRaw("YEAR(tickets.departure_time) = ? AND WEEK(tickets.departure_time, 1) = ?", [
-                    value.year,
-                    value.week,
-                ]);
-                break;
-
-            case "month":
-                query.whereRaw("YEAR(tickets.departure_time) = ? AND MONTH(tickets.departure_time) = ?", [
-                    value.year,
-                    value.month,
-                ]);
-                break;
-
-            case "year":
-                query.whereRaw("YEAR(tickets.departure_time) = ?", [value]);
-                break;
-
-            default:
-                throw new Error("Unsupported type");
-        }
-
-        return query;
+    async getRevenueByCompany(startDate: string, endDate: string) {
+        return db("tickets as t")
+            .join("schedules as s", "t.schedule_id", "s.id")
+            .join("buses as b", "s.bus_id", "b.id")
+            .join("bus_companies as bc", "b.company_id", "bc.id")
+            .where("t.status", "BOOKED")
+            .andWhereBetween("t.created_at", [startDate, endDate])
+            .groupBy("bc.id", "bc.company_name")
+            .select([
+                "bc.id as company_id",
+                "bc.company_name",
+                db.raw("SUM(t.price) as total_revenue"),
+                db.raw("COUNT(t.id) as total_tickets"),
+            ]);
     }
 }

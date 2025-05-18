@@ -1,46 +1,88 @@
-// import express, { type Router } from "express";
-// import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
+import express, { type Router } from "express";
+import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 
-// import { revenueController } from "./getRevenueController";
-// import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-// import {
-//     RevenueFilterSchema,
-//     RevenueByRouteResponseSchema,
-//     RevenueByCompanyResponseSchema,
-// } from "./getRevenueModel";
+import { revenueStatisticController } from "./getRevenueController";
+import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
+import { RevenueByRouteListSchema, RevenueByCompanyListSchema } from "./getRevenueModel";
 
-// export const getRevenueRegistry = new OpenAPIRegistry();
-// export const getRevenueRouter: Router = express.Router();
+// import { authenticate } from "@/common/middleware/auth/authMiddleware";
+// import { permission } from "@/common/middleware/auth/permission";
 
-// getRevenueRegistry.registerPath({
-//     method: "get",
-//     path: "/revenue/routes",
-//     operationId: "getRevenueByRoute",
-//     summary: "Thống kê doanh thu theo tuyến đường",
-//     tags: ["Revenue"],
-//     request: {
-//         query: RevenueFilterSchema,
-//     },
-//     responses: createApiResponse(
-//         RevenueByRouteResponseSchema,
-//         "Lấy thống kê doanh thu theo tuyến đường thành công"
-//     ),
-// });
+// Khởi tạo OpenAPI registry
+export const revenueRegistry = new OpenAPIRegistry();
 
-// revenueRegistry.registerPath({
-//     method: "get",
-//     path: "/revenue/companies",
-//     operationId: "getRevenueByCompany",
-//     summary: "Thống kê doanh thu theo nhà xe",
-//     tags: ["Revenue"],
-//     request: {
-//         query: RevenueFilterSchema,
-//     },
-//     responses: createApiResponse(
-//         RevenueByCompanyResponseSchema,
-//         "Lấy thống kê doanh thu theo nhà xe thành công"
-//     ),
-// });
+// Khởi tạo express router
+export const revenueRouter: Router = express.Router();
 
-// revenueRouter.get("/routes", revenueController.getRevenueByRoute);
-// revenueRouter.get("/companies", revenueController.getRevenueByCompany);
+// Thống kê doanh thu theo tuyến đường
+revenueRegistry.registerPath({
+    method: "get",
+    path: "/revenues/by-route",
+    operationId: "getRevenueByRoute",
+    summary: "Thống kê doanh thu theo tuyến đường trong khoảng thời gian",
+    tags: ["Statistical"],
+    parameters: [
+        {
+            name: "start_date",
+            in: "query",
+            required: true,
+            schema: { type: "string", format: "date-time" },
+            description: "Ngày bắt đầu 2025-05-10 08:00:00 (ISO 8601)",
+        },
+        {
+            name: "end_date",
+            in: "query",
+            required: true,
+            schema: { type: "string", format: "date-time" },
+            description: "Ngày kết thúc 2025-05-14 12:00:00 (ISO 8601)",
+        },
+    ],
+    responses: createApiResponse(
+        RevenueByRouteListSchema,
+        "Lấy thống kê doanh thu theo tuyến đường thành công"
+    ),
+});
+
+// Thống kê doanh thu theo công ty
+revenueRegistry.registerPath({
+    method: "get",
+    path: "/revenues/by-company",
+    operationId: "getRevenueByCompany",
+    summary: "Thống kê doanh thu theo công ty trong khoảng thời gian",
+    tags: ["Statistical"],
+    parameters: [
+        {
+            name: "start_date",
+            in: "query",
+            required: true,
+            schema: { type: "string", format: "date-time" },
+            description: "Ngày bắt đầu (ISO 8601)",
+        },
+        {
+            name: "end_date",
+            in: "query",
+            required: true,
+            schema: { type: "string", format: "date-time" },
+            description: "Ngày kết thúc (ISO 8601)",
+        },
+    ],
+    responses: createApiResponse(
+        RevenueByCompanyListSchema,
+        "Lấy thống kê doanh thu theo công ty thành công"
+    ),
+});
+
+// Định nghĩa route
+revenueRouter.get(
+    "/by-route",
+    // authenticate,
+    // permission,
+    revenueStatisticController.getRevenueByRoute
+);
+
+revenueRouter.get(
+    "/by-company",
+    // authenticate,
+    // permission,
+    revenueStatisticController.getRevenueByCompany
+);

@@ -1,3 +1,4 @@
+// findArrivalRoute.ts
 import express, { Router } from "express";
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 
@@ -8,6 +9,7 @@ import { SearchScheduleByStation, ScheduleSchema } from "./findArrivalModel";
 export const findArrivalRegistry = new OpenAPIRegistry();
 export const findArrivalRouter: Router = express.Router();
 
+// Đăng ký endpoint vào OpenAPI
 findArrivalRegistry.registerPath({
     method: "get",
     path: "/search/find-arrival",
@@ -23,4 +25,5 @@ findArrivalRegistry.registerPath({
     ),
 });
 
+// Router Express
 findArrivalRouter.get("/find-arrival", scheduleController.search);

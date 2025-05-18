@@ -21,7 +21,7 @@ import { getPaymentProviderRegistry } from "@/api/getPaymentProvider/getPaymentP
 import { getPopularStationRegistry } from "@/api/getPopularStation/stationRouter";
 import { popularRouteRegistry } from "@/api/popularRoute/popularRouteRouter";
 import { getTopReviewRegistry } from "@/api/getTopReview/busReviewRouter";
-// import { getRevenueRegistry } from "@/api/getRevenue/getRevenueRouter";
+import { revenueRegistry } from "@/api/getRevenue/getRevenueRouter";
 import { getCustomerRegistry } from "@/api/getCustomer/getCustomerRouter";
 import { findArrivalRegistry } from "@/api/findArrival/findArrivalRouter";
 import { get } from "http";
@@ -53,7 +53,7 @@ export function generateOpenAPIDocument(): OpenAPIDocument {
 		getStationPassengerRegistry,
 		getStatusTicketRegistry,
 		getPaymentProviderRegistry,
-		// getRevenueRegistry,
+		revenueRegistry,
 		getCustomerRegistry,
 		findArrivalRegistry,
 
