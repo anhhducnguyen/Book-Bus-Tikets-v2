@@ -1,74 +1,134 @@
 import { Request, Response, RequestHandler } from 'express';
 import { BannerService } from '@/api/banners/bannerService';
-import { StatusCodes } from "http-status-codes";  
+import { StatusCodes } from "http-status-codes";
 import { error } from 'console';
+import { uploadImage } from "@/common/utils/upload";
+import fs from "fs";
+
 
 export const bannerService = new BannerService();
 
 export class BannerController {
-    async getAllBanner(req: Request, res: Response) {
-        try {
-          const page = parseInt(req.query.page as string) || 1;
-          const limit = parseInt(req.query.limit as string) || 10;
-      
-          const allowedSortBy = ['banner_url', 'position'] as const;
-          type SortBy = typeof allowedSortBy[number];
-      
-          const sortByParam = req.query.sortBy as string;
-          const sortBy: SortBy = allowedSortBy.includes(sortByParam as SortBy)
-            ? (sortByParam as SortBy)
-            : 'position';
-      
-          const order = req.query.order === 'asc' ? 'asc' : 'desc';
-      
-          const banner_url = req.query.banner_url as string | undefined;
-          const position = req.query.position as string | undefined;
-      
-          const banner = await bannerService.getAllBanner({
-            page,
-            limit,
-            sortBy,
-            order,
-            banner_url,
-            position,
-          });
-      
-          res.json({
-            success: true,
-            message: "Lấy dữ liệu thành công",
-            
-              responseObject: {
-                results: banner.results,
-                page: banner.page,
-                limit:banner.limit,
-                total: banner.total,
-                totalPages: banner.totalPages,
-              
-            },
-            statusCode: 200
-          });
+  async getAllBanner(req: Request, res: Response) {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+
+      const allowedSortBy = ['banner_url', 'position'] as const;
+      type SortBy = typeof allowedSortBy[number];
+
+      const sortByParam = req.query.sortBy as string;
+      const sortBy: SortBy = allowedSortBy.includes(sortByParam as SortBy)
+        ? (sortByParam as SortBy)
+        : 'position';
+
+      const order = req.query.order === 'asc' ? 'asc' : 'desc';
+
+      const banner_url = req.query.banner_url as string | undefined;
+      const position = req.query.position as string | undefined;
+
+      const banner = await bannerService.getAllBanner({
+        page,
+        limit,
+        sortBy,
+        order,
+        banner_url,
+        position,
+      });
+
+      res.json({
+        success: true,
+        message: "Lấy dữ liệu thành công",
+
+        responseObject: {
+          results: banner.results,
+          page: banner.page,
+          limit: banner.limit,
+          total: banner.total,
+          totalPages: banner.totalPages,
+
+        },
+        statusCode: 200
+      });
 
 
-          
-        } catch (error) {
-          console.error(error);
-          res.status(500).json({ error: "Something went wrong" });
-        }
-      }
-      
+
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Something went wrong" });
+    }
+  }
+
   //Them moi banner
- public createBanner: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+  // public createBanner: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+  //   try {
+  //     const file = req.file;
+  //     const { position } = req.body;
+
+  //     if (!file || !position) {
+  //       res.status(StatusCodes.BAD_REQUEST).json({ message: "image and position are required." });
+  //       return;
+  //     }
+
+  //     // const bannerData = {
+  //     //   banner_url: `../uploads/${file.filename}`, // đường dẫn ảnh lưu trong DB
+  //     //   position,
+  //     // };
+
+  //     const cloudinaryUrl = await uploadImage(file.path);
+  //     if (!cloudinaryUrl) {
+  //       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Cloudinary upload failed." });
+  //       return;
+  //     }
+
+  //     const bannerData = {
+  //       banner_url: cloudinaryUrl, // lưu URL Cloudinary vào DB
+  //       position,
+  //     };
+
+  //     const response = await bannerService.createBanner(bannerData);
+
+  //     res.status(response.statusCode).json({
+  //       banner: response.responseObject,
+  //       message: response.message,
+  //     });
+
+  //   } catch (ex) {
+  //     console.log(ex);
+  //     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+  //       message: "An error occurred while creating banner.",
+  //     });
+  //   }
+  // };
+  public createBanner: RequestHandler = async (req: Request, res: Response): Promise<void> => {
   try {
     const file = req.file;
     const { position } = req.body;
 
     if (!file || !position) {
-      res.status(StatusCodes.BAD_REQUEST).json({ message: "image and position are required." });
+      res.status(StatusCodes.BAD_REQUEST).json({ message: "Image and position are required." });
       return;
     }
 
+    // 🟡 Upload to Cloudinary
+    const cloudinaryUrl = await uploadImage(file.path);
+    if (!cloudinaryUrl) {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Cloudinary upload failed." });
+      return;
+    }
+
+    // 🧹 Clean up local file
+    fs.unlink(file.path, (err) => {
+      if (err) {
+        console.error("Failed to delete local file:", err);
+      } else {
+        console.log("Deleted local file:", file.path);
+      }
+    });
+
+    // 📝 Save to DB
     const bannerData = {
-      banner_url: `../uploads/${file.filename}`, // đường dẫn ảnh lưu trong DB
+      banner_url: cloudinaryUrl,
       position,
     };
 
@@ -88,23 +148,23 @@ export class BannerController {
 };
 
 
-//xoa 1 banner
-public deleteBanner: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+  //xoa 1 banner
+  public deleteBanner: RequestHandler = async (req: Request, res: Response): Promise<void> => {
     const id = parseInt(req.params.id);
-  
+
     try {
       if (isNaN(id)) {
         res.status(StatusCodes.BAD_REQUEST).json({ message: "Invalid banner id." });
         return;
       }
-  
+
       const response = await bannerService.deleteBanner(id);
-  
+
       if (response.statusCode === StatusCodes.OK) {
         res.status(StatusCodes.OK).json({
-            success:'true',
-            message: `banners  with id ${id} deleted successfully`,
-           statusCode: response.statusCode,
+          success: 'true',
+          message: `banners  with id ${id} deleted successfully`,
+          statusCode: response.statusCode,
 
         });
       } else {
@@ -117,11 +177,11 @@ public deleteBanner: RequestHandler = async (req: Request, res: Response): Promi
       });
     }
   };
-  
 
 
 
- 
+
+
 }
 
 export const bannerController = new BannerController();

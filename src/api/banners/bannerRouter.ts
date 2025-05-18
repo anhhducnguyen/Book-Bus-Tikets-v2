@@ -144,7 +144,9 @@ bannerRegistry.registerPath({
 });
 
 
-bannerRouter.post("/", authenticate, permission, uploadBanner.single('image'),bannerController.createBanner);
+bannerRouter.post("/", 
+  // authenticate, permission, 
+  uploadBanner.single('image'),bannerController.createBanner);
 bannerRegistry.registerPath({
   method: "delete",
   path: "/banners/{id}",
@@ -178,4 +180,7 @@ bannerRegistry.registerPath({
   },
 });
 //xoa 1 banner
-bannerRouter.delete("/:id", authenticate, permission, bannerController.deleteBanner);
+bannerRouter.delete("/:id", 
+  authenticate, 
+  permission, 
+bannerController.deleteBanner);
