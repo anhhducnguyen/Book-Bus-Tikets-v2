@@ -1,26 +1,46 @@
-import { Request, Response, RequestHandler } from "express";
-import { StatusCodes } from "http-status-codes";
-import { RevenueService } from "./getRevenueService";
+import { Request, Response, RequestHandler } from 'express';
+import { RevenueStatisticService } from './getRevenueService';
+import { StatusCodes } from 'http-status-codes';
 
-export const revenueService = new RevenueService();
+export const revenueStatisticService = new RevenueStatisticService();
 
-export class RevenueController {
-    public getRevenueStats: RequestHandler = async (req: Request, res: Response) => {
-        const { type, value } = req.query as { type: string; value: string };
-
+export class RevenueStatisticController {
+    // Thống kê doanh thu theo tuyến đường
+    public getRevenueByRoute: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const response = await revenueService.getRevenue(type, value);
+            // Ép kiểu query params, hoặc có thể validate nâng cao nếu muốn
+            const { start_date, end_date } = req.query as { start_date: string; end_date: string };
+
+            const response = await revenueStatisticService.getRevenueByRoute({ start_date, end_date });
+
             res.status(response.statusCode).json({
                 message: response.message,
-                data: response.responseObject,
+                revenues: response.responseObject,
             });
-        } catch (ex) {
-            const errorMessage = ex instanceof Error ? ex.message : "Unexpected error";
+        } catch (error) {
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-                message: `Lỗi khi lấy thống kê doanh thu: ${errorMessage}`,
+                message: 'An unexpected error occurred while fetching revenue by route.',
+            });
+        }
+    };
+
+    // Thống kê doanh thu theo công ty
+    public getRevenueByCompany: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const { start_date, end_date } = req.query as { start_date: string; end_date: string };
+
+            const response = await revenueStatisticService.getRevenueByCompany({ start_date, end_date });
+
+            res.status(response.statusCode).json({
+                message: response.message,
+                revenues: response.responseObject,
+            });
+        } catch (error) {
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                message: 'An unexpected error occurred while fetching revenue by company.',
             });
         }
     };
 }
 
-export const revenueController = new RevenueController();
+export const revenueStatisticController = new RevenueStatisticController();
