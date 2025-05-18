@@ -57,8 +57,15 @@ vehicleScheduleRegistry.registerPath({
   tags: ["VehicleSchedule"],
   operationId: "createVehicleSchedule",
   summary: "Thêm mới lịch trình xe",
-  description: `Tạo mới một lịch trình xe với thông tin chi tiết bao gồm tuyến đường, xe, thời gian khởi hành, thời gian đến, số ghế, v.v.<br />
-                Thời gian khởi hành và thời gian đến phải theo định dạng ISO 8601, ví dụ: "2025-06-01T08:00:00".`,
+  description: `Tạo mới một lịch trình xe với thông tin chi tiết bao gồm tuyến đường, xe, thời gian khởi hành, thời gian đến, số ghế, v.v.<br /><br />
+                **route_id**: ID của tuyến đường (route)<br /><br />
+                **bus_id**: ID của xe bus<br /><br />
+                **departure_time**: Thời gian khởi hành VD: 2025-06-01 08:00:00<br /><br />
+                **arrival_time**: Thời gian đến VD: 2025-06-01 10:00:00<br /><br />
+                **available_seats**: Số ghế còn trống<br /><br />
+                **total_seats**: Tổng số ghế của xe<br /><br />
+                **status**: Trạng thái lịch trình xe (AVAILABLE, FULL, CANCELLED)`,
+
   request: {
     body: {
       content: {
@@ -81,13 +88,13 @@ vehicleScheduleRegistry.registerPath({
               departure_time: {
                 type: "string",
                 format: "date-time",
-                example: "2025-06-01T08:00:00",
+                example: "2025-06-01 08:00:00",
                 description: "Thời gian xe khởi hành (ISO 8601)",
               },
               arrival_time: {
                 type: "string",
                 format: "date-time",
-                example: "2025-06-01T10:00:00",
+                example: "2025-06-01 10:00:00",
                 description: "Thời gian xe đến nơi (ISO 8601)",
               },
               available_seats: {
@@ -137,7 +144,15 @@ vehicleScheduleRegistry.registerPath({
   tags: ["VehicleSchedule"],
   operationId: "updateVehicleSchedule",
   summary: "Cập nhật lịch trình xe theo ID",
-  description: "Cập nhật thông tin lịch trình xe theo ID.",
+  description: `Cập nhật thông tin lịch trình xe theo ID. <br /><br />
+                **route_id**: ID của tuyến đường (route)<br /><br />
+                **bus_id**: ID của xe bus<br /><br />
+                **departure_time**: Thời gian khởi hành VD: 2025-06-01 08:00:00<br /><br />
+                **arrival_time**: Thời gian đến VD: 2025-06-01 10:00:00<br /><br />
+                **available_seats**: Số ghế còn trống<br /><br />
+                **total_seats**: Tổng số ghế của xe<br /><br />
+                **status**: Trạng thái lịch trình xe (AVAILABLE, FULL, CANCELLED)`,
+
   request: {
     params: GetVehicleScheduleSchema.shape.params,
     body: {
