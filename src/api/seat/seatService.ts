@@ -12,19 +12,19 @@ export class SeatService {
 		this.seatRepository = repository;
 	}
 
-	// Retrieves all users from the database
+	// Retrieves all Seats from the database
 	async findAll(): Promise<ServiceResponse<Seat[] | null>> {
 		try {
 			const seats = await this.seatRepository.findAllAsync();
 			if (!seats || seats.length === 0) {
-				return ServiceResponse.failure("No Users found", null, StatusCodes.NOT_FOUND);
+				return ServiceResponse.failure("No Seats found", null, StatusCodes.NOT_FOUND);
 			}
-			return ServiceResponse.success<Seat[]>("Users found", seats);
+			return ServiceResponse.success<Seat[]>("Seats found", seats);
 		} catch (ex) {
-			const errorMessage = `Error finding all users: $${(ex as Error).message}`;
+			const errorMessage = `Error finding all Seats: $${(ex as Error).message}`;
 			logger.error(errorMessage);
 			return ServiceResponse.failure(
-				"An error occurred while retrieving users.",
+				"An error occurred while retrieving Seats" + errorMessage,
 				null,
 				StatusCodes.INTERNAL_SERVER_ERROR,
 			);
@@ -35,13 +35,13 @@ export class SeatService {
 		try {
 			const seats = await this.seatRepository.findSeatsByBusIdAsync(id);
 			if (!seats) {
-				return ServiceResponse.failure("User not found", null, StatusCodes.NOT_FOUND);
+				return ServiceResponse.failure("Seats not found", null, StatusCodes.NOT_FOUND);
 			}
 			return ServiceResponse.success<Seat[]>("Seats found", seats);
 		} catch (ex) {
-			const errorMessage = `Error finding user with id ${id}:, ${(ex as Error).message}`;
+			const errorMessage = `Error finding Seats with id ${id}:, ${(ex as Error).message}`;
 			logger.error(errorMessage);
-			return ServiceResponse.failure("An error occurred while finding user.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure("An error occurred while finding Seats" + errorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -57,7 +57,7 @@ export class SeatService {
 		} catch (ex) {
 			const errorMessage = `Error deleting seats with id ${id}: ${(ex as Error).message}`;
 			logger.error(errorMessage);
-			return ServiceResponse.failure("An error occurred while deleting seats.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure("An error occurred while deleting seats" + errorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

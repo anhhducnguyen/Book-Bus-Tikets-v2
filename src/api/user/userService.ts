@@ -18,7 +18,7 @@ export class UserService {
 			const result = await this.userRepository.findAllAsync(filter, options);
 			return ServiceResponse.success("Users fetched successfully", result);
 		} catch (error) {
-			return ServiceResponse.failure("Failed to fetch users", null);
+			return ServiceResponse.failure(`Failed to fetch users ${error}`, null);
 		}
 	}
 
@@ -33,7 +33,7 @@ export class UserService {
 		} catch (ex) {
 			const errorMessage = `Error finding user with id ${id}:, ${(ex as Error).message}`;
 			logger.error(errorMessage);
-			return ServiceResponse.failure("An error occurred while finding user.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure(`An error occurred while finding user: ${errorMessage}`, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -44,25 +44,26 @@ export class UserService {
 		} catch (ex) {
 			const errorMessage = `Error creating user: ${(ex as Error).message}`;
 			logger.error(errorMessage);
-			return ServiceResponse.failure("An error occurred while creating user.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure(`An error occurred while creating user: ${errorMessage}`, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	async delete(id: number): Promise<ServiceResponse<boolean>> {
-    try {
-      const isDeleted = await this.userRepository.deleteAsync(id);
+		try {
+			const isDeleted = await this.userRepository.deleteAsync(id);
 
-      if (!isDeleted) {
-        return ServiceResponse.failure("User does not exist or cannot be deleted", false, StatusCodes.NOT_FOUND);
-      }
+			if (!isDeleted) {
+				return ServiceResponse.failure("User does not exist or cannot be deleted", false, StatusCodes.NOT_FOUND);
+			}
 
-      return ServiceResponse.success<boolean>("User deleted successfully", true);
-    } catch (error) {
-      const errorMessage = `Error deleted user ${id}: ${(error as Error).message}`;
-      logger.error(errorMessage);
-      return ServiceResponse.failure("An error occurred while delete user.", false, StatusCodes.INTERNAL_SERVER_ERROR);
-    }
-  }
+			return ServiceResponse.success<boolean>("User deleted successfully", true);
+		} catch (error: any) {
+			const errorMessage = `Error deleting user ${id}: ${error.message}`;
+			logger.error(errorMessage);
+			return ServiceResponse.failure(errorMessage, false);
+		}
+	}
+
 }
 
 

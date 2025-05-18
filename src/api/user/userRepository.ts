@@ -22,63 +22,87 @@ export const users: User[] = [
 
 export class UserRepository {
 	async findAllAsync(filter: any, options: { sortBy?: string; limit?: number; page?: number }) {
-		const { sortBy = "id:asc", limit = 10, page = 1 } = options;
-		const [sortField, sortOrder] = sortBy.split(":");
+		try {
+			const { sortBy = "id:asc", limit = 10, page = 1 } = options;
+			const [sortField, sortOrder] = sortBy.split(":");
 
-		const query = db<User>("users");
+			const query = db<User>("users");
 
-		if (filter.email) {
-			query.where("email", "like", `%${filter.email}%`);
+			if (filter.email) {
+				query.where("email", "like", `%${filter.email}%`);
+			}
+
+			const offset = (page - 1) * limit;
+
+			const data = await query
+				.orderBy(sortField, sortOrder)
+				.limit(limit)
+				.offset(offset);
+
+			// Xóa trường 'password' khỏi từng user
+			const sanitizedData = (data as any[]).map(({ password, ...rest }) => rest);
+
+			const countResult = await db<User>("users")
+				.modify((qb) => {
+					if (filter.email) {
+						qb.where("email", "like", `%${filter.email}%`);
+					}
+				})
+				.count("id as count");
+
+			const totalCount = Number((countResult[0] as { count: string }).count);
+
+			return {
+				results: sanitizedData,
+				page,
+				limit,
+				total: totalCount,
+				totalPages: Math.ceil(totalCount / limit),
+			};
+		} catch (error) {
+			throw error;
 		}
-
-		const offset = (page - 1) * limit;
-
-		const data = await query.orderBy(sortField, sortOrder).limit(limit).offset(offset);
-
-		const countResult = await db<User>("users")
-			.modify((qb) => {
-				if (filter.email) {
-					qb.where("email", "like", `%${filter.email}%`);
-				}
-			})
-			.count("id as count");
-
-		const totalCount = Number((countResult[0] as { count: string }).count);
-
-		return {
-			results: data,
-			page,
-			limit,
-			total: totalCount,
-			totalPages: Math.ceil(totalCount / limit),
-		};
 	}
 
 	// Lấy người dùng theo ID
 	async findByIdAsync(id: number): Promise<User | null> {
-		const user = await db<User>('users')
-			.where({ id })
-			.first();
+		try {
+			const user = await db<User>('users')
+				.where({ id })
+				.first();
 
-		return user ?? null;
+			return user ?? null;
+		} catch (error) {
+			throw error;
+		}
 	}
 
 	async createUserAsync(data: Omit<User, "id" | "createdAt" | "updatedAt">): Promise<User> {
-		const currentTime = new Date();
+		try {
+			const currentTime = new Date();
 
-		const [id] = await db('users').insert({
-			...data,
-			createdAt: currentTime,
-			updatedAt: currentTime,
-		});
+			const [id] = await db('users').insert({
+				...data,
+				createdAt: currentTime,
+				updatedAt: currentTime,
+			});
 
-		const [newUser] = await db('users').where({ id }).select('*');
+			const [newUser] = await db('users').where({ id }).select('*');
 
-		return newUser;
+			return newUser;
+		} catch (error) {
+			throw error;
+		}
 	}
 
 	async deleteAsync(id: number): Promise<boolean> {
-		const deletedRows = await db<User>("users").where({ id }).del();
-		return deletedRows > 0;
-	  }
+		try {
+			await db("payments").where({ user_id: id }).del();
+			await db("bus_reviews").where({ user_id: id }).del();
+			const deletedRows = await db<User>("users").where({ id }).del();
+			return deletedRows > 0;
+		} catch (error) {
+			throw error;
+		}
+	}
 }

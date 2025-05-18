@@ -1,12 +1,12 @@
 import type { User } from "@/api/auth/authModel";
-import { db } from "@/common/config/database"; 
+import { db } from "@/common/config/database";
 
 export const users: User[] = [
     {
         id: 1,
         email: "alice@example.com",
         password: "1234",
-        username: "alice",  
+        username: "alice",
         reset_token: null,
         reset_token_expiry: null,
         role: "user",
@@ -30,75 +30,120 @@ export const users: User[] = [
 
 export class AuthRepository {
     async findByIdAsync(id: number): Promise<User | null> {
-        const user = await db<User>('users')
-          .where({ id })
-          .first();
+        try {
+            const user = await db<User>('users')
+                .where({ id })
+                .first();
 
-        return user ?? null;
+            return user ?? null;
+        } catch (error) {
+            throw error;
+        }
     }
 
     async createAsync(user: { email: string; password: string }) {
-        await db("users").insert({
-            email: user.email,
-            password: user.password,
-            username: user.email.split("@")[0], 
-            role: "user"
-        });
+        try {
+            await db("users").insert({
+                email: user.email,
+                password: user.password,
+                username: user.email.split("@")[0],
+                role: "user"
+            });
+        } catch (error) {
+            throw error;
+        }
     }
 
     async findOne(condition: { email: string }) {
-        const result = await db("users")
-          .where(condition)
-          .first();
-        return result ?? null;
+        try {
+            const result = await db("users")
+                .where(condition)
+                .first();
+            return result ?? null;
+        } catch (error) {
+            throw error;
+        }
     }
 
     async findById(id: number): Promise<User | null> {
-        const user = await db<User>("users").where({ id }).first();
-        return user ?? null;
+        try {
+            const user = await db<User>("users").where({ id }).first();
+            return user ?? null;
+        } catch (error) {
+            throw error;
+        }
     }
 
-    async findByGoogleId(googleId: number): Promise<User | null>{
-        return await db("users").where({ google_id: googleId }).first();
+    async findByGoogleId(googleId: number): Promise<User | null> {
+        try {
+            return await db("users").where({ google_id: googleId }).first();
+        } catch (error) {
+            throw error;
+        }
     };
 
     async createUser(newUser: Omit<User, "id" | "created_at" | "updated_at">): Promise<number> {
-        console.log(newUser);
-        const result = await db("users").insert({
-            ...newUser,
-            created_at: new Date(),
-            updated_at: new Date()
-        });
-        return result[0]; 
-    }   
-    
+        try {
+            console.log(newUser);
+            const result = await db("users").insert({
+                ...newUser,
+                created_at: new Date(),
+                updated_at: new Date()
+            });
+            return result[0];
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async updateResetToken(email: string, token: string, expiry: number) {
-        return await db("users")
-          .where({ email })
-          .update({ reset_token: token, reset_token_expiry: expiry });
-      }
-    
+        try {
+            return await db("users")
+                .where({ email })
+                .update({ reset_token: token, reset_token_expiry: expiry });
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async findByResetToken(token: string): Promise<User | null> {
-        const user = await db<User>("users").where({ reset_token: token }).first();
-        return user || null;  
-    }    
-    
+        try {
+            const user = await db<User>("users").where({ reset_token: token }).first();
+            return user || null;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async resetPasswordByToken(token: string, hashedPassword: string) {
-        return await db("users")
-          .where({ reset_token: token })
-          .update({
-            password: hashedPassword,
-            reset_token: null,
-            reset_token_expiry: null
-          });
+        try {
+            return await db("users")
+                .where({ reset_token: token })
+                .update({
+                    password: hashedPassword,
+                    reset_token: null,
+                    reset_token_expiry: null
+                });
+        } catch (error) {
+            throw error;
+        }
     }
 
     async addTokenToBlacklist(token: string, expiresAt: number) {
-      await db("token_blacklist").insert({ token, expires_at: expiresAt });
+        try {
+            await db("token_blacklist").insert({ token, expires_at: expiresAt });
+
+        } catch (error) {
+            throw error;
+        }
     }
 
     async isTokenBlacklisted(token: string): Promise<boolean> {
-      const result = await db("token_blacklist").where({ token }).first();
-      return !!result;
+        try {
+            const result = await db("token_blacklist").where({ token }).first();
+            return !!result;
+        } catch (error) {
+            throw error;
+        }
     }
 }

@@ -27,7 +27,7 @@ export class AuthService {
 		} catch (ex) {
 			const errorMessage = `Error finding user with id ${id}:, ${(ex as Error).message}`;
 			logger.error(errorMessage);
-			return ServiceResponse.failure("An error occurred while finding user.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure("An error occurred while finding user." + errorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -38,8 +38,9 @@ export class AuthService {
 
 			return { statusCode: 201, message: "User registered successfully" };
 		} catch (error) {
-			console.error("Register service error:", error);
-			return { statusCode: 500, message: "Server error" };
+			// console.error("Register service error:", error);
+			// return { statusCode: 500, message: "Server error" };
+			return ServiceResponse.failure("An error occurred while finding user." + error, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 

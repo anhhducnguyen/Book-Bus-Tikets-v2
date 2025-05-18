@@ -18,7 +18,7 @@ export class CarService {
 		  const result = await this.carRepository.findAll(filter, options);
 		  return ServiceResponse.success("Buses fetched successfully", result);
 		} catch (error) {
-		  return ServiceResponse.failure("Failed to fetch buses", null);
+		  return ServiceResponse.failure("Failed to fetch buses" + error, null);
 		}
 	}
 
@@ -33,7 +33,7 @@ export class CarService {
 		} catch (ex) {
 			const errorMessage = `Error finding Car with id ${id}:, ${(ex as Error).message}`;
 			logger.error(errorMessage);
-			return ServiceResponse.failure("An error occurred while finding Car.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure("An error occurred while finding Car." + errorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -50,7 +50,7 @@ export class CarService {
 		} catch (ex) {
 			const errorMessage = `Error deleting Car with id ${id}: ${(ex as Error).message}`;
 			logger.error(errorMessage);
-			return ServiceResponse.failure("An error occurred while deleting Car.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure("An error occurred while deleting Car." + errorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 

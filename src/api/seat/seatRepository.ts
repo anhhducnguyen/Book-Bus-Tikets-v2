@@ -1,5 +1,5 @@
 import type { Seat } from "@/api/seat/seatModel";
-import { db } from "@/common/config/database"; 
+import { db } from "@/common/config/database";
 
 export const seats: Seat[] = [
 	{
@@ -45,30 +45,40 @@ export const seats: Seat[] = [
 ];
 export class SeatRepository {
 	async findAllAsync(): Promise<Seat[]> {
-		const rows = await db<Seat>('seats').select('*');
-		return rows as Seat[];
+		try {
+			const rows = await db<Seat>('seats').select('*');
+			return rows as Seat[];
+		} catch (error) {
+			throw error;
+		}
 	}
-	
-	async findSeatsByBusIdAsync(busId: number): Promise<Seat[]> {	
-		const seats = await db<Seat>('seats')
-			.join('buses', 'seats.bus_id', '=', 'buses.id')
-			.select(
-				'seats.*',
-				'buses.name as bus_name',
-				'buses.license_plate as bus_license_plate'
-			)
-			.where('seats.bus_id', busId);
-		
-		return seats;
-	}	
+
+	async findSeatsByBusIdAsync(busId: number): Promise<Seat[]> {
+		try {
+			const seats = await db<Seat>('seats')
+				.join('buses', 'seats.bus_id', '=', 'buses.id')
+				.select(
+					'seats.*',
+					'buses.name as bus_name',
+					'buses.license_plate as bus_license_plate'
+				)
+				.where('seats.bus_id', busId);
+
+			return seats;
+		} catch (error) {
+			throw error;
+		}
+	}
 
 	async deleteSeatsByBusIdAsync(busId: number): Promise<void> {
-		console.log(`Deleting seats for bus with id: ${busId}`);
-		
-		await db<Seat>('seats')
-			.where('bus_id', busId)
-			.del();
-	
-		console.log(`Deleted seats for bus with id: ${busId}`);
+		try {
+			await db<Seat>('seats')
+				.where('bus_id', busId)
+				.del();
+
+			console.log(`Deleted seats for bus with id: ${busId}`);
+		} catch (error) {
+			throw error;
+		}
 	}
 }
