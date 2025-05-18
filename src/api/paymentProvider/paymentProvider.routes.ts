@@ -43,6 +43,10 @@ paymentProviderRegistry.registerPath({
     tags: ["PaymentProvider"],
     operationId: "createPaymentProvider",
     summary: "Tạo mới một nhà cung cấp thanh toán",
+    description: `Tạo mới một nhà cung cấp thanh toán với thông tin chi tiết bao gồm tên, loại và endpoint API.<br /><br />
+                <strong>provider_name</strong>: Tên nhà cung cấp thanh toán.<br />
+                <strong>provider_type</strong>: Loại nhà cung cấp thanh toán (ví dụ: E_WALLET, CARD, BANK_TRANSFER, QR_CODE).<br />
+                <strong>api_endpoint</strong>: Đường dẫn API của nhà cung cấp thanh toán. Phải là ulr  (ví dụ: "https://api.paymentprovider.com/v1, http://example.com/api) <br />`,
     request: {
         body: {
             content: {
