@@ -1,6 +1,7 @@
 import { Request, Response, RequestHandler } from 'express';
 import { BannerService } from '@/api/banners/bannerService';
 import { StatusCodes } from "http-status-codes";  
+import { error } from 'console';
 
 export const bannerService = new BannerService();
 
@@ -32,7 +33,23 @@ export class BannerController {
             position,
           });
       
-          res.json(banner);
+          res.json({
+            success: true,
+            message: "Lấy dữ liệu thành công",
+            
+              responseObject: {
+                results: banner.results,
+                page: banner.page,
+                limit:banner.limit,
+                total: banner.total,
+                totalPages: banner.totalPages,
+              
+            },
+            statusCode: 200
+          });
+
+
+          
         } catch (error) {
           console.error(error);
           res.status(500).json({ error: "Something went wrong" });
@@ -40,34 +57,36 @@ export class BannerController {
       }
       
   //Them moi banner
-  public createBanner: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-      const bannerData = req.body;
-      try {
-        if (!bannerData) {
-          res.status(StatusCodes.BAD_REQUEST).json({ message: "banner data is required." });
-          return;
-        }
-  
-        const response = await bannerService.createBanner(bannerData);
-      
-        if (response.statusCode === StatusCodes.CREATED) {
-        res.status(StatusCodes.CREATED).json({
-            banner: response.responseObject,
-            
-          message: response.message,
-          
-          
-        });
-      
-        } else {
-          res.status(response.statusCode).json({ message: response.message });
-        }
-      } catch (ex) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-          message: "An error occurred while creating bannerbanner.",
-        });
-      }
+ public createBanner: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const file = req.file;
+    const { position } = req.body;
+
+    if (!file || !position) {
+      res.status(StatusCodes.BAD_REQUEST).json({ message: "image and position are required." });
+      return;
+    }
+
+    const bannerData = {
+      banner_url: `../uploads/${file.filename}`, // đường dẫn ảnh lưu trong DB
+      position,
     };
+
+    const response = await bannerService.createBanner(bannerData);
+
+    res.status(response.statusCode).json({
+      banner: response.responseObject,
+      message: response.message,
+    });
+
+  } catch (ex) {
+    console.log(ex);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "An error occurred while creating banner.",
+    });
+  }
+};
+
 
 //xoa 1 banner
 public deleteBanner: RequestHandler = async (req: Request, res: Response): Promise<void> => {
@@ -83,7 +102,10 @@ public deleteBanner: RequestHandler = async (req: Request, res: Response): Promi
   
       if (response.statusCode === StatusCodes.OK) {
         res.status(StatusCodes.OK).json({
-          message: `Banner with id ${id} deleted successfully`,
+            success:'true',
+            message: `banners  with id ${id} deleted successfully`,
+           statusCode: response.statusCode,
+
         });
       } else {
         res.status(response.statusCode).json({ message: response.message });

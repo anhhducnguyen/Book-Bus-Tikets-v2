@@ -9,6 +9,7 @@ import { BannerSchema, CreateBannerSchema } from "./bannerModel"; // Schema Zod 
 
 import { permission } from "@/common/middleware/auth/permission";
 import { authenticate } from "@/common/middleware/auth/authMiddleware";
+import {uploadBanner} from "@/api/banners/bannerMiddleware"
 
 // Khởi tạo OpenAPI registry
 export const bannerRegistry = new OpenAPIRegistry();
@@ -93,26 +94,33 @@ bannerRegistry.registerPath({
   method: "post",
   path: "/banners",
   tags: ["Banners"],
-  operationId: "createBanner",  // Thay 'operation' bằng 'operationId'
-  summary: "Thêm mới banner",  // Thêm phần mô tả ngắn gọn về API
+  operationId: "createBanner",
+  summary: "Thêm mới banner",
   requestBody: {
+    required: true,
     content: {
-      "application/json": {
+      "multipart/form-data": {
         schema: {
           type: "object",
           properties: {
-            banner_url: { type: "string" },
-            position: { type: "string" },
-
+            image: {
+              type: "string",
+              format: "binary", // định dạng file
+              description: "Ảnh banner (jpeg, png...)"
+            },
+            position: {
+              type: "string",
+              description: "Vị trí hiển thị banner (ví dụ: top, bottom...)"
+            },
           },
-          required: ["banner_url", "position"],
+          required: ["image", "position"],
         },
       },
     },
   },
   responses: {
     201: {
-      description: "banner created successfully",
+      description: "Banner created successfully",
       content: {
         "application/json": {
           schema: {
@@ -121,7 +129,6 @@ bannerRegistry.registerPath({
               id: { type: "number" },
               banner_url: { type: "string" },
               position: { type: "string" },
-
             },
           },
         },
@@ -136,7 +143,8 @@ bannerRegistry.registerPath({
   },
 });
 
-bannerRouter.post("/", authenticate, permission, validateRequest(CreateBannerSchema), bannerController.createBanner);
+
+bannerRouter.post("/", authenticate, permission, uploadBanner.single('image'),bannerController.createBanner);
 bannerRegistry.registerPath({
   method: "delete",
   path: "/banners/{id}",

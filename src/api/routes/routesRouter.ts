@@ -5,7 +5,7 @@ import { z } from "zod";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders"; // Bạn đã xây dựng hàm này cho OpenAPI response
 import { validateRequest } from "@/common/utils/httpHandlers"; // Nếu bạn muốn validate request data
 import { routesController } from "@/api/routes/routesController"; // Controller để xử lý logic route
-import { RoutesSchema, CreateRoutesSchema } from "./routesModel"; // Schema Zod cho routes
+import { RoutesSchema, CreateRoutesSchema, PaginatedRoutesResponseSchema } from "./routesModel"; // Schema Zod cho routes
 
 import { permission } from "@/common/middleware/auth/permission";
 import { authenticate } from "@/common/middleware/auth/authMiddleware";
@@ -50,14 +50,14 @@ routesRegistry.registerPath({
       in: "query",
       required: false,
       schema: { type: "number" },
-      description: "Tìm theo departure_station",
+      description: "Tìm theo id trạm khởi hành ",
     },
     {
       name: "arrival_station_id",
       in: "query",
       required: false,
       schema: { type: "number" },
-      description: "Tìm theo vị trí hiển thị arrival_station",
+      description: "Tìm theo id trạm đích  ",
     },
     {
       name: "sortBy",
@@ -80,52 +80,55 @@ routesRegistry.registerPath({
       description: "Thứ tự sắp xếp (tăng dần hoặc giảm dần)",
     },
   ],
-  responses: createApiResponse(z.array(RoutesSchema), "Thành công"),
+  responses: createApiResponse(PaginatedRoutesResponseSchema,"Thành công"),
 });
 routesRouter.get("/", routesController.getAllRoutes);
 //them moi tuyen duong 
+
+           
+
+
 routesRegistry.registerPath({
     method: "post",
     path: "/routes",
     tags: ["Routes"],
     operationId: "createRoutes",  // Thay 'operation' bằng 'operationId'
     summary: "Thêm mới tuyến đường",  // Thêm phần mô tả ngắn gọn về API
+    description: `
+    API này dùng để tạo mới một tuyến đường.
+    Bạn cần cung cấp các thông tin sau:
+    - departure_station_id: ID trạm xuất phát
+    - arrival_station_id: ID trạm đến
+    - price: Giá vé
+    - duration: Thời gian di chuyển (phút)
+    - distance: Khoảng cách (km)`,
     requestBody: {
       content: {
         "application/json": {
           schema: {
             type: "object",
             properties: {
-              departure_station_id: { type: "number" },
-              arrival_station_id:{type:"number"},
-              price:{type:"number"},
-              duration:{type:"number"},
-              distance: {type:"number"},
+              departure_station_id: { type: "number" ,
+                 description: "ID của trạm khởi hành" 
+              },
+              arrival_station_id:{type:"number",
+                description: "ID của trạm đến"
+              },
+              price:{type:"number",
+                description:'giá vé'
+              },
+              duration:{type:"number",
+                description:"Thời gian di chuyển "
+              },
+              distance: {type:"number", description:'khoảng cách'},
             },
-            required: ["name", "email", "age"],
+            
           },
         },
       },
     },
     responses: {
-      201: {
-        description: "Routes created successfully",
-        content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: {
-                id: { type: "number" },
-                name: { type: "string" },
-                email: { type: "string" },
-                age: { type: "number" },
-                createdAt: { type: "string", format: "date-time" },
-                updatedAt: { type: "string", format: "date-time" },
-              },
-            },
-          },
-        },
-      },
+      
       400: {
         description: "Invalid input data",
       },
@@ -133,9 +136,96 @@ routesRegistry.registerPath({
         description: "Internal server error",
       },
     },
-  });
+  })
+
+
  routesRouter.post("/", authenticate, permission, validateRequest(CreateRoutesSchema), routesController.createRoutes);
  //update tuyen duong theo id
+ routesRegistry.registerPath({
+  method: "put",
+  path: "/routes/{id}",
+  tags: ["Routes"],
+  operationId: "updateRoute",
+  summary: "Cập nhật thông tin tuyến đường theo ID",
+  description: `
+    API này dùng để cập nhật thông tin tuyến đường đã tồn tại.
+    Bạn cần cung cấp ID tuyến đường trong path và các trường muốn cập nhật trong body:
+    - departure_station_id: ID trạm xuất phát (nếu muốn thay đổi)
+    - arrival_station_id: ID trạm đến (nếu muốn thay đổi)
+    - price: Giá vé (nếu muốn thay đổi)
+    - duration: Thời gian di chuyển (phút) (nếu muốn thay đổi)
+    - distance: Khoảng cách (km) (nếu muốn thay đổi)
+  `,
+  parameters: [
+    {
+      name: "id",
+      in: "path",
+      required: true,
+      description: "ID của tuyến đường cần cập nhật",
+      schema: {
+        type: "number",
+      },
+    },
+  ],
+  requestBody: {
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          properties: {
+            departure_station_id: {
+              type: "number",
+              description: "ID của trạm khởi hành",
+            },
+            arrival_station_id: {
+              type: "number",
+              description: "ID của trạm đến",
+            },
+            price: {
+              type: "number",
+              description: "Giá vé",
+            },
+            duration: {
+              type: "number",
+              description: "Thời gian di chuyển (phút)",
+            },
+            distance: {
+              type: "number",
+              description: "Khoảng cách (km)",
+            },
+          },
+          // Không bắt buộc phải cập nhật tất cả trường
+          // Nếu muốn bắt buộc thì thêm "required" vào đây
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Cập nhật tuyến đường thành công",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              id: { type: "number" },
+              departure_station_id: { type: "number" },
+              arrival_station_id: { type: "number" },
+              price: { type: "number" },
+              duration: { type: "number" },
+              distance: { type: "number" },
+              updatedAt: { type: "string", format: "date-time" },
+            },
+          },
+        },
+      },
+    },
+    400: { description: "Dữ liệu gửi lên không hợp lệ" },
+    404: { description: "Không tìm thấy tuyến đường với ID này" },
+    500: { description: "Lỗi máy chủ" },
+  },
+});
+
  routesRouter.put("/:id", authenticate, permission, validateRequest(CreateRoutesSchema), routesController.updateRoutes);
  //Xoa tuyen duong
  routesRegistry.registerPath({
@@ -150,12 +240,12 @@ routesRegistry.registerPath({
        in: "path",
        required: true,
        schema: { type: "integer" },
-       description: "ID của banner cần xóa",
+       description: "ID của route cần xóa",
      },
    ],
    responses: {
      200: {
-       description: "Banner đã được xóa thành công",
+       description: "Routes đã được xóa thành công",
        content: {
          "application/json": {
            schema: RoutesSchema,

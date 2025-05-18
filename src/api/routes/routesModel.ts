@@ -28,7 +28,18 @@ export const CreateRoutesSchema = z.object({
 
 	}),
 });
-
+export const PaginatedRoutesResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+  responseObject: z.object({
+    results: z.array(RoutesSchema),
+    page: z.number(),
+    limit: z.number(),
+    total: z.number(),
+    totalPages: z.number(),
+  }),
+  
+});
 
 // Input Validation for 'GET users/:id' endpoint
 export const GetRoutesSchema = z.object({

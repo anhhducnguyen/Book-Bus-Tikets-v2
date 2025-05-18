@@ -25,6 +25,18 @@ export const CreateBusReviewSchema = z.object({
 
     }),
 });
+export const PaginatedBusReviewResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+  responseObject: z.object({
+    results: z.array(BusReviewSchema),
+    page: z.number(),
+    limit: z.number(),
+    total: z.number(),
+    totalPages: z.number(),
+  }),
+  
+});
 
 
 // Input Validation for 'GET users/:id' endpoint

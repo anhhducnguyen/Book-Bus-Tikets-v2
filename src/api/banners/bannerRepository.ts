@@ -10,37 +10,60 @@ interface GetBannerOptions {
     sortBy?: 'position' | 'banner_url';
     order?: 'asc' | 'desc';
   }
+  interface PaginatedResult<T> {
+      results: T[];
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+   }
   
-  export class BannerRepository {
-    async findAllAsync(options: GetBannerOptions): Promise<Banner[]> {
-      const {
-        page = 1,
-        limit = 10,
-        banner,
-        position,
-        sortBy = 'position',
-        order = 'asc',
-      } = options;
-  
-      const offset = (page - 1) * limit;
-  
-      const query = db<Banner>('banners')
-        .select('*')
-        .modify(qb => {
-          if (banner) {
-            qb.where('banner_url', 'like', `%${banner}%`);
-          }
-          if (position) {
-            qb.where('position', 'like', `%${position}%`);
-          }
-        })
-        .orderBy(sortBy, order)
-        .offset(offset)
-        .limit(limit);
-  
-      const rows = await query;
-      return rows;
+    export class BannerRepository {
+   async findAllAsync(options: GetBannerOptions): Promise<PaginatedResult<Banner>> {
+  const {
+    page = 1,
+    limit = 10,
+    banner,
+    position,
+    sortBy = 'position',
+    order = 'asc',
+  } = options;
+
+  const offset = (page - 1) * limit;
+
+  // Base query (chỉ lọc điều kiện, không limit/offset)
+  const baseQuery = db<Banner>('banners').modify(qb => {
+    if (banner) {
+      qb.where('banner_url', 'like', `%${banner}%`);
     }
+    if (position) {
+      qb.where('position', 'like', `%${position}%`);
+    }
+  });
+
+  // Đếm tổng số bản ghi thỏa điều kiện
+  const [{ count }] = await baseQuery.clone().count('* as count');
+  const total = Number(count);
+  const totalPages = Math.ceil(total / limit);
+
+  // Lấy dữ liệu phân trang
+  const results = await baseQuery
+    .clone()
+    .select('*')
+    .orderBy(sortBy, order)
+    .offset(offset)
+    .limit(limit);
+
+  return {
+    results,
+    page,
+    limit,
+    total,
+    totalPages
+  };
+   }
+
+    
     async createBannerAsync(data: Omit<Banner, 'id'>): Promise<Banner> {
         try {
           const [id] = await db('banners').insert({ ...data });

@@ -5,7 +5,7 @@ import { z } from "zod";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders"; // Bạn đã xây dựng hàm này cho OpenAPI response
 import { validateRequest } from "@/common/utils/httpHandlers"; // Nếu bạn muốn validate request data
 import { routesController } from "@/api/routes/routesController"; // Controller để xử lý logic route
-import { BusReviewSchema, CreateBusReviewSchema } from "@/api/bus_reviews/busReviewModel"; // Schema Zod cho routes
+import { BusReviewSchema, CreateBusReviewSchema, PaginatedBusReviewResponseSchema } from "@/api/bus_reviews/busReviewModel"; // Schema Zod cho routes
 import { busReviewController } from "./busReviewController";
 
 import { permission } from "@/common/middleware/auth/permission";
@@ -45,40 +45,34 @@ busReviewRegistry.registerPath({
       schema: { type: "integer", minimum: 1 },
       description: "Số lượng bản ghi mỗi trang (mặc định: 10)",
     },
-    {
-      name: "bus_id",
-      in: "query",
-      required: false,
-      schema: { type: "number" },
-      description: "Tìm review theo bus_id",
-    },
+    
     {
       name: "user_id",
       in: "query",
       required: false,
       schema: { type: "number" },
-      description: "Tìm review theo user_id",
+      description: "Tìm đánh giá theo user_id",
     },
     {
       name: "rating",
       in: "query",
       required: false,
       schema: { type: "number" },
-      description: "Tìm review theo rating",
+      description: "Tìm đánh giá theo mức đánh giá(rating)",
     },
     {
       name: "bus_name",
       in: "query",
       required: false,
       schema: { type: "string" },
-      description: "Tìm review theo string",
+      description: "Tìm đánh giá theo tên xe",
     },
      {
       name: "company_name",
       in: "query",
       required: false,
       schema: { type: "string" },
-      description: "Tìm review nha xe",
+      description: "Tìm đánh giá nhà xe",
     },
     {
       name: "sortBy",
@@ -101,7 +95,7 @@ busReviewRegistry.registerPath({
       description: "Thứ tự sắp xếp (tăng dần hoặc giảm dần)",
     },
   ],
-  responses: createApiResponse(z.array(BusReviewSchema), "Thành công"),
+  responses: createApiResponse(PaginatedBusReviewResponseSchema, "Thành công"),
 });
 // Đăng ký handler cho GET /routes
 busReviewRouter.get("/", busReviewController.getAllBusReview);
@@ -112,6 +106,15 @@ busReviewRegistry.registerPath({
      tags: ["Bus reviews"],
     operationId: "createBusReview",  // Thay 'operation' bằng 'operationId'
     summary: "Thêm mới đánh giá xe",  // Thêm phần mô tả ngắn gọn về API
+     description: `
+    API này dùng để thêm 1 đánh giá .
+    
+    - bus_id : mã xe  
+    - user_id : mã người dùng 
+    - rating: mức đánh giá(từ 1->5)
+    - review: đánh giá 
+    
+  `,
     requestBody: {
       content: {
         "application/json": {
@@ -164,6 +167,7 @@ busReviewRegistry.registerPath({
     tags: ["Bus reviews"],
    operationId: "deleteBusReview",
    summary: "Xóa đánh giá xe theo ID",
+    
    
    parameters: [
      {
@@ -171,7 +175,7 @@ busReviewRegistry.registerPath({
        in: "path",
        required: true,
        schema: { type: "integer" },
-       description: "ID của BusReview cần xóa",
+       description: "ID của đánh giá cần xóa",
      },
    ],
    responses: {

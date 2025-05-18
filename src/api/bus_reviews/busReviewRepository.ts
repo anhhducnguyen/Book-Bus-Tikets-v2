@@ -14,53 +14,77 @@ interface GetBusReviewOptions {
     sortBy?: 'rating' | 'created_at' | 'updated_at';
     order?: 'asc' | 'desc';
   }
-  
-  
+ 
+   interface PaginatedResult<T> {
+      results: T[];
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+}
   export class BusReviewRepository {
-    async findAllAsync(options: GetBusReviewOptions): Promise<BusReview[]> {
-        const {
-          page = 1,
-          limit = 10,
-          bus_id,
-          user_id,
-          rating,
-          bus_name,
-          company_id,
-          company_name,
-          sortBy = 'created_at',
-          order = 'desc',
-        } = options;
-    
-        const offset = (page - 1) * limit;
-    
-        const query = db('bus_reviews as br')
-          .select(
-            'br.id',
-            'br.rating',
-            'br.review',
-            'br.created_at',
-            'br.updated_at',
-            'b.id as bus_id',
-            'b.name as bus_name',
-            'bc.id as company_id',
-            'bc.company_name'
-          )
-          .join('buses as b', 'br.bus_id', 'b.id')
-          .join('bus_companies as bc', 'b.company_id', 'bc.id')
-          .modify(qb => {
-            if (bus_id) qb.where('br.bus_id', bus_id);
-            if (user_id) qb.where('br.user_id', user_id);
-            if (rating) qb.where('br.rating', rating);
-            if (bus_name) qb.where('b.name', 'like', `%${bus_name}%`);
-            if (company_id) qb.where('bc.id', company_id);
-            if (company_name) qb.where('bc.company_name', 'like', `%${company_name}%`);
-          })
-          .orderBy(`br.${sortBy}`, order)
-          .offset(offset)
-          .limit(limit);
-    
-        return await query;
-      }
+  async findAllAsync(options: GetBusReviewOptions): Promise<PaginatedResult<BusReview>> {
+    const {
+      page = 1,
+      limit = 10,
+      bus_id,
+      user_id,
+      rating,
+      bus_name,
+      company_id,
+      company_name,
+      sortBy = 'created_at',
+      order = 'desc',
+    } = options;
+
+    const offset = (page - 1) * limit;
+
+    // Query filter gốc (chỉ dùng WHERE, JOIN)
+    const baseQuery = db('bus_reviews as br')
+      .join('buses as b', 'br.bus_id', 'b.id')
+      .join('bus_companies as bc', 'b.company_id', 'bc.id')
+      .modify(qb => {
+        if (bus_id) qb.where('br.bus_id', bus_id);
+        if (user_id) qb.where('br.user_id', user_id);
+         if (rating != null) qb.where('br.rating', rating);
+        if (bus_name) qb.where('b.name', 'like', `%${bus_name}%`);
+        if (company_id) qb.where('bc.id', company_id);
+        if (company_name) qb.where('bc.company_name', 'like', `%${company_name}%`);
+      });
+
+    // 🔹 Đếm tổng số bản ghi
+    const [{ count }] = await baseQuery.clone().count<{ count: string }>({ count: '*' });
+    const total = Number(count);
+    const totalPages = Math.ceil(total / limit);
+
+    // 🔹 Truy vấn dữ liệu phân trang
+    const results = await baseQuery
+      .clone()
+      .select(
+        'br.id',
+        'br.rating',
+        'br.review',
+        'br.created_at',
+        'br.updated_at',
+        'b.id as bus_id',
+        'b.name as bus_name',
+        'bc.id as company_id',
+        'bc.company_name'
+      )
+      .orderBy(`br.${sortBy}`, order)
+      .offset(offset)
+      .limit(limit);
+
+    return {
+      results,
+      page,
+      limit,
+      total,
+      totalPages
+    };
+  }
+
+
     //them moi mot review
     async createBusReviewAsync(data: Omit<BusReview, "id" | "created_at" | "updated_at">): Promise<BusReview> {
             try {
