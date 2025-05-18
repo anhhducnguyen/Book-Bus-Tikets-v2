@@ -12,7 +12,7 @@ import {
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { busCompanyController } from "./busCompanyController";
-
+import { upload } from "@/common/middleware/uploadMiddleware";
 import { authenticate } from "@/common/middleware/auth/authMiddleware";
 import { permission } from "@/common/middleware/auth/permission";
 
@@ -38,7 +38,7 @@ busCompanyRegistry.registerPath({
   method: "get",
   path: "/bus-companies/{id}",
   tags: ["BusCompany"],
-  summary: "Lấy thông tin nhà xe",
+  summary: "Lấy thông tin chi tiết một nhà xe theo ID",
   request: { params: GetBusCompanySchema.shape.params },
   responses: createApiResponse(BusCompanySchema, "Chi tiết nhà xe"),
 });
@@ -53,15 +53,45 @@ busCompanyRegistry.registerPath({
   request: {
     body: {
       content: {
-        "application/json": {
-          schema: CreateBusCompanySchema.shape.body,
+        "multipart/form-data": {
+          schema: z.object({
+            name: z.string(),
+            descriptions: z.string().optional(),
+            image: z.any().optional(),        
+          }).openapi({
+            properties: {
+              company_name: {
+                type: "string",
+                description: "Tên nhà xe",
+              },
+              descriptions: {
+                type: "string",
+                description: "Mô tả nhà xe",
+              },
+              image: {
+                type: "string",
+                format: "binary",
+                description: "Ảnh đại diện nhà xe",
+              },
+            },
+            required: ["company_name"]
+          }),
         },
       },
     },
   },
   responses: createApiResponse(BusCompanySchema, "Tạo nhà xe thành công"),
 });
-busCompanyRouter.post("/", authenticate, permission, validateRequest(CreateBusCompanySchema), busCompanyController.createCompany);
+
+busCompanyRouter.post(
+  "/",
+  // authenticate,
+  // permission,
+  upload.fields([
+    { name: "image", maxCount: 1 },
+  ]),
+  busCompanyController.createCompany
+);
 
 //  PUT /bus-companies/:id
 busCompanyRegistry.registerPath({
@@ -73,15 +103,45 @@ busCompanyRegistry.registerPath({
     params: UpdateBusCompanySchema.shape.params,
     body: {
       content: {
-        "application/json": {
-          schema: UpdateBusCompanySchema.shape.body,
+        "multipart/form-data": {
+          schema: z.object({
+            name: z.string(),
+            descriptions: z.string().optional(),
+            image: z.any().optional(),        
+          }).openapi({
+            properties: {
+              company_name: {
+                type: "string",
+                description: "Tên nhà xe",
+              },
+              descriptions: {
+                type: "string",
+                description: "Mô tả nhà xe",
+              },
+              image: {
+                type: "string",
+                format: "binary",
+                description: "Ảnh đại diện nhà xe",
+              },
+            },
+            required: ["company_name"]
+          }),
         },
       },
     },
   },
   responses: createApiResponse(BusCompanySchema, "Cập nhật thành công"),
 });
-busCompanyRouter.put("/:id", authenticate, permission, validateRequest(UpdateBusCompanySchema), busCompanyController.updateCompany);
+busCompanyRouter.put(
+  "/:id",
+  // authenticate,
+  // permission,
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "wallpaper", maxCount: 1 },
+  ]),
+  busCompanyController.updateCompany
+);
 
 //  DELETE /bus-companies/:id
 busCompanyRegistry.registerPath({

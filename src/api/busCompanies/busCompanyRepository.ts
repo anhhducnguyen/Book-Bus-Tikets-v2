@@ -26,24 +26,24 @@ export class BusCompanyRepository {
     return await query.select("*");
   }
 
-  // 🔍 Tìm một nhà xe theo ID
+  // Tìm một nhà xe theo ID
   async findByIdAsync(id: number): Promise<BusCompany | null> {
     return await db<BusCompany>("bus_companies").where({ id }).first() || null;
   }
 
-  // 🆕 Tạo mới một nhà xe
+  // Tạo mới một nhà xe
   async createAsync(data: Omit<BusCompany, "id">): Promise<number> {
     const [newId] = await db<BusCompany>("bus_companies").insert(data);
     return newId;
   }
 
-  // ✏️ Cập nhật nhà xe
+  // Cập nhật nhà xe
   async updateAsync(id: number, data: Partial<BusCompany>): Promise<boolean> {
     const updatedRows = await db<BusCompany>("bus_companies").where({ id }).update(data);
     return updatedRows > 0;
   }
 
-  // ❌ Xóa nhà xe
+  // Xóa nhà xe
   async deleteAsync(id: number): Promise<boolean> {
     const deletedRows = await db<BusCompany>("bus_companies").where({ id }).del();
     return deletedRows > 0;
