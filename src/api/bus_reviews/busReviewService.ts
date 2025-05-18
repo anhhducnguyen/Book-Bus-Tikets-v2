@@ -18,7 +18,13 @@ interface GetBusReviewOptions {
     sortBy?: 'rating' | 'created_at' | 'updated_at';
     order?: 'asc' | 'desc';
   }
-
+    interface PaginatedResult<T> {
+      results: T[];
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    }
 export class BusReviewService {
   private busReviewRepository: BusReviewRepository;
 
@@ -27,7 +33,7 @@ export class BusReviewService {
   }
 
   // Lấy danh sách các review với phân trang, tìm kiếm, sắp xếp
-  async getAllBusReview(options: GetBusReviewOptions): Promise<BusReview[]> {
+  async getAllBusReview(options: GetBusReviewOptions): Promise<PaginatedResult<BusReview>>{
     return await this.busReviewRepository.findAllAsync(options);
   }
   //Tao 1 review moi

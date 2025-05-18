@@ -16,7 +16,13 @@ interface GetRoutesOptions {
   sortBy?: 'position' | 'banner_url';
   order?: 'asc' | 'desc';
 }
-
+ interface PaginatedResult<T> {
+      results: T[];
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    }
 export class BannerService {
   private bannerRepository: BannerRepository;
 
@@ -25,7 +31,7 @@ export class BannerService {
   }
 
   // Lấy danh sách các banner với phân trang, tìm kiếm, sắp xếp
-  async getAllBanner(options: GetRoutesOptions): Promise<Banner[]> {
+  async getAllBanner(options: GetRoutesOptions): Promise<PaginatedResult<Banner>> {
     return await this.bannerRepository.findAllAsync(options);
   }
   //Tao 1 banner moi

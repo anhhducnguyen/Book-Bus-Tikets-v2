@@ -1,4 +1,4 @@
-import { RouteRepository } from '@/api/routes/routesRepository';
+import { RouteRepository,  } from '@/api/routes/routesRepository';
 import { Routes } from '@/api/routes/routesModel';
 import { StatusCodes } from "http-status-codes";
 
@@ -16,7 +16,13 @@ interface GetRoutesOptions {
   sortBy?: 'price' | 'duration' | 'distance' | 'created_at';
   order?: 'asc' | 'desc';
 }
-
+interface PaginatedResult<T> {
+  results: T[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
 export class RouteService {
   private routeRepository: RouteRepository;
 
@@ -25,9 +31,10 @@ export class RouteService {
   }
 
   // Lấy danh sách các tuyến đường với phân trang, tìm kiếm, sắp xếp
-  async getAllRoutes(options: GetRoutesOptions): Promise<Routes[]> {
-    return await this.routeRepository.findAllAsync(options);
-  }
+  async getAllRoutes(options: GetRoutesOptions): Promise<PaginatedResult<Routes>> {
+  return await this.routeRepository.findAllAsync(options);
+}
+
   //Tao 1 tuyen duong moi
   async createRoutes(data: Omit<Routes, "id" | "created_at" | "updated_at">): Promise<ServiceResponse<Routes| null>> {
     try {

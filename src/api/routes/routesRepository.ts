@@ -1,7 +1,8 @@
 import type { Routes } from "@/api/routes/routesModel";
 import { db } from "@/common/config/database"; // Đảm bảo db được cấu hình đúng
 
-interface GetRoutesOptions {
+
+  interface GetRoutesOptions {
     page?: number;
     limit?: number;
     departure_station_id?: number;
@@ -10,36 +11,61 @@ interface GetRoutesOptions {
     order?: 'asc' | 'desc';
   }
   
-  export class RouteRepository {
-    async findAllAsync(options: GetRoutesOptions): Promise<Routes[]> {
-      const {
-        page = 1,
-        limit = 10,
-        departure_station_id,
-        arrival_station_id,
-        sortBy = 'created_at',
-        order = 'asc',
-      } = options;
-  
-      const offset = (page - 1) * limit;
-  
-      const query = db<Routes>('routes')
-        .select('*')
-        .modify(qb => {
-          if (departure_station_id) {
-            qb.where('departure_station_id', departure_station_id);
-          }
-          if (arrival_station_id) {
-            qb.where('arrival_station_id', arrival_station_id);
-          }
-        })
-        .orderBy(sortBy, order)
-        .offset(offset)
-        .limit(limit);
-  
-      const rows = await query;
-      return rows;
-    }
+  interface PaginatedResult<T> {
+  results: T[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export class RouteRepository {
+  async findAllAsync(options: GetRoutesOptions): Promise<PaginatedResult<Routes>> {
+    const {
+      page = 1,
+      limit = 10,
+      departure_station_id,
+      arrival_station_id,
+      sortBy = 'created_at',
+      order = 'asc',
+    } = options;
+
+    const offset = (page - 1) * limit;
+
+    // Query cơ bản có lọc
+    const baseQuery = db<Routes>('routes')
+      .modify(qb => {
+        if (departure_station_id) {
+          qb.where('departure_station_id', departure_station_id);
+        }
+        if (arrival_station_id) {
+          qb.where('arrival_station_id', arrival_station_id);
+        }
+      });
+
+    // Đếm tổng số bản ghi (clone để không ảnh hưởng query chính)
+    const [{ count }] = await baseQuery.clone().count('* as count');
+    const total = Number(count);
+    const totalPages = Math.ceil(total / limit);
+
+    // Lấy dữ liệu phân trang
+    const results = await baseQuery
+      .clone()
+      .select('*')
+      .orderBy(sortBy, order)
+      .offset(offset)
+      .limit(limit);
+
+    return {
+      results,
+      page,
+      limit,
+      total,
+      totalPages
+    };
+  }
+
+
     //them moi mot tuyen duong
     async createRoutesAsync(data: Omit<Routes, "id" | "created_at" | "updated_at">): Promise<Routes> {
             try {
@@ -82,27 +108,63 @@ interface GetRoutesOptions {
         }
     }
     //Xoa mot tuyen duong
-    async deleteRoutesAsync(id: number): Promise<Routes | null> {
-        try {
-            // Tìm tuyến đường cần xóa
-            const routeToDelete = await db('routes').where({ id }).first();
-    
-            if (!routeToDelete) {
-                return null; // Nếu không tìm thấy tuyến đường để xóa
+ async deleteRoutesAsync(id: number): Promise<Routes | null> {
+    try {
+        const routeToDelete = await db('routes').where({ id }).first();
+        if (!routeToDelete) return null;
+
+        await db.transaction(async (trx) => {
+            // 1. Lấy schedule_id liên quan đến route
+            const schedules = await trx('schedules')
+                .where('route_id', id)
+                .select('id');
+            const scheduleIds = schedules.map((s) => s.id);
+
+            // 2. Lấy ticket_id liên quan đến các schedule
+            let ticketIds: number[] = [];
+            if (scheduleIds.length > 0) {
+                const tickets = await trx('tickets')
+                    .whereIn('schedule_id', scheduleIds)
+                    .select('id');
+                ticketIds = tickets.map((t) => t.id);
             }
-    
-            // Thực hiện xóa tuyến đường
-            await db('routes').where({ id }).del();
-    
-            // Trả về tuyến đường đã xóa
-            return routeToDelete;
-        } catch (error: unknown) {
-            throw new Error(`Error deleting route: ${(error instanceof Error) ? error.message : 'Unknown error'}`);
-        }
+
+            // 3. Xóa payments liên quan đến tickets
+            if (ticketIds.length > 0) {
+                await trx('payments')
+                    .whereIn('ticket_id', ticketIds)
+                    .del();
+            }
+
+            // 4. Xóa tickets
+            if (ticketIds.length > 0) {
+                await trx('tickets')
+                    .whereIn('id', ticketIds)
+                    .del();
+            }
+
+            // 5. Xóa schedules
+            if (scheduleIds.length > 0) {
+                await trx('schedules')
+                    .whereIn('id', scheduleIds)
+                    .del();
+            }
+
+            // 6. Xóa cancellation_policies
+            await trx('cancellation_policies')
+                .where('route_id', id)
+                .del();
+
+            // 7. Xóa route
+            await trx('routes')
+                .where({ id })
+                .del();
+        });
+
+        return routeToDelete;
+    } catch (error: unknown) {
+        throw new Error(`Error deleting route: ${(error instanceof Error) ? error.message : 'Unknown error'}`);
     }
-    
-    
+}
 
 }
-  
-

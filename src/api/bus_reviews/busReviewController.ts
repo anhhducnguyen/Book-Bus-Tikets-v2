@@ -19,7 +19,9 @@ export class BusReviewController {
             : 'created_at';
     
           const order = (req.query.order as string) === 'asc' ? 'asc' : 'desc';
-    
+          const rating = req.query.rating !== undefined ? Number(req.query.rating) : undefined;
+           const bus_id = req.query.bus_id !== undefined ? Number(req.query.rating) : undefined;
+
           const company_name = req.query.company_name
           ? req.query.company_name.toString()
           : undefined;
@@ -33,11 +35,32 @@ export class BusReviewController {
             order,
             company_name,
             bus_name,
+            rating,
+            bus_id
+            
+
             
             
           });
     
-          res.json(busReview);
+          
+            res.json({
+            success: true,
+            message: "Lấy dữ liệu thành công",
+            
+              responseObject: {
+                results: busReview.results,
+                page: busReview.page,
+                limit: busReview.limit,
+                total: busReview.total,
+                totalPages: busReview.totalPages,
+              
+            },
+            statusCode: 200
+          });
+
+
+          
         } catch (error) {
           console.error(error);
           res.status(500).json({ error: "Something went wrong" });
@@ -56,9 +79,12 @@ export class BusReviewController {
       
         if (response.statusCode === StatusCodes.CREATED) {
         res.status(StatusCodes.CREATED).json({
-            review: response.responseObject,
-            
-          message: response.message,
+           suscess:'true',
+             message: response.message,
+             responseObject:[
+                response.responseObject
+             ],
+            statusCode: response.statusCode,
           
           
         });
@@ -91,7 +117,10 @@ public deleteBusReview: RequestHandler = async (req: Request, res: Response): Pr
 
       if (response.statusCode === StatusCodes.OK) {
         res.status(StatusCodes.OK).json({
-          message: `Review8 with id ${id} deleted successfully`,
+          success:'true',
+          message: `review  with id ${id} deleted successfully`,
+           statusCode: response.statusCode,
+
         });
       } else {
         res.status(response.statusCode).json({ message: response.message });

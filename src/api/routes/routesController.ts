@@ -1,6 +1,7 @@
 import { Request, Response, RequestHandler } from 'express';
 import { RouteService } from '@/api/routes/routesService';
 import { StatusCodes } from "http-status-codes";  // Đảm bảo import StatusCodes
+import { error } from 'node:console';
 
 export const routeService = new RouteService();
 
@@ -36,8 +37,26 @@ export class RoutesController {
             departure_station_id,
             arrival_station_id,
           });
+          
+         res.json({
+            success: true,
+            message: "Lấy dữ liệu thành công",
+            
+              responseObject: {
+                results: routes.results,
+                page: routes.page,
+                limit: routes.limit,
+                total: routes.total,
+                totalPages: routes.totalPages,
+              
+            },
+            statusCode: 200
+          });
+
+
+          
+         
     
-          res.json(routes);
         } catch (error) {
           console.error(error);
           res.status(500).json({ error: "Something went wrong" });
@@ -48,7 +67,7 @@ export class RoutesController {
       const routesData = req.body;
       try {
         if (!routesData) {
-          res.status(StatusCodes.BAD_REQUEST).json({ message: "User data is required." });
+          res.status(StatusCodes.BAD_REQUEST).json({ message: "route data is required." });
           return;
         }
   
@@ -56,12 +75,18 @@ export class RoutesController {
       
         if (response.statusCode === StatusCodes.CREATED) {
         res.status(StatusCodes.CREATED).json({
-            routes: response.responseObject,
+            suscess:'true',
+             message: response.message,
+             responseObject:[
+                response.responseObject
+             ],
+            statusCode: response.statusCode,
+})
             
-          message: response.message,
+         
           
           
-        });
+        
       
         } else {
           res.status(response.statusCode).json({ message: response.message });
@@ -89,8 +114,12 @@ public updateRoutes: RequestHandler = async (req: Request, res: Response): Promi
 
       if (response.statusCode === StatusCodes.OK) {
         res.status(StatusCodes.OK).json({
-          routes: response.responseObject,
-          message: response.message,
+           suscess:'true',
+             message: response.message,
+             responseObject:[
+                response.responseObject
+             ],
+            statusCode: response.statusCode,
         });
       } else {
         res.status(response.statusCode).json({ message: response.message });
@@ -118,12 +147,16 @@ public deleteRoutes: RequestHandler = async (req: Request, res: Response): Promi
 
       if (response.statusCode === StatusCodes.OK) {
         res.status(StatusCodes.OK).json({
-          message: `Route with id ${id} deleted successfully`,
+            success:'true',
+            message: `route  with id ${id} deleted successfully`,
+            statusCode: response.statusCode,
+
         });
       } else {
         res.status(response.statusCode).json({ message: response.message });
       }
     } catch (ex) {
+      console.log(error)
       const errorMessage = (ex instanceof Error) ? ex.message : "An unexpected error occurred.";
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         message: `An error occurred while deleting the route: ${errorMessage}`,
