@@ -2,7 +2,7 @@ import { Request, Response, RequestHandler } from 'express';
 import { BannerService } from '@/api/banners/bannerService';
 import { StatusCodes } from "http-status-codes";
 import { error } from 'console';
-import { uploadImage } from "@/common/utils/upload";
+import { uploadImage } from '@/common/utils/upload';
 import fs from "fs";
 
 
@@ -59,47 +59,6 @@ export class BannerController {
     }
   }
 
-  //Them moi banner
-  // public createBanner: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-  //   try {
-  //     const file = req.file;
-  //     const { position } = req.body;
-
-  //     if (!file || !position) {
-  //       res.status(StatusCodes.BAD_REQUEST).json({ message: "image and position are required." });
-  //       return;
-  //     }
-
-  //     // const bannerData = {
-  //     //   banner_url: `../uploads/${file.filename}`, // đường dẫn ảnh lưu trong DB
-  //     //   position,
-  //     // };
-
-  //     const cloudinaryUrl = await uploadImage(file.path);
-  //     if (!cloudinaryUrl) {
-  //       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Cloudinary upload failed." });
-  //       return;
-  //     }
-
-  //     const bannerData = {
-  //       banner_url: cloudinaryUrl, // lưu URL Cloudinary vào DB
-  //       position,
-  //     };
-
-  //     const response = await bannerService.createBanner(bannerData);
-
-  //     res.status(response.statusCode).json({
-  //       banner: response.responseObject,
-  //       message: response.message,
-  //     });
-
-  //   } catch (ex) {
-  //     console.log(ex);
-  //     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-  //       message: "An error occurred while creating banner.",
-  //     });
-  //   }
-  // };
   public createBanner: RequestHandler = async (req: Request, res: Response): Promise<void> => {
   try {
     const file = req.file;
@@ -110,14 +69,12 @@ export class BannerController {
       return;
     }
 
-    // 🟡 Upload to Cloudinary
     const cloudinaryUrl = await uploadImage(file.path);
     if (!cloudinaryUrl) {
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Cloudinary upload failed." });
       return;
     }
 
-    // 🧹 Clean up local file
     fs.unlink(file.path, (err) => {
       if (err) {
         console.error("Failed to delete local file:", err);
@@ -126,7 +83,6 @@ export class BannerController {
       }
     });
 
-    // 📝 Save to DB
     const bannerData = {
       banner_url: cloudinaryUrl,
       position,
