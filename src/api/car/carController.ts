@@ -56,9 +56,6 @@ class CarController {
     const id = Number.parseInt(req.params.id as string, 10);
     const carData = req.body;
 
-    // console.log("id", id);
-    // console.log("carData", carData);
-
     const serviceResponse = await carService.updateCar(id, carData);
     res.status(serviceResponse.statusCode).send(serviceResponse);
   }
