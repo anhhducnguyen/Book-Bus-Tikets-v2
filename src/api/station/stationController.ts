@@ -1,6 +1,8 @@
 // src/controllers/station.controller.ts
 import type { Request, RequestHandler, Response } from "express";
 import { stationService } from "@/api/station/stationService";
+import { uploadImage } from '@/common/utils/upload';
+
 
 class StationController {
   public getStations: RequestHandler = async (req, res) => {
@@ -32,24 +34,59 @@ class StationController {
     }
   };
 
+  // public createStation: RequestHandler = async (req, res) => {
+  //   try {
+  //     const { name, descriptions, location } = req.body;
+
+  //     // Thay đổi cách lấy file:
+  //     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+  //     // const image = files["image"] ? files["image"][0]?.path : undefined;
+  //     // const wallpaper = files["wallpaper"] ? files["wallpaper"][0]?.path : undefined;
+
+  //     const image = files["image"] ? files["image"][0]?.filename : undefined;
+  //     const wallpaper = files["wallpaper"] ? files["wallpaper"][0]?.filename : undefined;
+
+
+  //     // console.log(image);
+  //     // console.log(wallpaper);
+
+
+  //     const newStation = {
+  //       name,
+  //       descriptions,
+  //       location,
+  //       image,
+  //       wallpaper,
+  //     };
+
+  //     const serviceResponse = await stationService.create(newStation);
+  //     res.status(serviceResponse.statusCode).send(serviceResponse);
+  //   } catch (error: unknown) {
+  //     const errorMessage = error instanceof Error ? error.message : "Lỗi không xác định";
+  //     res.status(500).send({ message: errorMessage });
+  //   }
+  // };
   public createStation: RequestHandler = async (req, res) => {
     try {
       const { name, descriptions, location } = req.body;
-
-      // Thay đổi cách lấy file:
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
-      // const image = files["image"] ? files["image"][0]?.path : undefined;
-      // const wallpaper = files["wallpaper"] ? files["wallpaper"][0]?.path : undefined;
+      let image: string | undefined;
+      let wallpaper: string | undefined;
 
-      const image = files["image"] ? files["image"][0]?.filename : undefined;
-      const wallpaper = files["wallpaper"] ? files["wallpaper"][0]?.filename : undefined;
+      if (files["image"] && files["image"][0]) {
+        const filePath = files["image"][0].path;
+        const uploadedImageUrl = await uploadImage(filePath);
+        image = uploadedImageUrl ?? undefined;
+      }
 
-      
-      // console.log(image);
-      // console.log(wallpaper);
-      
-      
+      if (files["wallpaper"] && files["wallpaper"][0]) {
+        const filePath = files["wallpaper"][0].path;
+        const uploadedWallpaperUrl = await uploadImage(filePath);
+        wallpaper = uploadedWallpaperUrl ?? undefined;
+      }
+
       const newStation = {
         name,
         descriptions,

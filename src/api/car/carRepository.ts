@@ -186,48 +186,8 @@ export class CarRepository {
         }
     }
 
-    async generateSeatByCarId(busId: number): Promise<void> {
-        const totalSeats = 40; // Số lượng ghế mặc định
-
-        // Định nghĩa các loại ghế và mức giá tương ứng
-        const seatTypes = [
-            { type: 'LUXURY', maxSeats: 10, price: 150000 },
-            { type: 'VIP', maxSeats: 20, price: 100000 },
-            { type: 'STANDARD', maxSeats: totalSeats, price: 50000 }
-        ];
-
-        const seatsToInsert = [];
-
-        for (let i = 1; i <= totalSeats; i++) {
-            const seat = seatTypes.find((seat, index) => i <= seatTypes.slice(0, index + 1).reduce((acc, type) => acc + type.maxSeats, 0));
-
-            // Kiểm tra nếu `seat` là undefined
-            if (seat) {
-                const seatType = seat.type;
-                const price = seat.price;
-
-                seatsToInsert.push({
-                    bus_id: busId,
-                    seat_number: `S${i}`,
-                    seat_type: seatType,
-                    status: 'AVAILABLE',
-                    price_for_type_seat: price,
-                    created_at: new Date(),
-                    updated_at: new Date()
-                });
-            } else {
-                // Xử lý trường hợp không tìm thấy seat hợp lệ nếu cần
-                console.error(`Seat for index ${i} not found`);
-            }
-        }
-
-        try {
-            await db('seats').insert(seatsToInsert);
-            console.log(`Created ${totalSeats} seats for bus with ID ${busId}`);
-        } catch (error) {
-            console.error('Error creating seats:', error);
-            throw error;
-        }
+    async insertSeats(seats: any[]): Promise<void> {
+        await db("seats").insert(seats);
     }
 
     async updateAsync(id: number, data: Partial<Car>): Promise<Car | null> {

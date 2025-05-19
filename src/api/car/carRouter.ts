@@ -3,13 +3,15 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { 
-  GetCarSchema, 
-  CarSchema, 
-  CreateCarSchema, 
+import {
+  GetCarSchema,
+  CarSchema,
+  CreateCarSchema,
   UpdateCarSchema,
   CarQuerySchema,
-  CarDescriptionItemSchema
+  CarDescriptionItemSchema,
+  GenerateSeatsByCarSchema,
+  SeatTypeEnum
 } from "@/api/car/carModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { carController } from "./carController";
@@ -130,7 +132,7 @@ carRegistry.registerPath({
   operationId: "createCar",
   summary: "Thêm mới xe",
   // description: "Create a new car with the provided details.",
-    description: `
+  description: `
 Thêm mới xe với các trường thông tin bắt buộc 
 
   - **name**: Tên của xe
@@ -210,23 +212,75 @@ carRouter.put(
   carController.updateCar
 );
 
+
 carRegistry.registerPath({
   method: "post",
   path: "/cars/{id}/seats",
   tags: ["Seat"],
-  summary: "Thêm mới ghế theo xe",
-  description: "Generate seats for a car by bus id",
-  request: { params: GetCarSchema.shape.params },
-  responses: createApiResponse(GetCarSchema, "Success"),
+  summary: "Tạo ghế cho xe",
+  description: "Tạo mới các ghế cho xe bằng cách nhập số lượng và loại ghế",
+  request: {
+    params: GenerateSeatsByCarSchema.shape.params,
+    body: {
+      content: {
+        "application/json": {
+          schema: GenerateSeatsByCarSchema.shape.body
+        }
+      }
+    }
+  },
+  responses: {
+    201: {
+      description: "Ghế được tạo thành công",
+      content: {
+        "application/json": {
+          schema: z.object({
+            message: z.string(),
+            seats: z.array(
+              z.object({
+                bus_id: z.number(),
+                seat_number: z.string(),
+                seat_type: SeatTypeEnum,
+                price_for_type_seat: z.number(),
+                status: z.string()
+              })
+            )
+          })
+        }
+      }
+    },
+    // 404: createApiResponse(null, "Car not found"),
+    // 409: createApiResponse(null, "Seats already exist"),
+    // 500: createApiResponse(null, "Internal Server Error")
+  }
 });
 
 carRouter.post(
   "/:id/seats",
   authenticate,
-  permission,
-  validateRequest(GetCarSchema),
+  validateRequest(GenerateSeatsByCarSchema),
   carController.generateSeatByCarId
 );
+
+// {
+//   "seat_config": [
+//     {
+//       "seat_type": "LUXURY",
+//       "quantity": 5,
+//       "price": 150000
+//     },
+//     {
+//       "seat_type": "VIP",
+//       "quantity": 10,
+//       "price": 100000
+//     },
+//     {
+//       "seat_type": "STANDARD",
+//       "quantity": 25,
+//       "price": 50000
+//     }
+//   ]
+// }
 
 
 
