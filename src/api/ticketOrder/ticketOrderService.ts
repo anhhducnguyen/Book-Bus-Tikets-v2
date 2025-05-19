@@ -44,7 +44,7 @@ export class TicketOrderService {
       const errorMessage = `Error finding all ticket orders: ${(ex as Error).message}`;
       logger.error(errorMessage);
       return ServiceResponse.failure(
-        "An error occurred while retrieving ticket orders.",
+        "An error occurred while retrieving ticket orders."+ errorMessage,
         null,
         StatusCodes.INTERNAL_SERVER_ERROR,
       );
@@ -68,7 +68,7 @@ export class TicketOrderService {
       const errorMessage = `Error finding ticket orders for company ${companyId}: ${(ex as Error).message}`;
       logger.error(errorMessage);
       return ServiceResponse.failure(
-        "An error occurred while retrieving ticket orders for the company.",
+        "An error occurred while retrieving ticket orders for the company." + errorMessage,
         null,
         StatusCodes.INTERNAL_SERVER_ERROR,
       );

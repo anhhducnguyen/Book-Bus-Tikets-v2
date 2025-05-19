@@ -66,28 +66,32 @@ export class TicketOrderRepository {
 
   async getTicketOrdersByCompany(companyId: number) {
 
-    const query = db("tickets")
-      .select(
-        "tickets.id as ticketId",
-        "tickets.status",
-        // "users.first_name as first_name",
-        "users.email as userEmail",
-        "schedules.departure_time",
-        "routes.price as price",
-        "buses.license_plate",
-        "bus_companies.company_name as busCompanyName",
-        "seats.seat_number"
-      )
-      .join("payments", "tickets.id", "payments.ticket_id")
-      .join("users", "payments.user_id", "users.id")
-      .join("schedules", "tickets.schedule_id", "schedules.id")
-      .join("routes", "schedules.route_id", "routes.id")
-      .join("buses", "schedules.bus_id", "buses.id")
-      .join("bus_companies", "buses.company_id", "bus_companies.id")
-      .join("seats", "tickets.seat_id", "seats.id")
-      .where("bus_companies.id", companyId)
+    try {
+      const query = db("tickets")
+        .select(
+          "tickets.id as ticketId",
+          "tickets.status",
+          // "users.first_name as first_name",
+          "users.email as userEmail",
+          "schedules.departure_time",
+          "routes.price as price",
+          "buses.license_plate",
+          "bus_companies.company_name as busCompanyName",
+          "seats.seat_number"
+        )
+        .join("payments", "tickets.id", "payments.ticket_id")
+        .join("users", "payments.user_id", "users.id")
+        .join("schedules", "tickets.schedule_id", "schedules.id")
+        .join("routes", "schedules.route_id", "routes.id")
+        .join("buses", "schedules.bus_id", "buses.id")
+        .join("bus_companies", "buses.company_id", "bus_companies.id")
+        .join("seats", "tickets.seat_id", "seats.id")
+        .where("bus_companies.id", companyId)
 
-    return await query;
+      return await query;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async getTicketOrdersByStatus(status: string) {
