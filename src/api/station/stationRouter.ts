@@ -32,6 +32,20 @@ stationRegistry.registerPath({
   path: "/stations",
   tags: ["Station"],
   summary: "Lấy tất cả các bến xe với phân trang, tìm kiếm và sắp xếp",
+//   description: `
+// Hiển thị thông tin tất cả các bến xe 
+
+//   - **page**: Số trang
+
+//   - **limit**: Giới hạn số lượng bến xe hiển thị
+
+//   - **search**: Tìm kiếm bến xe
+
+//   - **sortBy**: Sắp xếp theo 'tên bến xe','vị trí','thời gian tạo'
+
+//   - **order**: thứ tự 'tăng dần' hay 'giảm dần'
+
+// `,
   request: {
     query: StationQuerySchema.shape.query,
   },

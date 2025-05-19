@@ -46,10 +46,43 @@ export const UpdateStationSchema = z.object({
 // Schema cho phân trang, tìm kiếm và sắp xếp
 export const StationQuerySchema = z.object({
   query: z.object({
-    page: z.coerce.number().min(1).default(1),
-    limit: z.coerce.number().min(1).default(10),
-    search: z.string().optional(),
-    sortBy: z.enum(["name", "location", "created_at"]).default("name"),
-    order: z.enum(["asc", "desc"]).default("asc"),
+    // page: z.coerce.number().min(1).default(1),
+    // limit: z.coerce.number().min(1).default(10),
+    // search: z.string().optional(),
+    // sortBy: z.enum(["name", "location", "created_at"]).default("name"),
+    // order: z.enum(["asc", "desc"]).default("asc"),
+
+    page: z
+      .coerce.number()
+      .min(1)
+      .default(1)
+      .describe("Số trang hiện tại (bắt đầu từ 1), dùng để phân trang"),
+      
+    limit: z
+      .coerce.number()
+      .min(1)
+      .default(10)
+      .describe("Số lượng bản ghi trên mỗi trang, dùng để phân trang"),
+      
+    search: z
+      .string()
+      .optional()
+      .describe("Tìm kiếm thông tin bến xe"),
+      
+    sortBy: z
+      .enum(["name", "location", "created_at"])
+      .default("name")
+      .describe(
+        "Sắp xếp kết quả theo các trường :\n" +
+        "- name: Tên bến xe\n" +
+        "- location: Vị trí\n" +
+        "- create_at: Thời gian tạo mới bến xe\n" 
+      ),
+    order: z
+      .enum(["asc", "desc"])
+      .default("asc")
+      .describe(
+        "thứ tự 'tăng dần' hay 'giảm dần'\n"  
+      ),
   }),
 });

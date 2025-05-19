@@ -7,8 +7,14 @@ import { logger } from "@/server";
 export class BusCompanyService {
   private repository = new BusCompanyRepository();
 
-  // 🔍 Lấy danh sách nhà xe
-  async findAll(page: number, limit: number, search?: string, sortBy?: string, order?: string): Promise<ServiceResponse<BusCompany[] | null>> {
+  // Lấy danh sách nhà xe
+  async findAll(
+    page: number, 
+    limit: number, 
+    search?: string, 
+    sortBy?: string, 
+    order?: string
+  ): Promise<ServiceResponse<BusCompany[] | null>> {
     try {
       const data = await this.repository.findAllAsync(page, limit, search, sortBy, order);
 
@@ -18,12 +24,12 @@ export class BusCompanyService {
 
       return ServiceResponse.success("Danh sách nhà xe", data);
     } catch (error) {
-      logger.error(`❌ Lỗi lấy danh sách nhà xe: ${(error as Error).message}`);
+      logger.error(`Lỗi lấy danh sách nhà xe: ${(error as Error).message}`);
       return ServiceResponse.failure("Lỗi hệ thống", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 
-  // 🔍 Lấy chi tiết theo ID
+  // Lấy chi tiết theo ID
   async findById(id: number): Promise<ServiceResponse<BusCompany | null>> {
     try {
       const company = await this.repository.findByIdAsync(id);
@@ -32,23 +38,23 @@ export class BusCompanyService {
       }
       return ServiceResponse.success("Thông tin nhà xe", company);
     } catch (error) {
-      logger.error(`❌ Lỗi lấy nhà xe ID ${id}: ${(error as Error).message}`);
+      logger.error(`Lỗi lấy nhà xe ID ${id}: ${(error as Error).message}`);
       return ServiceResponse.failure("Lỗi hệ thống", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 
-  // 🆕 Tạo mới
+  // Tạo mới
   async create(data: Omit<BusCompany, "id">): Promise<ServiceResponse<number | null>> {
     try {
       const newId = await this.repository.createAsync(data);
       return ServiceResponse.success("Tạo nhà xe thành công", newId);
     } catch (error) {
-      logger.error(`❌ Lỗi tạo nhà xe: ${(error as Error).message}`);
+      logger.error(`Lỗi tạo nhà xe: ${(error as Error).message}`);
       return ServiceResponse.failure("Lỗi hệ thống", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 
-  // ✏️ Cập nhật
+  // Cập nhật
   async update(id: number, data: Partial<BusCompany>): Promise<ServiceResponse<boolean>> {
     try {
       const updated = await this.repository.updateAsync(id, data);
@@ -57,12 +63,12 @@ export class BusCompanyService {
       }
       return ServiceResponse.success("Cập nhật thành công", true);
     } catch (error) {
-      logger.error(`❌ Lỗi cập nhật nhà xe ID ${id}: ${(error as Error).message}`);
+      logger.error(`Lỗi cập nhật nhà xe ID ${id}: ${(error as Error).message}`);
       return ServiceResponse.failure("Lỗi hệ thống", false, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 
-  // ❌ Xóa
+  // Xóa
   async delete(id: number): Promise<ServiceResponse<boolean>> {
     try {
       const deleted = await this.repository.deleteAsync(id);
@@ -71,7 +77,7 @@ export class BusCompanyService {
       }
       return ServiceResponse.success("Xóa nhà xe thành công", true);
     } catch (error) {
-      logger.error(`❌ Lỗi xóa nhà xe ID ${id}: ${(error as Error).message}`);
+      logger.error(`Lỗi xóa nhà xe ID ${id}: ${(error as Error).message}`);
       return ServiceResponse.failure("Lỗi hệ thống", false, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
