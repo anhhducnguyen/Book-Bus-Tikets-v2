@@ -56,23 +56,23 @@ export const CarQuerySchema = z.object({
       .min(1)
       .default(1)
       .describe("Số trang hiện tại (bắt đầu từ 1), dùng để phân trang"),
-      
+
     limit: z
       .coerce.number()
       .min(1)
       .default(10)
       .describe("Số lượng bản ghi trên mỗi trang, dùng để phân trang"),
-      
+
     name: z
       .string()
       .optional()
       .describe("Tùy chọn lọc theo tên xe, hỗ trợ tìm kiếm một phần"),
-      
+
     license_plate: z
       .string()
       .optional()
       .describe("Tùy chọn lọc theo biển số xe, hỗ trợ tìm kiếm một phần"),
-      
+
     sortBy: z
       .enum(["id:asc", "id:desc", "name:asc", "name:desc", "license_plate:asc", "license_plate:desc"])
       .default("id:asc")
@@ -100,25 +100,79 @@ export const CarDescriptionItemSchema = z.object({
   buses: z.array(CarSchema).describe("Danh sách xe thuộc nhà xe"),
 });
 
-// export const CreateCarSchema = z.object({
-//     body: z.object({
-//       name: z.string(),
-//       description: z.string(),
-//       license_plate: z.string(),
-//       capacity: z.number(),
-//       company_id: z.number(),
-//     }).openapi({
-//       example: {
-//         name: "Ford Transit",
-//         description: "A comfortable 16-seat van used for intercity travel.",
-//         license_plate: "51B-123.45",
-//         capacity: 16,
-//         company_id: 2,
-//       },
-//     }),
-//   });
-
 // Input Validation for 'GET users/:id' endpoint
 export const GetCarSchema = z.object({
   params: z.object({ id: commonValidations.id }),
+});
+
+export interface SeatConfig {
+  seat_type: "LUXURY" | "VIP" | "STANDARD";
+  quantity: number;
+  price: number;
+}
+
+export interface GenerateSeatsDto {
+  seat_config: SeatConfig[];
+}
+
+// export const SeatTypeEnum = z.enum(["LUXURY", "VIP", "STANDARD"]);
+
+// export const SeatConfigSchema = z.object({
+//   seat_type: SeatTypeEnum,
+//   quantity: z.number().int().positive(),
+//   price: z.number().int().positive()
+// });
+
+// export const GenerateSeatsByCarSchema = z.object({
+//   params: z.object({
+//     id: z.string().regex(/^\d+$/)
+//   }),
+//   body: z.object({
+//     seat_config: z.array(SeatConfigSchema).min(1)
+//   })
+// });
+
+
+export const SeatTypeEnum = z.enum(["LUXURY", "VIP", "STANDARD"]).describe("Loại ghế");
+
+// Cấu hình ghế đơn
+export const SeatConfigSchema = z.object({
+  seat_type: SeatTypeEnum.describe("Loại ghế: LUXURY, VIP hoặc STANDARD"),
+  quantity: z.number().int().positive().describe("Số lượng ghế thuộc loại này"),
+  price: z.number().int().positive().describe("Giá tiền cho mỗi ghế (đơn vị: VNĐ)")
+});
+
+// Schema yêu cầu tạo ghế theo xe
+export const GenerateSeatsByCarSchema = z.object({
+  params: z.object({
+    id: z.string().regex(/^\d+$/).describe("ID của xe (Car ID)")
+  }),
+  body: z.object({
+    seat_config: z.array(SeatConfigSchema).min(1).describe("Danh sách các loại ghế cần tạo")
+  })
+}).openapi({
+  example: {
+    params: {
+      id: "1"
+    },
+    body: {
+      seat_config: [
+        {
+          seat_type: "LUXURY",
+          quantity: 5,
+          price: 150000
+        },
+        {
+          seat_type: "VIP",
+          quantity: 10,
+          price: 100000
+        },
+        {
+          seat_type: "STANDARD",
+          quantity: 25,
+          price: 50000
+        }
+      ]
+    }
+  }
 });
