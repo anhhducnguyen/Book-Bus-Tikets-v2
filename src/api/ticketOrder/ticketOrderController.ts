@@ -63,6 +63,8 @@ class TicketOrderController {
   public getTicketOrdersByStatus: RequestHandler = async (req: Request, res: Response) => {
     try {
       const status = String(req.params.status);
+      console.log("status", status);
+      
       const { page = 1, limit = 10, sortBy = "ticketNumber", order = "asc", search = "" } = req.query;
       const serviceResponse = await ticketOrderService.getTicketOrdersByStatus(status, {
         page: Number(page),

@@ -104,13 +104,13 @@ export class TicketOrderRepository {
       "bus_companies.company_name as busCompanyName",
       "seats.seat_number"
     )
-    .join("payments", "tickets.id", "payments.ticket_id")
-    .join("users", "payments.user_id", "users.id")
-    .join("schedules", "tickets.schedule_id", "schedules.id")
-    .join("routes", "schedules.route_id", "routes.id")
-    .join("buses", "schedules.bus_id", "buses.id") 
-    .join("bus_companies", "buses.company_id", "bus_companies.id")
-    .join("seats", "tickets.seat_id", "seats.id")
+    .leftJoin("payments", "tickets.id", "payments.ticket_id")
+    .leftJoin("users", "payments.user_id", "users.id")
+    .leftJoin("schedules", "tickets.schedule_id", "schedules.id")
+    .leftJoin("routes", "schedules.route_id", "routes.id")
+    .leftJoin("buses", "schedules.bus_id", "buses.id") 
+    .leftJoin("bus_companies", "buses.company_id", "bus_companies.id")
+    .leftJoin("seats", "tickets.seat_id", "seats.id")
     .where("tickets.status", status)
 
     console.log("Query:", query.toSQL().sql);
