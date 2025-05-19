@@ -12,13 +12,18 @@ export class BusReviewController {
             const response = await busReviewService.getReviewStatsByCompany();
 
             res.status(response.statusCode).json({
+                success: response.statusCode < 400,
                 message: response.message,
-                data: response.responseObject,
+                responseObject: response.responseObject,
+                statusCode: response.statusCode
             });
         } catch (ex) {
             const errorMessage = (ex instanceof Error) ? ex.message : "Unexpected error";
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                success: false,
                 message: `An error occurred while getting review statistics: ${errorMessage}`,
+                responseObject: {},
+                statusCode: StatusCodes.INTERNAL_SERVER_ERROR
             });
         }
     };
