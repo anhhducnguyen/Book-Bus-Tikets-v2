@@ -92,7 +92,7 @@ export class TicketOrderService {
       const errorMessage = `Error finding ticket orders with status ${status}: ${(ex as Error).message}`;
       logger.error(errorMessage);
       return ServiceResponse.failure(
-        "An error occurred while retrieving ticket orders with the specified status.",
+        "An error occurred while retrieving ticket orders with the specified status." + errorMessage,
         null,
         StatusCodes.INTERNAL_SERVER_ERROR,
       );

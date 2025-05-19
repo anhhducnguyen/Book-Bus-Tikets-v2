@@ -25,6 +25,9 @@ ticketOrderRegistry.registerPath({
   path: "/ticket-orders",
   tags: ["Ticket order"],
   summary: "Hiển thị tất cả đơn đặt vé của tất cả người dùng",
+  description: `Phân trang<br />
+                Tìm kiếm theo: email<br />
+                Sắp xếp theo: ticketId, tickets.status, users.email, schedules.departure_time, routes.price, buses.license_plate, bus_companies.company_name, seats.seat_number<br />`,
   request: { query: GetAllTicketOrdersSchema.shape.query },
   responses: createApiResponse(z.array(TicketOrderSchema), "Success"),
 });

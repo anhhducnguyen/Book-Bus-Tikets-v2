@@ -66,3 +66,5 @@ export const GetTicketOrdersByStatusSchema = z.object({
     status: TicketStatusEnum.openapi({ example: "CANCELED", description: "Trạng thái vé" }),
   }),
 }).openapi("GetTicketOrdersByStatusRequest");
+
+export type TicketOrder = z.infer<typeof TicketOrderSchema>;

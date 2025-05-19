@@ -17,15 +17,15 @@ export class TicketOrderRepository {
     const offset = (page - 1) * limit;
 
     if (!sortBy.includes(".")) {
-    sortBy = `tickets.id`;
-    sortBy = `tickets.status`;
-    // sortBy = `users.first_name`;
-    sortBy = `users.email`;
-    sortBy = `schedules.departure_time`;
-    sortBy = `routes.price`;
-    sortBy = `buses.license_plate`;
-    sortBy = `bus_companies.company_name`;
-    sortBy = `seats.seat_number`;
+      sortBy = `tickets.id`;
+      sortBy = `tickets.status`;
+      // sortBy = `users.first_name`;
+      sortBy = `users.email`;
+      sortBy = `schedules.departure_time`;
+      sortBy = `routes.price`;
+      sortBy = `buses.license_plate`;
+      sortBy = `bus_companies.company_name`;
+      sortBy = `seats.seat_number`;
     }
 
     const query = db("tickets")
@@ -44,12 +44,12 @@ export class TicketOrderRepository {
       .join("users", "payments.user_id", "users.id")
       .join("schedules", "tickets.schedule_id", "schedules.id")
       .join("routes", "schedules.route_id", "routes.id")
-      .join("buses", "schedules.bus_id", "buses.id") 
+      .join("buses", "schedules.bus_id", "buses.id")
       .join("bus_companies", "buses.company_id", "bus_companies.id")
       .join("seats", "tickets.seat_id", "seats.id")
-      
+
     if (search) {
-      query.where(function() {
+      query.where(function () {
         this
           // .where("users.first_name", "like", `%${search}%`)
           // .orWhere("users.email", "like", `%${search}%`);
@@ -59,7 +59,7 @@ export class TicketOrderRepository {
     query.orderBy(sortBy, order)
       .limit(limit)
       .offset(offset);
-    console.log("Query:", query.toSQL().sql); 
+    console.log("Query:", query.toSQL().sql);
 
     return await query;
   }
@@ -82,7 +82,7 @@ export class TicketOrderRepository {
       .join("users", "payments.user_id", "users.id")
       .join("schedules", "tickets.schedule_id", "schedules.id")
       .join("routes", "schedules.route_id", "routes.id")
-      .join("buses", "schedules.bus_id", "buses.id") 
+      .join("buses", "schedules.bus_id", "buses.id")
       .join("bus_companies", "buses.company_id", "bus_companies.id")
       .join("seats", "tickets.seat_id", "seats.id")
       .where("bus_companies.id", companyId)
@@ -90,31 +90,35 @@ export class TicketOrderRepository {
     return await query;
   }
 
-  async getTicketOrdersByStatus(status: string) { 
+  async getTicketOrdersByStatus(status: string) {
 
-    const query = db("tickets")
-    .select(
-      "tickets.id as ticketId",
-      "tickets.status",
-      // "users.first_name as first_name",
-      "users.email as userEmail",
-      "schedules.departure_time",
-      "routes.price as price",
-      "buses.license_plate",
-      "bus_companies.company_name as busCompanyName",
-      "seats.seat_number"
-    )
-    .leftJoin("payments", "tickets.id", "payments.ticket_id")
-    .leftJoin("users", "payments.user_id", "users.id")
-    .leftJoin("schedules", "tickets.schedule_id", "schedules.id")
-    .leftJoin("routes", "schedules.route_id", "routes.id")
-    .leftJoin("buses", "schedules.bus_id", "buses.id") 
-    .leftJoin("bus_companies", "buses.company_id", "bus_companies.id")
-    .leftJoin("seats", "tickets.seat_id", "seats.id")
-    .where("tickets.status", status)
+    try {
+      const query = db("tickets")
+        .select(
+          "tickets.id as ticketId",
+          "tickets.status",
+          // "users.first_name as first_name",
+          "users.email as userEmail",
+          "schedules.departure_time",
+          "routes.price as price",
+          "buses.license_plate",
+          "bus_companies.company_name as busCompanyName",
+          "seats.seat_number"
+        )
+        .leftJoin("payments", "tickets.id", "payments.ticket_id")
+        .leftJoin("users", "payments.user_id", "users.id")
+        .leftJoin("schedules", "tickets.schedule_id", "schedules.id")
+        .leftJoin("routes", "schedules.route_id", "routes.id")
+        .leftJoin("buses", "schedules.bus_id", "buses.id")
+        .leftJoin("bus_companies", "buses.company_id", "bus_companies.id")
+        .leftJoin("seats", "tickets.seat_id", "seats.id")
+        .where("tickets.status", status)
 
-    console.log("Query:", query.toSQL().sql);
+      console.log("Query:", query.toSQL().sql);
 
-    return await query;
+      return await query;
+    } catch (error) {
+      throw error;
+    }
   }
 }
