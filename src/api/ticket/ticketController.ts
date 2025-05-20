@@ -3,6 +3,15 @@ import { ticketService } from "@/api/ticket/ticketService";
 import { StatusCodes } from "http-status-codes";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 
+// Định nghĩa interface cho thông tin người dùng trong req.user
+interface JwtPayload {
+  id: number;
+  email: string;
+  role: string;
+  iat: number;
+  exp: number;
+}
+
 class TicketController {
   // Lựa chọn tuyến đường đi
   public getRoutes: RequestHandler = async (_req: Request, res: Response) => {
@@ -26,27 +35,53 @@ class TicketController {
 
   // Đặt vé
   public bookTicket: RequestHandler = async (req: Request, res: Response) => {
-    const serviceResponse = await ticketService.bookTicket(req.body);
+    // Lấy thông tin người dùng hiện tại từ req.user
+    const currentUser = req.user as JwtPayload;
+    if (!currentUser || !currentUser.id) {
+      res.status(StatusCodes.UNAUTHORIZED).send(
+        ServiceResponse.failure("Chưa đăng nhập", null, StatusCodes.UNAUTHORIZED)
+      );
+      return;
+    }
+    const serviceResponse = await ticketService.bookTicket(req.body, {
+      id: currentUser.id,
+      email: currentUser.email,
+      role: currentUser.role,
+    });
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
 
   // Hủy vé
   public cancelTicket: RequestHandler = async (req: Request, res: Response) => {
     const ticketId = Number.parseInt(req.params.ticketId as string, 10);
-    const serviceResponse = await ticketService.cancelTicket(ticketId);
+    const { reason } = req.body;
+    // Lấy thông tin người dùng hiện tại từ req.user
+    const currentUser = req.user as JwtPayload;
+    if (!currentUser || !currentUser.id) {
+      res.status(StatusCodes.UNAUTHORIZED).send(
+        ServiceResponse.failure("Chưa đăng nhập", null, StatusCodes.UNAUTHORIZED)
+      );
+      return;
+    }
+    const serviceResponse = await ticketService.cancelTicket(ticketId, reason, {
+      id: currentUser.id,
+      email: currentUser.email,
+      role: currentUser.role,
+    });
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
 
   // Thêm mới thông tin hủy vé xe dành cho admin
   public createCancelTicket: RequestHandler = async (req: Request, res: Response) => {
-    const ticketId = Number.parseInt(req.body.ticketId as string, 10);
+    const ticketId = Number.parseInt(req.params.ticketId as string, 10);
+    const { reason } = req.body;
     if (isNaN(ticketId)) {
       res.status(StatusCodes.BAD_REQUEST).send(
         ServiceResponse.failure("Invalid ticketId. Must be a number", null, StatusCodes.BAD_REQUEST)
       );
       return;
     }
-    const serviceResponse = await ticketService.createCancelTicket(ticketId);
+    const serviceResponse = await ticketService.createCancelTicket(ticketId, reason);
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
 
@@ -83,46 +118,48 @@ class TicketController {
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
 
-  // Chọn phương thức thanh toán
-  public selectPaymentMethod: RequestHandler = async (req: Request, res: Response) => {
-    const ticketId = Number.parseInt(req.params.ticketId as string, 10);
-    const { paymentMethod, userId, amount } = req.body;
+  // // Chọn phương thức thanh toán
+  // public selectPaymentMethod: RequestHandler = async (req: Request, res: Response) => {
+  //   const ticketId = Number.parseInt(req.params.ticketId as string, 10);
+  //   const { paymentMethod, userId, amount } = req.body;
 
-    if (isNaN(ticketId)) {
-      res.status(StatusCodes.BAD_REQUEST).send(
-        ServiceResponse.failure("Invalid ticketId. Must be a number", null, StatusCodes.BAD_REQUEST)
-      );
-      return;
-    }
+  //   if (isNaN(ticketId)) {
+  //     res.status(StatusCodes.BAD_REQUEST).send(
+  //       ServiceResponse.failure("Invalid ticketId. Must be a number", null, StatusCodes.BAD_REQUEST)
+  //     );
+  //     return;
+  //   }
 
-    if (!paymentMethod || !["ONLINE", "CASH"].includes(paymentMethod)) {
-      res.status(StatusCodes.BAD_REQUEST).send(
-        ServiceResponse.failure("Invalid payment method. Must be ONLINE or CASH", null, StatusCodes.BAD_REQUEST)
-      );
-      return;
-    }
+  //   if (!paymentMethod || !["ONLINE", "CASH"].includes(paymentMethod)) {
+  //     res.status(StatusCodes.BAD_REQUEST).send(
+  //       ServiceResponse.failure("Invalid payment method. Must be ONLINE or CASH", null, StatusCodes.BAD_REQUEST)
+  //     );
+  //     return;
+  //   }
 
-    if (isNaN(userId)) {
-      res.status(StatusCodes.BAD_REQUEST).send(
-        ServiceResponse.failure("Invalid userId. Must be a number", null, StatusCodes.BAD_REQUEST)
-      );
-      return;
-    }
+  //   if (isNaN(userId)) {
+  //     res.status(StatusCodes.BAD_REQUEST).send(
+  //       ServiceResponse.failure("Invalid userId. Must be a number", null, StatusCodes.BAD_REQUEST)
+  //     );
+  //     return;
+  //   }
 
-    if (isNaN(amount) || amount <= 0) {
-      res.status(StatusCodes.BAD_REQUEST).send(
-        ServiceResponse.failure("Invalid amount. Must be a positive number", null, StatusCodes.BAD_REQUEST)
-      );
-      return;
-    }
+  //   if (isNaN(amount) || amount <= 0) {
+  //     res.status(StatusCodes.BAD_REQUEST).send(
+  //       ServiceResponse.failure("Invalid amount. Must be a positive number", null, StatusCodes.BAD_REQUEST)
+  //     );
+  //     return;
+  //   }
 
-    const serviceResponse = await ticketService.selectPaymentMethod(ticketId, paymentMethod, userId, amount);
-    res.status(serviceResponse.statusCode).send(serviceResponse);
-  };
+  //   const serviceResponse = await ticketService.selectPaymentMethod(ticketId, paymentMethod, userId, amount);
+  //   res.status(serviceResponse.statusCode).send(serviceResponse);
+  // };
 
   // Xóa thông tin hủy vé xe
+  
   public deleteCancelledTicket: RequestHandler = async (req: Request, res: Response) => {
     const ticketId = Number.parseInt(req.params.ticketId as string, 10);
+    const { reason } = req.body;
     if (isNaN(ticketId)) {
       res.status(StatusCodes.BAD_REQUEST).send(
         ServiceResponse.failure("Invalid ticketId. Must be a number", null, StatusCodes.BAD_REQUEST)
@@ -130,7 +167,7 @@ class TicketController {
       return;
     }
 
-    const serviceResponse = await ticketService.deleteCancelledTicket(ticketId);
+    const serviceResponse = await ticketService.deleteCancelledTicket(ticketId, reason);
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
 

@@ -94,10 +94,10 @@ export class TicketRepository {
   }
 
   // Hủy vé
-  async cancelTicket(ticketId: number): Promise<void> {
+  async cancelTicket(ticketId: number, reason: string): Promise<void> {
     await db<Ticket>("tickets")
       .where({ id: ticketId })
-      .update({ status: "CANCELLED", updated_at: new Date() });
+      .update({ status: "CANCELLED", reason: reason, updated_at: new Date() });
   }
 
   // Hiển thị lịch sử đặt vé theo trạng thái
@@ -116,7 +116,6 @@ export class TicketRepository {
       .select("tickets.*");
   }
 
-  
   // Xem lại tất cả lịch sử đặt vé
   async getAllTickets(): Promise<Ticket[]> {
     return await db("tickets").select("*");
@@ -140,8 +139,6 @@ export class TicketRepository {
       .where({ ticket_id: ticketId })
       .first();
   }
-
-
   
   async getTicketById(ticketId: number): Promise<Ticket | undefined> {
     return await db("tickets")
@@ -150,18 +147,23 @@ export class TicketRepository {
   }
 
   // Xóa thông tin hủy vé xe
-  async deleteCancelledTicket(ticketId: number): Promise<void> {
+  async deleteCancelledTicket(ticketId: number, reason: string): Promise<void> {
     await db("tickets")
-      .where({ id: ticketId, status: "CANCELLED" })
-      .del();
+      .where({ id: ticketId })
+      .update({
+        status: "BOOKED",
+        reason: reason,
+        updated_at: new Date(),
+      });
   }
   
   // Thêm mới thông tin hủy vé xe dành cho admin
-  async createCancelTicket(ticketId: number): Promise<void> {
+  async createCancelTicket(ticketId: number, reason: string): Promise<void> {
     await db("tickets")
       .where({ id: ticketId })
       .update({
         status: "CANCELLED",
+        reason: reason,
         updated_at: new Date(),
       });
   }
@@ -206,6 +208,15 @@ export class TicketRepository {
       created_at: new Date(ticket.created_at),
       updated_at: new Date(ticket.updated_at),
     };
+  }
+
+  // Lấy user_id của vé thông qua bảng payments
+  async getTicketUserId(ticketId: number): Promise<number | null> {
+    const payment = await db("payments")
+      .where({ ticket_id: ticketId })
+      .select("user_id")
+      .first();
+    return payment ? payment.user_id : null;
   }
 
 }
