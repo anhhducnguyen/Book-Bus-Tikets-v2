@@ -1,4 +1,3 @@
-import cors from "cors";
 import express, { type Express } from "express";
 import helmet from "helmet";
 import path from "path";
@@ -46,6 +45,8 @@ import sessionMiddleware from '@/common/middleware/sessionMiddleware';
 const logger = pino({ name: "server start" });
 const app: Express = express();
 
+
+
 // Set the application to trust the reverse proxy
 app.set("trust proxy", true);
 
@@ -61,6 +62,7 @@ app.use(passport.session());
 
 // app.use(passport.initialize());
 // app.use(passport.session());
+import cors from "cors";
 
 // Middlewares
 app.use(express.json());
