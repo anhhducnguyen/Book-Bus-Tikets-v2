@@ -1,192 +1,3 @@
-// import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
-// import express, { type Router } from "express";
-// import { z } from "zod";
-// import { commonValidations } from "@/common/utils/commonValidation";
-
-// import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-// import { BookTicketInputSchema, CancelTicketSchema, RouteSchema, BusSchema, PaymentSchema, SeatSchema, TicketSchema, TicketSearchSchema, TicketSearchQueryOnly } from "@/api/ticket/ticketModel";
-// import { validateRequest } from "@/common/utils/httpHandlers";
-// import { ticketController } from "./ticketController";
-// import { permission } from "@/common/middleware/auth/permission";
-
-// export const ticketRegistry = new OpenAPIRegistry();
-// export const ticketRouter: Router = express.Router();
-
-// // Lựa chọn tuyến đường đi
-// ticketRegistry.registerPath({
-//   method: "get",
-//   path: "/tickets/routes",
-//   tags: ["Ticket"],
-//   summary: "Lựa chọn tuyến đường đi",
-//   responses: createApiResponse(z.array(RouteSchema), "Success"),
-// });
-// ticketRouter.get("/routes", ticketController.getRoutes);
-
-// // Lựa chọn xe đi
-// ticketRegistry.registerPath({
-//   method: "get",
-//   path: "/tickets/routes/{routeId}/buses",
-//   tags: ["Ticket"],
-//   summary: "Lựa chọn xe đi",
-//   request: { params: z.object({ routeId: commonValidations.id }) },
-//   responses: createApiResponse(z.array(BusSchema), "Success"),
-// });
-// ticketRouter.get("/routes/:routeId/buses", ticketController.getBusesByRoute);
-
-// // Lựa chọn ghế đi
-// ticketRegistry.registerPath({
-//   method: "get",
-//   path: "/tickets/buses/{busId}/seats",
-//   tags: ["Ticket"],
-//   summary: "Lựa chọn ghế đi",
-//   request: { params: z.object({ busId: commonValidations.id }) },
-//   responses: createApiResponse(z.array(SeatSchema), "Success"),
-// });
-// ticketRouter.get("/buses/:busId/seats", ticketController.getAvailableSeats);
-
-// // Đặt vé
-// ticketRegistry.registerPath({
-//   method: "post",
-//   path: "/tickets/booking",
-//   tags: ["Ticket"],
-//   summary: "Đặt vé",
-//   request: {
-//     body: {
-//       content: {
-//         "application/json": {
-//           schema: BookTicketInputSchema, // Sử dụng schema đầu vào trực tiếp
-//         },
-//       },
-//     },
-//   },
-//   responses: createApiResponse(TicketSchema, "Success"),
-// });
-// ticketRouter.post("/tickets", ticketController.bookTicket);
-
-// // Hủy vé
-// ticketRegistry.registerPath({
-//   method: "delete",
-//   path: "/tickets/cancel/{ticketId}",
-//   tags: ["Ticket"],
-//   summary: "Hủy vé",
-//   request: { params: CancelTicketSchema.shape.params },
-//   responses: createApiResponse(z.void(), "Success"),
-// });
-// ticketRouter.delete("/tickets/:ticketId", validateRequest(CancelTicketSchema), ticketController.cancelTicket);
-
-// // Lịch sử đặt vé theo trạng thái
-// ticketRegistry.registerPath({
-//   method: "get",
-//   path: "/tickets/history_status/{status}",
-//   tags: ["Ticket"],
-//   summary: "Lịch sử đặt vé theo trạng thái",
-//   request: {
-//     params: z.object({
-//       status: z.enum(["BOOKED", "CANCELLED"]),
-//     }),
-//   },
-//   responses: createApiResponse(z.array(TicketSchema), "Success"),
-// });
-
-// // Thêm route mới: Lịch sử đặt vé theo nhà xe
-// ticketRegistry.registerPath({
-//   method: "get",
-//   path: "/tickets/history_companyid/{companyId}",
-//   tags: ["Ticket"],
-//   summary: "Lịch sử đặt vé theo nhà xe",
-//   request: {
-//     params: z.object({
-//       companyId: z.string().regex(/^\d+$/, "Company ID must be a numeric string"),
-//     }),
-//   },
-//   responses: createApiResponse(z.array(TicketSchema), "Success"),
-// });
-// ticketRouter.get("/history/:status", ticketController.getTicketsByStatus);
-
-// ticketRouter.get("/tickets/history/:companyId", ticketController.getTicketsByCompany);
-
-// // Xem tất cả lịch sử đặt vé
-// ticketRegistry.registerPath({
-//   method: "get",
-//   path: "/tickets/history",
-//   tags: ["Ticket"],
-//   summary: "Xem tất cả lịch sử đặt vé",
-//   responses: createApiResponse(z.array(TicketSchema), "Success"),
-// });
-// ticketRouter.get("/tickets/history", ticketController.getTicketHistory);
-
-// // Chọn phương thức thanh toán
-// ticketRegistry.registerPath({
-//   method: "post",
-//   path: "/tickets/payment/{ticketId}",
-//   tags: ["Ticket"],
-//   summary: "Chọn phương thức thanh toán",
-//   request: {
-//     params: z.object({
-//       ticketId: z.string().regex(/^\d+$/, "Ticket ID must be a numeric string"),
-//     }),
-//     body: {
-//       content: {
-//         "application/json": {
-//           schema: z.object({
-//             paymentMethod: z.enum(["ONLINE", "CASH"]),
-//             userId: z.number(),
-//             amount: z.number().positive(),
-//           }),
-//         },
-//       },
-//     },
-//   },
-//   responses: createApiResponse(PaymentSchema, "Success"),
-// });
-// ticketRouter.post("/payment/:ticketId", ticketController.selectPaymentMethod);
-
-// // Xóa thông tin hủy vé
-// ticketRegistry.registerPath({
-//   method: "delete",
-//   path: "/tickets/cancel_ticket/delete/{ticketId}",
-//   tags: ["Ticket"],
-//   summary: "Xóa thông tin hủy vé",
-//   request: {
-//     params: z.object({
-//       ticketId: z.string().regex(/^\d+$/, "Ticket ID must be a numeric string"),
-//     }),
-//   },
-//   responses: createApiResponse(z.any(), "Success"),
-// });
-// ticketRouter.delete("/cancel_ticket/delete/:ticketId", permission, ticketController.deleteCancelledTicket);
-
-
-// // Hiển thi danh sách thông tin hủy theo vé xe
-// ticketRegistry.registerPath({
-//   method: "get",
-//   path: "/tickets/cancel_ticket/list",
-//   tags: ["Ticket"],
-//   summary: "Hiển thi danh sách thông tin hủy theo vé xe cho admin",
-//   request: {
-//     params: z.object({}).strict(), // Không cần tham số
-//   },
-//   responses: createApiResponse(z.array(TicketSchema), "Success"),
-// });
-// ticketRouter.get("/cancel_ticket/list", permission, ticketController.getCancelledTickets);
-
-// //  Tra cứu vé xe bằng mã vé với số điện thoại
-// ticketRegistry.registerPath({
-//   method: "get",
-//   path: "/tickets/search",
-//   tags: ["Ticket"],
-//   operationId: "searchTicket",
-//   summary: "Tra cứu vé xe bằng mã vé và số điện thoại",
-//   request: {
-//     query: TicketSearchQueryOnly,
-//   },
-//   responses: createApiResponse(TicketSchema, "Successfully found the ticket", 200),
-// });
-
-// // Trong router:
-// ticketRouter.get("/search", validateRequest(TicketSearchSchema), ticketController.searchTicketByIdAndPhone);
-
-
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import express, { type Router } from "express";
 import { z } from "zod";
@@ -280,19 +91,20 @@ ticketRegistry.registerPath({
   tags: ["Ticket"],
   summary: "Đặt vé",
   description: `Đặt vé<br /> 
-                - Chức năng này sẽ cho phép người dùng nhập id user của mình, id tuyến đường, id xe khách và id ghế mình chọn để đặt vé.<br />
+                - Chức năng này sẽ cho phép người dùng nhập id tuyến đường, id xe khách, id ghế mình chọn và phương thức thanh toán để đặt vé.<br />
+                - Vé sẽ tự động được đặt cho người dùng hiện tại (dựa trên token xác thực)<br />
                 - Chức năng này ta cần nhập body có dạng sau để đặt vé:<br />
                 {<br />
-                  "user_id": 1,<br />
                   "route_id": 1,<br />
                   "bus_id": 1,<br />
                   "seat_id": 1<br />
+                  "paymentMethod": "ONLINE"<br />
                 }<br />
-                user_id: Id của người dùng<br />
                 route_id: Id tuyến đường mình chọn<br />
                 bus_Id: Id xe khách mình chọn<br />
                 seat_id: Id ghế mình chọn<br />
-                Note: Nếu tuyến đường và xe không có trong lịch trình (schedule) thì sẽ có thông báo và vé sẽ không được đặt. Tương tự, xe phải thuộc tuyến đường mình chọn và ghế cũng phải thuộc chiếc xe đó.`,
+                paymentMethod: Phương thức thanh toán ('ONLINE' hoặc 'CASH')<br />
+                <b>Note: Nếu tuyến đường và xe không có trong lịch trình (schedule) thì sẽ có thông báo và vé sẽ không được đặt. Tương tự, xe phải thuộc tuyến đường mình chọn và ghế cũng phải thuộc chiếc xe đó.</b>`,
   request: {
     body: {
       content: {
@@ -308,21 +120,35 @@ ticketRouter.post("/booking", authenticate, ticketController.bookTicket);
 
 // Hủy vé
 ticketRegistry.registerPath({
-  method: "delete",
+  method: "put",
   path: "/tickets/cancel/{ticketId}",
   tags: ["Ticket"],
   summary: "Hủy vé",
   description: `Hủy vé<br /> 
-                - Chức năng này sẽ cho phép người dùng nhập id vé xe và chuyển sang trạng thái Cancelled(đã hủy)<br />
-                - Chức năng này ta cần nhập ID của vé xe mình chọn<br />
-                ticketId: Id vé xe<br />`,
-  request: { params: CancelTicketSchema.shape.params },
+                - Chức năng này sẽ cho phép người dùng nhập id vé xe và lý do hủy, sau đó chuyển sang trạng thái Cancelled(đã hủy)<br />
+                - Chức năng này ta cần nhập ID của vé xe mình chọn và lý do hủy trong body<br />
+                <b>Note: Người dùng chỉ có thể hủy vé của chính mình. Hãy xem lịch sử đặt vé và tìm vé mình vừa đặt.</b>
+                ticketId: Id vé xe<br />
+                Body:<br />
+                {<br />
+                  "reason": "Lý do hủy vé (ví dụ: Hủy do thay đổi lịch trình)"<br />
+                }<br />`,
+  request: { 
+    params: CancelTicketSchema.shape.params,
+    body: {
+      content: {
+        "application/json": {
+          schema: CancelTicketSchema.shape.body,
+        },
+      },
+    },
+  },
   responses: createApiResponse(
     z.null().openapi({ description: "No content" }),
     "Success"
   ),
 });
-ticketRouter.delete("/cancel/:ticketId", authenticate, validateRequest(CancelTicketSchema), ticketController.cancelTicket);
+ticketRouter.put("/cancel/:ticketId", authenticate, validateRequest(CancelTicketSchema), ticketController.cancelTicket);
 
 
 // Lịch sử đặt vé theo trạng thái
@@ -410,23 +236,29 @@ ticketRouter.get("/history", authenticate, ticketController.getTicketHistory);
 
 // Thêm mới thông tin hủy vé xe dành cho admin
 ticketRegistry.registerPath({
-  method: "post",
-  path: "/tickets/cancel_ticket/add",
+  method: "put",
+  path: "/tickets/cancel_ticket/add/{ticketId}",
   tags: ["Ticket"],
-  summary: "Thêm mới thông tin hủy vé xe dành cho admin",
-  description: `Thêm mới thông tin hủy vé xe dành cho admin<br /> 
-                - Chức năng này sẽ cho phép quản trị viên nhập id vé xe mình muốn hủy và trạng thái của vé đó sẽ chuyển sang CANCELLED(Đã hủy)<br />
-                - Chức năng này ta cần nhập body có dạng sau:<br />
+  summary: "Cập nhật trạng thái vé thành CANCELLED cho admin",
+  description: `Cập nhật trạng thái vé thành CANCELLED cho admin<br /> 
+                - Chức năng này sẽ cho phép quản trị viên nhập id vé xe mình muốn hủy, trạng thái của vé đó sẽ chuyển sang CANCELLED(Đã hủy) và giải phóng ghế<br />
+                - Chức năng này ta cần nhập params với ticketId và body có dạng sau:<br />
+                Params: {ticketId: "3"}<br />
+                Body:<br />
                 {<br />
-                  "ticketId": "3"<br />
+                  "reason": "Hủy vé theo yêu cầu admin"<br />
                 }<br />
-                ticketId: Id vé xe<br />`,
+                ticketId: Id vé xe<br />
+                reason: Lý do hủy vé (bắt buộc)<br />`,
   request: {
+    params: z.object({
+      ticketId: z.string().regex(/^\d+$/, "Ticket ID must be a numeric string"),
+    }),
     body: {
       content: {
         "application/json": {
           schema: z.object({
-            ticketId: z.string().regex(/^\d+$/, "Ticket ID must be a numeric string"),
+            reason: z.string().min(1, "Reason is required"),
           }),
         },
       },
@@ -434,7 +266,7 @@ ticketRegistry.registerPath({
   },
   responses: createApiResponse(z.any(), "Success"),
 });
-ticketRouter.post("/cancel_ticket/add", authenticate, permission, ticketController.createCancelTicket);
+ticketRouter.put("/cancel_ticket/add/:ticketId", authenticate, permission, ticketController.createCancelTicket);
 
 // Hiển thi danh sách thông tin hủy theo vé xe
 ticketRegistry.registerPath({
@@ -475,7 +307,7 @@ ticketRegistry.registerPath({
                 ticketId: Id vé xe<br />
                 phoneNumber: Số điện thoại có người đặt mã vé đó.<br />
                 - VD: Mã vé 1 cửa người dùng 1 đặt với số điện thoại là 0256568962<br />
-                Note: Số điện thoại đăng ký cần có 10 số, mã vé phải được đặt bởi ngời dùng có số điện thoại đó.
+                Note: Số điện thoại đăng ký cần có 10 số, mã vé phải được đặt bởi ngời dùng có số điện thoại đó.<br />
                 <br />
                 <b>id</b>: Id vé<br />
                 <b>schedule_id</b>: Id lịch trình<br />
@@ -499,40 +331,20 @@ ticketRouter.get("/search", validateRequest(TicketSearchSchema), ticketControlle
 
 // Xóa thông tin hủy vé
 ticketRegistry.registerPath({
-  method: "delete",
+  method: "put",
   path: "/tickets/cancel_ticket/delete/{ticketId}",
   tags: ["Ticket"],
-  summary: "Xóa thông tin hủy vé cho admin",
-  description: `Xóa thông tin hủy vé cho admin<br /> 
-                - Chức năng này sẽ cho phép quản trị viên nhập id vé xe đã hủy mình muốn xóa và xóa vé xe đó khỏi danh sách<br />
-                - Chức năng này ta cần nhập ID của vé xe đã hủy<br />
-                ticketId: Id vé xe<br />`,
-  request: {
-    params: z.object({
-      ticketId: z.string().regex(/^\d+$/, "Ticket ID must be a numeric string"),
-    }),
-  },
-  responses: createApiResponse(z.any(), "Success"),
-});
-ticketRouter.delete("/cancel_ticket/delete/:ticketId", authenticate, permission, ticketController.deleteCancelledTicket);
-
-// Chọn phương thức thanh toán
-ticketRegistry.registerPath({
-  method: "post",
-  path: "tickets/payment/{ticketId}",
-  tags: ["Ticket"],
-  summary: "Chọn phương thức thanh toán",
-  description: `Chọn phương thức thanh toán<br /> 
-                - Chức năng này sẽ cho phép nhập <br />
-                - Chức năng này ta cần nhập body theo dạng sau: <br />
+  summary: "Cập nhật trạng thái vé từ CANCELLED thành BOOKED cho admin",
+  description: `Cập nhật trạng thái vé từ CANCELLED thành BOOKED cho admin<br /> 
+                - Chức năng này sẽ cho phép quản trị viên nhập id vé xe đã hủy và chuyển trạng thái của vé đó từ CANCELLED về BOOKED, kèm theo lý do khôi phục.<br />
+                - Chức năng này ta cần nhập params với ticketId và body có dạng sau:<br />
+                Params: {ticketId: "3"}<br />
+                Body:<br />
                 {<br />
-                  "paymentMethod": "CASH", <br />
-                  "userId": 1, <br />
-                  "amount": 50 <br />
+                  "reason": "Khôi phục do lỗi hủy vé"<br />
                 }<br />
-                "paymentMethod": Phương thức thanh toán ('CASH', 'ONLINE')<br />
-                "userId": Id người dùng<br />
-                "amount": Tổng số tiền thanh toán<br />`,
+                ticketId: Id vé xe<br />
+                reason: Lý do khôi phục vé (bắt buộc)<br />`,
   request: {
     params: z.object({
       ticketId: z.string().regex(/^\d+$/, "Ticket ID must be a numeric string"),
@@ -541,14 +353,49 @@ ticketRegistry.registerPath({
       content: {
         "application/json": {
           schema: z.object({
-            paymentMethod: z.enum(["ONLINE", "CASH"]),
-            userId: z.number(),
-            amount: z.number().positive(),
+            reason: z.string().min(1, "Reason is required"),
           }),
         },
       },
     },
   },
-  responses: createApiResponse(PaymentSchema, "Success"),
+  responses: createApiResponse(z.any(), "Success"),
 });
-ticketRouter.post("/payment/:ticketId", ticketController.selectPaymentMethod);
+ticketRouter.put("/cancel_ticket/delete/:ticketId", authenticate, permission, ticketController.deleteCancelledTicket);
+
+// // Chọn phương thức thanh toán
+// ticketRegistry.registerPath({
+//   method: "post",
+//   path: "tickets/payment/{ticketId}",
+//   tags: ["Ticket"],
+//   summary: "Chọn phương thức thanh toán",
+//   description: `Chọn phương thức thanh toán<br /> 
+//                 - Chức năng này sẽ cho phép nhập <br />
+//                 - Chức năng này ta cần nhập body theo dạng sau: <br />
+//                 {<br />
+//                   "paymentMethod": "CASH", <br />
+//                   "userId": 1, <br />
+//                   "amount": 50 <br />
+//                 }<br />
+//                 "paymentMethod": Phương thức thanh toán ('CASH', 'ONLINE')<br />
+//                 "userId": Id người dùng<br />
+//                 "amount": Tổng số tiền thanh toán<br />`,
+//   request: {
+//     params: z.object({
+//       ticketId: z.string().regex(/^\d+$/, "Ticket ID must be a numeric string"),
+//     }),
+//     body: {
+//       content: {
+//         "application/json": {
+//           schema: z.object({
+//             paymentMethod: z.enum(["ONLINE", "CASH"]),
+//             userId: z.number(),
+//             amount: z.number().positive(),
+//           }),
+//         },
+//       },
+//     },
+//   },
+//   responses: createApiResponse(PaymentSchema, "Success"),
+// });
+// ticketRouter.post("/payment/:ticketId", authenticate, ticketController.selectPaymentMethod);

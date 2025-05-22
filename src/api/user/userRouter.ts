@@ -6,7 +6,6 @@ import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { 
 	GetUserSchema,
 	UserSchema, 
-	CreateUserSchema,
 	UserQuerySchema,
 	PaginatedUsersResponseSchema
 } from "@/api/user/userModel";
@@ -29,7 +28,6 @@ userRegistry.registerPath({
 	tags: ["User"],
 	summary: "Hiển thị tất cả người dùng (phân trang, sắp xếp theo id hoặc email, tìm kiếm theo email)",
 	request: { query: UserQuerySchema.shape.query },
-	// responses: createApiResponse(z.array(UserSchema), "Success"),
 	responses: createApiResponse(PaginatedUsersResponseSchema, "Success"),
 
 });
@@ -53,41 +51,6 @@ userRouter.get("/:id",
 	validateRequest(GetUserSchema),
 	userController.getUser
 );
-
-// userRegistry.registerPath({
-// 	method: "post",
-// 	path: "/users",
-// 	tags: ["User"],
-// 	operationId: "createUser",
-// 	summary: "Thêm mới người dùng",
-// 		description: `
-// Thêm mới người dùng
-
-//   - **name**: Tên người dùng
-
-//   - **email**: Email người dùng
-
-//   - **age**: Tuổi người dùng
-  
-// `,
-// 	request: {
-// 		body: {
-// 			content: {
-// 				"application/json": {
-// 					schema: CreateUserSchema.shape.body,
-// 				},
-// 			},
-// 		},
-// 	},
-// 	responses: createApiResponse(UserSchema, "User created successfully", 201),
-// });
-
-// userRouter.post("/",
-// 	permission,
-// 	validateRequest(CreateUserSchema),
-// 	userController.createUser
-// );
-
 
 userRegistry.registerPath({
   method: "delete",

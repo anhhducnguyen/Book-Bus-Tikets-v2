@@ -15,6 +15,22 @@ findArrivalRegistry.registerPath({
     path: "/search/find-arrival",
     operationId: "searchSchedulesByStationName",
     summary: "Tìm kiếm lịch trình theo tên điểm đón, điểm đến và ngày khởi hành",
+    description: `Trường dữ liệu trả về:
+    - id: ID của lịch trình
+
+    - bus_id: ID của xe
+
+    - route_id: ID của tuyến đường
+
+    - departure_time: Thời gian khởi hành
+
+    - arrival_time: Thời gian đến   
+
+    - available_seats: Số ghế còn trống
+
+    - total_seats: Tổng số ghế
+
+    - status: Trạng thái của lịch trình`,
     tags: ["Statistical"],
     request: {
         query: SearchScheduleByStation,

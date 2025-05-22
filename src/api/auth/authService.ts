@@ -31,15 +31,17 @@ export class AuthService {
 		}
 	}
 
-	async register({ email, password }: { email: string; password: string }) {
+	async register({ email, phone, password }: { email: string; phone: string; password: string }) {
 		try {
+			const existingUser = await this.authRepository.findOne({ email });
+			if (existingUser) {
+				return ServiceResponse.failure("Email already exists", null, StatusCodes.CONFLICT);
+			}
 			const hashedPassword = await bcrypt.hash(password, 10);
-			await this.authRepository.createAsync({ email, password: hashedPassword });
+			await this.authRepository.createAsync({ email, phone, password: hashedPassword });
 
 			return { statusCode: 201, message: "User registered successfully" };
 		} catch (error) {
-			// console.error("Register service error:", error);
-			// return { statusCode: 500, message: "Server error" };
 			return ServiceResponse.failure("An error occurred while finding user." + error, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}

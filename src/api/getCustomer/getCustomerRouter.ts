@@ -20,6 +20,12 @@ getCustomerRegistry.registerPath({
     path: "/get-customer/statistics",
     operationId: "getCustomerStats",
     summary: "Thống kê số lượng khách hàng mới và trung thành",
+    description: `Trường dữ liệu trả về:
+    
+    - new_customers: Số lượng khách hàng mới trong tháng
+
+    - loyal_customers: Số lượng khách hàng trung thành trong tháng
+    `,
     tags: ["Statistical"],
     responses: createApiResponse(
         CustomerStatsSchema,
