@@ -30,10 +30,19 @@ getStationPassengerRegistry.registerPath({
   tags: ["Statistical"],
   operationId: "getStationFrequency",
   summary: "Thống kê tần suất hoạt động tại các bến xe (dựa vào số lượng khách)",
+  description: `Trường dữ liệu trả về:
+
+  - id: ID của bến xe
+
+  - station_name: Tên của bến xe
+
+  - departure_bookings: Số lượng đặt vé đi
+  
+  - arrival_bookings: Số lượng đặt vé đến`,
   responses: createApiResponse(z.any(), "Thành công"),
 });
 getStationPassengerRouter.get("/frequency",
   authenticate,
-  permission, 
+  permission,
   stationController.getStationFrequency);
 

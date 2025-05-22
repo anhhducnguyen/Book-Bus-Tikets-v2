@@ -20,6 +20,15 @@ getPaymentProviderRegistry.registerPath({
     path: "/getPaymentProvider/statistics",
     operationId: "getPaymentProviderStats",
     summary: "Thống kê số lượng giao dịch và doanh thu theo nhà cung cấp thanh toán",
+    description: `Trường dữ liệu trả về:
+
+    - provider_id: ID của nhà cung cấp thanh toán
+
+    - provider_name: Tên của nhà cung cấp thanh toán
+
+    - transation_count: Tổng số giao dịch
+    
+    - total_revenue: Doanh thu từ nhà cung cấp thanh toán`,
     tags: ["Statistical"],
     responses: createApiResponse(
         PaymentProviderStatListSchema,

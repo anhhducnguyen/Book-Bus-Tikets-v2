@@ -3,10 +3,10 @@ import express, { type Router } from "express";
 import { z } from "zod";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { 
-  GetCarSchema, 
-  CarSchema, 
-  CreateCarSchema, 
+import {
+  GetCarSchema,
+  CarSchema,
+  CreateCarSchema,
   UpdateCarSchema,
   CarQuerySchema,
   CarDescriptionItemSchema
@@ -130,7 +130,7 @@ carRegistry.registerPath({
   operationId: "createCar",
   summary: "Thêm mới xe",
   // description: "Create a new car with the provided details.",
-    description: `
+  description: `
 Thêm mới xe với các trường thông tin bắt buộc 
 
   - **name**: Tên của xe
