@@ -41,11 +41,12 @@ export class AuthRepository {
         }
     }
 
-    async createAsync(user: { email: string; password: string }) {
+    async createAsync(user: { email: string; phone: string; password: string }) {
         try {
             await db("users").insert({
                 email: user.email,
                 password: user.password,
+                phone: user.phone,
                 username: user.email.split("@")[0],
                 role: "user"
             });

@@ -31,10 +31,12 @@ export const SignUpSchema = z.object({
         .object({
             email: z.string().email().openapi({ example: "anhnguyen2k373@gmail.com" }),
             password: z.string().min(6).openapi({ example: "Ducanh12@#" }),
+            phone: z.string().min(9).max(15).regex(/^\+?[0-9]{9,15}$/, "Invalid phone number").openapi({ example: "+84987654321" }),
         })
         .openapi({
             example: {
                 email: "anhnguyen2k373@gmail.com",
+                phone: "+84987654321",
                 password: "Ducanh12@#",
             },
         }),
