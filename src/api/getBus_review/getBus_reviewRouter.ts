@@ -22,7 +22,16 @@ getBus_reviewRegistry.registerPath({
     method: "get",
     path: "/reviewbus-companies/review-stats",
     operationId: "getReviewStatsByCompany",
+
     summary: "Thống kê đánh giá (tích cực, tiêu cực) theo nhà xe",
+    description: `Trường dữ liệu trả về:
+    - **company_i**: ID của nhà xe
+
+    - **company_name**: Tên nhà xe
+
+    - **positive_reviews**: Số lượng đánh giá tích cực
+    
+    - **negative_reviews**: Số lượng đánh giá tiêu cực`,
     tags: ["Statistical"],
     responses: createApiResponse(
         z.array(

@@ -11,16 +11,20 @@ export class StationController {
             const response = await stationService.getMostPopularStations();
 
             res.status(response.statusCode).json({
+                success: true,
                 message: response.message,
-                route: response.responseObject,
+                responseObject: response.responseObject,
+                statusCode: response.statusCode,
             });
         } catch (error) {
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                success: false,
                 message: 'An unexpected error occurred while fetching the most popular route.',
+                responseObject: [],
+                statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
             });
         }
     };
-
 }
 
 export const stationController = new StationController();

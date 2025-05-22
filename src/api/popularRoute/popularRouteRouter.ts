@@ -32,6 +32,7 @@ popularRouteRegistry.registerPath({
               departure_station: { type: "number" },
               arrival_station: { type: "number" },
               price: { type: "number" },
+              image: { type: "string" },
               duration: { type: "number" },
               distance: { type: "number" },
               trip_count: { type: "number" },  // Số chuyến đi cho tuyến đường này

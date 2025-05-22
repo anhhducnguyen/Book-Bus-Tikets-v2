@@ -10,9 +10,10 @@ export class StationRepository {
             .select(
                 's.id',
                 's.name',
+                's.image',
                 db.raw('COUNT(sch1.id) + COUNT(sch2.id) as total_schedules')
             )
-            .groupBy('s.id', 's.name')
+            .groupBy('s.id', 's.name', 's.image')
             .orderBy('total_schedules', 'desc')
             .limit(limit);
 

@@ -23,6 +23,18 @@ getTopReviewRegistry.registerPath({
     tags: ["Statistical"],
     operationId: "getTopReviewedRoutesByDestination",
     summary: "Lấy danh sách tuyến có đánh giá cao nhất theo điểm đến",
+    description: `Trường dữ liệu trả về:
+
+    - route_id: ID của tuyến đường
+
+    - departure_station_id: ID của trạm khởi hành
+
+    - arrival_station_id: ID của trạm đến
+
+    - average_rating: Điểm đánh giá trung bình
+    
+    - review_count: Số lượng đánh giá
+    `,
     parameters: [
         {
             name: "arrivalStationId",

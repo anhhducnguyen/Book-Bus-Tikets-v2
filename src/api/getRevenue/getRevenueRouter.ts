@@ -20,6 +20,16 @@ revenueRegistry.registerPath({
     path: "/revenues/by-route",
     operationId: "getRevenueByRoute",
     summary: "Thống kê doanh thu theo tuyến đường trong khoảng thời gian",
+    description: `Trường dữ liệu trả về:
+
+    - route_id: ID của tuyến đường
+
+    - route_price: Tên của tuyến đường
+
+    - total_revenue: Doanh thu từ tuyến đường
+    
+    - total_tickets: Tổng số vé đã bán`,
+
     tags: ["Statistical"],
     parameters: [
         {

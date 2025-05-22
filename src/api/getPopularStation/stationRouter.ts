@@ -20,6 +20,15 @@ getPopularStationRegistry.registerPath({
     tags: ["Statistical"],
     operationId: "getMostPopularStations",
     summary: "Lấy danh sách bến xe phổ biến nhất theo số lượng lịch trình",
+    description: `Trường dữ liệu trả về:
+
+    - station_id: ID của bến xe
+
+    - station_name: Tên của bến xe
+
+    - image: URL ảnh đại diện
+    
+    - schedule_count: Số lượng lịch trình của bến xe`,
     responses: {
         200: {
             description: "Lấy danh sách bến xe phổ biến thành công",
@@ -36,6 +45,7 @@ getPopularStationRegistry.registerPath({
                                     properties: {
                                         station_id: { type: "number" },
                                         station_name: { type: "string" },
+                                        station_image: { type: "string" },
                                         schedule_count: { type: "number" },
                                     },
                                 },
