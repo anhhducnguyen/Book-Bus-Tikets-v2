@@ -20,38 +20,46 @@ import { db } from "@/common/config/database"; // Đảm bảo db được cấu
 }
 
 export class RouteRepository {
-  async findAllAsync(options: GetRoutesOptions): Promise<PaginatedResult<Routes>> {
+   async findAllAsync(options: GetRoutesOptions): Promise<PaginatedResult<Routes>> {
     const {
       page = 1,
       limit = 10,
       departure_station_id,
       arrival_station_id,
-      sortBy = 'created_at',
+      sortBy = 'routes.created_at', // lưu ý: cần prefix table
       order = 'asc',
     } = options;
 
     const offset = (page - 1) * limit;
 
-    // Query cơ bản có lọc
-    const baseQuery = db<Routes>('routes')
+    // Base query with joins
+    const baseQuery = db('routes')
+      .join('stations as departure', 'routes.departure_station_id', 'departure.id')
+      .join('stations as arrival', 'routes.arrival_station_id', 'arrival.id')
       .modify(qb => {
         if (departure_station_id) {
-          qb.where('departure_station_id', departure_station_id);
+          qb.where('routes.departure_station_id', departure_station_id);
         }
         if (arrival_station_id) {
-          qb.where('arrival_station_id', arrival_station_id);
+          qb.where('routes.arrival_station_id', arrival_station_id);
         }
       });
 
-    // Đếm tổng số bản ghi (clone để không ảnh hưởng query chính)
+    // Đếm tổng
     const [{ count }] = await baseQuery.clone().count('* as count');
     const total = Number(count);
     const totalPages = Math.ceil(total / limit);
 
-    // Lấy dữ liệu phân trang
+    // Lấy dữ liệu
     const results = await baseQuery
       .clone()
-      .select('*')
+      .select(
+        'routes.*',
+        'departure.name as departure_name',
+        'departure.image as departure_image',
+        'arrival.name as arrival_name',
+        'arrival.image as arrival_image'
+      )
       .orderBy(sortBy, order)
       .offset(offset)
       .limit(limit);
@@ -64,6 +72,9 @@ export class RouteRepository {
       totalPages
     };
   }
+
+
+
 
 
     //them moi mot tuyen duong
