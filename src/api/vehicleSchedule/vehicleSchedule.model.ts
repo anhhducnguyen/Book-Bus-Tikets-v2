@@ -26,6 +26,12 @@ export const CreateVehicleScheduleBodySchema = VehicleScheduleSchema.omit({
   id: true,
   created_at: true,
   updated_at: true,
+  total_seats: true,
+}).extend({
+  route_id: z.number().int(),
+  bus_id: z.number().int(),
+  departure_time: z.coerce.date(),
+  arrival_time: z.coerce.date(),
 });
 
 export const CreateVehicleScheduleSchema = z.object({

@@ -35,16 +35,8 @@ class VehicleScheduleController {
         res.status(StatusCodes.BAD_REQUEST).json({ message: "Schedule data is required." });
         return;
       }
-
       const serviceResponse = await vehicleScheduleService.createSchedule(scheduleData);
-      if (serviceResponse.statusCode === StatusCodes.CREATED) {
-        res.status(StatusCodes.CREATED).json({
-          schedule: serviceResponse.responseObject,
-          message: serviceResponse.message,
-        });
-      } else {
-        res.status(serviceResponse.statusCode).json({ message: serviceResponse.message });
-      }
+      res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error) {
       console.error("Error in createSchedule:", error);
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });

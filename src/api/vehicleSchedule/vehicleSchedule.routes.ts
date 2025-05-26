@@ -101,15 +101,8 @@ vehicleScheduleRegistry.registerPath({
                 type: "integer",
                 format: "int32",
                 minimum: 0,
-                example: 30,
+                example: 20,
                 description: "Số ghế còn trống",
-              },
-              total_seats: {
-                type: "integer",
-                format: "int32",
-                minimum: 0,
-                example: 40,
-                description: "Tổng số ghế của xe",
               },
               status: {
                 type: "string",
