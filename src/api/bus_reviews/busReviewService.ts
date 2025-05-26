@@ -44,7 +44,7 @@ export class BusReviewService {
     } catch (ex) {
         const errorMessage = `Error creating Review: ${(ex as Error).message}`;
         logger.error(errorMessage);
-        return ServiceResponse.failure("An error occurred while creating Route.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+        return ServiceResponse.failure("An error occurred while creating Route."+errorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
 }
 
