@@ -95,13 +95,13 @@ class TicketController {
       return;
     }
     console.log("Received status:", status);
-    if (status !== "BOOKED" && status !== "CANCELLED") {
+    if (status !== "BOOKED" && status !== "CANCELED") {
       res.status(StatusCodes.BAD_REQUEST).send(
         ServiceResponse.failure("Invalid status. Must be 'BOOKED' or 'CANCELLED'", null, StatusCodes.BAD_REQUEST)
       );
-      return; 
+      return;
     }
-    const serviceResponse = await ticketService.getTicketsByStatus(status as "BOOKED" | "CANCELLED");
+    const serviceResponse = await ticketService.getTicketsByStatus(status as "BOOKED" | "CANCELED");
     res.status(serviceResponse.statusCode).send(serviceResponse);
   }
 
@@ -156,7 +156,7 @@ class TicketController {
   // };
 
   // Xóa thông tin hủy vé xe
-  
+
   public deleteCancelledTicket: RequestHandler = async (req: Request, res: Response) => {
     const ticketId = Number.parseInt(req.params.ticketId as string, 10);
     const { reason } = req.body;

@@ -93,11 +93,11 @@ export class TicketService {
     try {
       const parsedInput = BookTicketInputSchema.parse(input);
       const { route_id, bus_id, seat_id, payment_method } = parsedInput;
-  
+
       // Kiểm tra tuyến đường
       const route = await db("routes").where({ id: route_id }).first();
       if (!route) return ServiceResponse.failure("Route not found", null, StatusCodes.NOT_FOUND);
-  
+
       // Lấy schedule
       const schedule = await db("schedules")
         .where({ route_id: route_id, bus_id: bus_id, status: "AVAILABLE" })
@@ -107,7 +107,7 @@ export class TicketService {
       if (!schedule || schedule.available_seats <= 0) {
         return ServiceResponse.failure("No available schedule for this bus and route", null, StatusCodes.BAD_REQUEST);
       }
-  
+
       // Kiểm tra ghế và xe
       const seat = await db("seats").where({ id: seat_id, bus_id: bus_id, status: "AVAILABLE" }).first();
       if (!seat) {
@@ -121,29 +121,29 @@ export class TicketService {
       if (existingTicket) {
         return ServiceResponse.failure("Seat is already booked", null, StatusCodes.BAD_REQUEST);
       }
-  
+
       const totalPrice = route.price + seat.price_for_type_seat;
       if (totalPrice <= 0 || totalPrice > 9999999999) { // Giới hạn giá tiền hợp lý
-      return ServiceResponse.failure("Invalid ticket price", null, StatusCodes.BAD_REQUEST);
+        return ServiceResponse.failure("Invalid ticket price", null, StatusCodes.BAD_REQUEST);
       }
       logger.info(`Calculated total price: ${totalPrice}, Route: ${route.price}, Seat: ${seat.price_for_type_seat}`);
-    
+
       // Tạo ticket
       const ticketData = {
-      seat_id: seat_id,
-      schedule_id: schedule.id,
-      departure_time: schedule.departure_time,
-      arrival_time: schedule.arrival_time,
-      seat_type: seat.seat_type,
-      price: totalPrice,
-      status: "BOOKED" as const,
-      created_at: new Date(),
-      updated_at: new Date(),
+        seat_id: seat_id,
+        schedule_id: schedule.id,
+        departure_time: schedule.departure_time,
+        arrival_time: schedule.arrival_time,
+        seat_type: seat.seat_type,
+        price: totalPrice,
+        status: "BOOKED" as const,
+        created_at: new Date(),
+        updated_at: new Date(),
       };
-  
+
       const [ticketId] = await db("tickets").insert(ticketData);
       const ticket = { id: ticketId, ...ticketData };
-  
+
       // Cập nhật trạng thái
       await db("seats").where({ id: seat_id }).update({ status: "BOOKED" });
       await db("schedules").where({ id: schedule.id }).decrement("available_seats", 1);
@@ -157,7 +157,7 @@ export class TicketService {
         status: "PENDING" as const,
       };
       await this.ticketRepository.createOrUpdatePayment(paymentData);
-  
+
       return ServiceResponse.success<Ticket>("Ticket booked successfully", ticket);
     } catch (error) {
       logger.error(`Error booking ticket: ${(error as Error).message}`);
@@ -165,14 +165,14 @@ export class TicketService {
     }
   }
 
-    // Hủy vé
+  // Hủy vé
   async cancelTicket(ticketId: number, reason: string, currentUser: CurrentUser): Promise<ServiceResponse<null>> {
     try {
       const ticket = await db<Ticket>("tickets").where({ id: ticketId }).first();
       if (!ticket) {
         return ServiceResponse.failure("Ticket not found", null, StatusCodes.NOT_FOUND);
       }
-      if (ticket.status === "CANCELLED") {
+      if (ticket.status === "CANCELED") {
         return ServiceResponse.failure("Ticket already cancelled", null, StatusCodes.BAD_REQUEST);
       }
 
@@ -208,7 +208,7 @@ export class TicketService {
   }
 
   // Hiển thị lịch sử đặt vé theo trạng thái
-  async getTicketsByStatus(status: "BOOKED" | "CANCELLED"): Promise<ServiceResponse<Ticket[] | null>> {
+  async getTicketsByStatus(status: "BOOKED" | "CANCELED"): Promise<ServiceResponse<Ticket[] | null>> {
     try {
       const tickets = await this.ticketRepository.getTicketsByStatus(status);
       if (!Array.isArray(tickets)) {
@@ -249,7 +249,7 @@ export class TicketService {
         logger.warn("Invalid data format returned from repository");
         return ServiceResponse.success<Ticket[]>("No tickets found", []);
       }
-  
+
       // Validate dữ liệu với TicketSchema
       const validatedTickets = TicketSchema.array().parse(tickets);
       return ServiceResponse.success<Ticket[]>("Tickets retrieved", validatedTickets);
@@ -268,7 +268,7 @@ export class TicketService {
         await trx.rollback();
         return ServiceResponse.failure("Ticket not found", null, StatusCodes.NOT_FOUND);
       }
-      if (ticket.status === "CANCELLED") {
+      if (ticket.status === "CANCELED") {
         await trx.rollback();
         return ServiceResponse.failure("Cannot select payment method for cancelled ticket", null, StatusCodes.BAD_REQUEST);
       }
@@ -307,7 +307,7 @@ export class TicketService {
       if (!ticket) {
         return ServiceResponse.failure("Ticket not found", null, StatusCodes.NOT_FOUND);
       }
-      if (ticket.status !== "CANCELLED") {
+      if (ticket.status !== "CANCELED") {
         return ServiceResponse.failure("Only cancelled tickets can be deleted", null, StatusCodes.BAD_REQUEST);
       }
 
@@ -325,7 +325,7 @@ export class TicketService {
   // Hiển thi danh sách thông tin hủy theo vé xe
   async getCancelledTickets(): Promise<ServiceResponse<Ticket[] | null>> {
     try {
-      const tickets = await this.ticketRepository.getTicketsByStatus("CANCELLED");
+      const tickets = await this.ticketRepository.getTicketsByStatus("CANCELED");
       if (!Array.isArray(tickets)) {
         logger.warn("Invalid data format returned from repository");
         return ServiceResponse.success<Ticket[]>("No cancelled tickets found", []);
@@ -372,7 +372,7 @@ export class TicketService {
       if (ticket.status !== "BOOKED") {
         return ServiceResponse.failure("Only booked tickets can be cancelled", null, StatusCodes.BAD_REQUEST);
       }
-      
+
       await this.ticketRepository.createCancelTicket(ticketId, reason);
       await db("seats").where({ id: ticket.seat_id }).update({ status: "AVAILABLE" });
       await db("schedules").where({ id: ticket.schedule_id }).increment("available_seats", 1);
