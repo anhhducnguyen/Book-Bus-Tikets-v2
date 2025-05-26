@@ -86,28 +86,63 @@ interface GetBusReviewOptions {
 
 
     //them moi mot review
-    async createBusReviewAsync(data: Omit<BusReview, "id" | "created_at" | "updated_at">): Promise<BusReview> {
-            try {
-                // Tính toán thời gian cho createdAt và updatedAt nếu chưa có
-                const currentTime = new Date();
+    // async createBusReviewAsync(data: Omit<BusReview, "id" | "created_at" | "updated_at">): Promise<BusReview> {
+    //         try {
+    //             // Tính toán thời gian cho createdAt và updatedAt nếu chưa có
+    //             const currentTime = new Date();
     
-                //them 1 review moi
-                const [id] = await db('bus_reviews').insert({
-                    ...data,
-                    created_at: currentTime,
-                    updated_at: currentTime,
-                  });
+    //             //them 1 review moi
+    //             const [id] = await db('bus_reviews').insert({
+    //                 ...data,
+    //                 created_at: currentTime,
+    //                 updated_at: currentTime,
+    //               });
                   
-                  const [newBusReview] = await db('bus_reviews').where({ id }).select('*');
+    //               const [newBusReview] = await db('bus_reviews').where({ id }).select('*');
                   
-                  return newBusReview;
+    //               return newBusReview;
                   
-            } catch (error:unknown) {
-                throw new Error(`Error creating user: ${error.message}`);
-            }
+    //         } catch (error:unknown) {
+    //             throw new Error(`Error creating user: ${error.message}`);
+    //         }
     
+    //     }
+  async createBusReviewAsync(data: Omit<BusReview, "id" | "created_at" | "updated_at">): Promise<BusReview> {
+    try {
+        const currentTime = new Date();
+
+        
+        const completedTicket = await db('payments as p')
+            .join('tickets as t', 'p.ticket_id', 't.id')
+            .join('seats as s', 't.seat_id', 's.id')
+            .join('schedules as sch', 't.schedule_id', 'sch.id')
+            .where('p.user_id', data.user_id)
+            .andWhere('p.status', 'COMPLETED')
+            .andWhere('s.bus_id', data.bus_id)
+            .andWhere('sch.arrival_time', '<', currentTime)
+            .first();
+
+        if (!completedTicket) {
+            // throw new Error('Bạn chỉ có thể đánh giá sau khi đã hoàn thành chuyến đi.');
+            
         }
-    //Xoa mot binh luan
+
+        // Thêm review mới
+        const [id] = await db('bus_reviews').insert({
+            ...data,
+            created_at: currentTime,
+            updated_at: currentTime,
+        });
+
+        const [newBusReview] = await db('bus_reviews').where({ id }).select('*');
+        return newBusReview;
+
+    } catch (error: unknown) {
+        // throw new Error(`Error creating review: ${(error instanceof Error) ? error.message : 'Unknown error'}`);
+        throw error
+    }
+}
+    // //Xoa mot binh luan
     async deleteBusReviewAsync(id: number): Promise<BusReview | null> {
             try {
                 // Tìm review cần xóa
