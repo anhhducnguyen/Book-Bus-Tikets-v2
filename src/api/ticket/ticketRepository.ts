@@ -120,6 +120,25 @@ export class TicketRepository {
   async getAllTickets(): Promise<Ticket[]> {
     return await db("tickets").select("*");
   }
+  // Lấy lịch sử đặt vé theo user_id
+  async getTicketsByUserId(userId: number): Promise<Ticket[]> {
+    return await db("tickets")
+      .join("payments", "tickets.id", "payments.ticket_id")
+      .where("payments.user_id", userId)
+      .select(
+        "tickets.id",
+        "tickets.seat_id",
+        "tickets.schedule_id",
+        "tickets.departure_time",
+        "tickets.arrival_time",
+        "tickets.seat_type",
+        "tickets.price",
+        "tickets.status",
+        "tickets.created_at",
+        "tickets.updated_at",
+        "tickets.reason"
+      );
+  }
 
   // Chọn phương thức thanh toán
   async createOrUpdatePayment(paymentData: Omit<Payment, "id" | "created_at" | "updated_at">): Promise<Payment> {
