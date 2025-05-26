@@ -14,11 +14,17 @@ import {
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { vehicleScheduleController } from "./vehicleSchedule.controller";
 
+import { authenticate } from "@/common/middleware/auth/authMiddleware";
+import { permission } from "@/common/middleware/auth/permission";
+
+
 
 export const vehicleScheduleRegistry = new OpenAPIRegistry();
 export const vehicleScheduleRouter: Router = express.Router();
 
 // vehicleScheduleRouter.use(authenticate);
+vehicleScheduleRouter.use(authenticate);
+
 
 vehicleScheduleRegistry.register("VehicleSchedule", VehicleScheduleSchema);
 
@@ -37,6 +43,7 @@ vehicleScheduleRegistry.registerPath({
 
 vehicleScheduleRouter.get(
   "/",
+  permission,
   validateRequest(VehicleScheduleQuerySchema),
   vehicleScheduleController.getSchedules
 );
@@ -122,6 +129,7 @@ vehicleScheduleRegistry.registerPath({
 
 vehicleScheduleRouter.post(
   "/",
+  permission,
   validateRequest(CreateVehicleScheduleSchema),
   vehicleScheduleController.createSchedule
 );
@@ -161,6 +169,7 @@ vehicleScheduleRegistry.registerPath({
 
 vehicleScheduleRouter.put(
   "/:id",
+  permission,
   validateRequest(UpdateVehicleScheduleSchema),
   vehicleScheduleController.updateSchedule
 );
@@ -180,6 +189,7 @@ vehicleScheduleRegistry.registerPath({
 
 vehicleScheduleRouter.delete(
   "/:id",
+  permission,
   validateRequest(DeleteVehicleScheduleSchema),
   vehicleScheduleController.deleteSchedule
 );
