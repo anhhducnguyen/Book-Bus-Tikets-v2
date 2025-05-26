@@ -242,9 +242,18 @@ export class TicketService {
   }
 
   // Xem lại tất cả lịch sử đặt vé
-  async getTicketHistory(): Promise<ServiceResponse<Ticket[] | null>> {
+  async getTicketHistory(currentUser: CurrentUser): Promise<ServiceResponse<Ticket[] | null>> {
     try {
-      const tickets = await this.ticketRepository.getAllTickets();
+      let tickets: Ticket[];
+
+      if (currentUser.role === "ADMIN") {
+        // Admin xem toàn bộ lịch sử
+        tickets = await this.ticketRepository.getAllTickets();
+      } else {
+        // Người dùng thông thường chỉ xem lịch sử của chính mình
+        tickets = await this.ticketRepository.getTicketsByUserId(currentUser.id);
+      }
+
       if (!Array.isArray(tickets)) {
         logger.warn("Invalid data format returned from repository");
         return ServiceResponse.success<Ticket[]>("No tickets found", []);

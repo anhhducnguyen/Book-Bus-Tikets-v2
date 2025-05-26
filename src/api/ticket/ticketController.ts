@@ -114,7 +114,18 @@ class TicketController {
 
   // Xem tất cả lịch sử đặt vé
   public getTicketHistory: RequestHandler = async (req, res) => {
-    const serviceResponse = await ticketService.getTicketHistory();
+    const currentUser = req.user as JwtPayload;
+    if (!currentUser || !currentUser.id) {
+      res.status(StatusCodes.UNAUTHORIZED).send(
+        ServiceResponse.failure("Chưa đăng nhập", null, StatusCodes.UNAUTHORIZED)
+      );
+      return;
+    }
+    const serviceResponse = await ticketService.getTicketHistory({
+      id: currentUser.id,
+      email: currentUser.email,
+      role: currentUser.role,
+    });
     res.status(serviceResponse.statusCode).send(serviceResponse);
   };
 
