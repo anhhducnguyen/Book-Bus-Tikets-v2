@@ -146,8 +146,8 @@ stationRegistry.registerPath({
 
 stationRouter.post(
   "/",
-  // authenticate,
-  // permission,
+  authenticate,
+  permission,
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "wallpaper", maxCount: 1 },
@@ -209,8 +209,8 @@ stationRegistry.registerPath({
 
 stationRouter.put(
   "/:id",
-  // authenticate,
-  // permission,
+  authenticate,
+  permission,
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "wallpaper", maxCount: 1 },

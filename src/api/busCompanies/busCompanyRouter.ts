@@ -85,8 +85,8 @@ busCompanyRegistry.registerPath({
 
 busCompanyRouter.post(
   "/",
-  // authenticate,
-  // permission,
+  authenticate,
+  permission,
   upload.fields([
     { name: "image", maxCount: 1 },
   ]),
@@ -134,8 +134,8 @@ busCompanyRegistry.registerPath({
 });
 busCompanyRouter.put(
   "/:id",
-  // authenticate,
-  // permission,
+  authenticate,
+  permission,
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "wallpaper", maxCount: 1 },
