@@ -93,6 +93,7 @@ export class BusReviewController {
           res.status(response.statusCode).json({ message: response.message });
         }
       } catch (ex) {
+        console.log(ex);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
           ex,
           message: "An error occurred while creating review.",

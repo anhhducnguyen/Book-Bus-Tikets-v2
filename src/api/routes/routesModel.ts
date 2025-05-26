@@ -17,16 +17,21 @@ export const RoutesSchema = z.object({
     updated_at: z.date()
 
 });
-export const CreateRoutesSchema = z.object({
-	body: z.object({
-		departure_station_id: z.number(),
-		arrival_station_id: z.number(),
-		price: z.number(),
-		duration: z.number(),
-		distance: z.number(),
-		
 
-	}),
+export const CreateRoutesSchema = z.object({
+  body: z.object({
+    departure_station_id: z.number(),
+    arrival_station_id: z.number(),
+    price: z.number().min(0, "Giá phải >= 0"),
+    duration: z.number().min(0, "Thời gian phải >= 0"),
+    distance: z.number().min(0, "Khoảng cách phải >= 0"),
+  }).refine(
+    (data) => data.departure_station_id !== data.arrival_station_id,
+    {
+      path: ["arrival_station_id"], // chỉ ra lỗi nằm ở arrival_station_id
+      message: "Điểm đi và điểm đến không được trùng nhau",
+    }
+  ),
 });
 export const PaginatedRoutesResponseSchema = z.object({
   success: z.boolean(),
