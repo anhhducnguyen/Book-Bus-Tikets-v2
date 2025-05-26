@@ -179,7 +179,7 @@ ticketRegistry.registerPath({
   },
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
-ticketRouter.get("/history_status/:status", authenticate, ticketController.getTicketsByStatus);
+ticketRouter.get("/history_status/:status", authenticate, permission, ticketController.getTicketsByStatus);
 
 // Lịch sử đặt vé theo nhà xe
 ticketRegistry.registerPath({
@@ -209,7 +209,7 @@ ticketRegistry.registerPath({
   },
   responses: createApiResponse(z.array(TicketSchema), "Success"),
 });
-ticketRouter.get("/history_companyid/:companyId", authenticate, ticketController.getTicketsByCompany);
+ticketRouter.get("/history_companyid/:companyId", authenticate, permission, ticketController.getTicketsByCompany);
 
 // Xem tất cả lịch sử đặt vé
 ticketRegistry.registerPath({
