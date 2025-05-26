@@ -219,6 +219,8 @@ ticketRegistry.registerPath({
   summary: "Xem tất cả lịch sử đặt vé",
   description: `Xem tất cả lịch sử đặt vé<br /> 
                 - Chức năng này chỉ hiển thị danh sách lịch sử đặt vé<br />
+                - Admin có thể xem toàn bộ lịch sử đặt vé.<br />
+                - Người dùng thông thường chỉ xem được lịch sử đặt vé của chính mình.<br />
                 <br />
                 <b>id</b>: Id vé<br />
                 <b>schedule_id</b>: Id lịch trình<br />
@@ -227,7 +229,7 @@ ticketRegistry.registerPath({
                 <b>arrival_time</b>: Thời gian đến nơi<br />
                 <b>seat_type</b>: Loại ghế đã lựa chọn ('LUXURY', 'VIP', 'STANDARD')<br />
                 <b>price</b>: Giá tiền vé<br />
-                <b>status</b>: Trạng thái của vé ('BOOKED', 'CANCELLED')<br />
+                <b>status</b>: Trạng thái của vé ('BOOKED', 'CANCELED')<br />
                 <b>created_at</b>: Thời gian tạo vé<br />
                 <b>updated_at</b>: Thời gian cập nhật vé<br />`,
   responses: createApiResponse(z.array(TicketSchema), "Success"),
