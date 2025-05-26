@@ -20,7 +20,7 @@ export const ticketRouter: Router = express.Router();
 ticketRegistry.registerPath({
   method: "get",
   path: "/tickets/routes",
-  tags: ["Ticket"],
+  tags: ["Book tickets"],
   summary: "Lựa chọn tuyến đường đi",
   description: `Lựa chọn tuyến đường đi:<br /> 
                 - Chức năng này sẽ hiển thị danh sách tuyến đường để người dùng có thể lựa chọn tại chức năng đặt vé và để hướng tới đường dẫn cho chức năng lựa chọn xe<br />
@@ -41,7 +41,7 @@ ticketRouter.get("/routes", ticketController.getRoutes);
 ticketRegistry.registerPath({
   method: "get",
   path: "/tickets/routes/{routeId}/buses",
-  tags: ["Ticket"],
+  tags: ["Book tickets"],
   summary: "Lựa chọn xe đi",
   description: `Lựa chọn xe đi:<br /> 
                 - Chức năng này sẽ cho phép người dùng nhập id tuyến đường mình chọn và hiển thị danh sách tất cả các xe khách trên tuyến đường đó<br />
@@ -64,7 +64,7 @@ ticketRouter.get("/routes/:routeId/buses", authenticate, ticketController.getBus
 ticketRegistry.registerPath({
   method: "get",
   path: "/tickets/buses/{busId}/seats",
-  tags: ["Ticket"],
+  tags: ["Book tickets"],
   summary: "Lựa chọn ghế đi",
   description: `Lựa chọn ghế đi<br /> 
                 - Tương tự, chức năng này sẽ cho phép người dùng nhập id xe khách mình chọn và hiển thị danh sách tất cả các ghế trên tuyến đường đó<br />
@@ -88,7 +88,7 @@ ticketRouter.get("/buses/:busId/seats", ticketController.getAvailableSeats);
 ticketRegistry.registerPath({
   method: "post",
   path: "/tickets/booking",
-  tags: ["Ticket"],
+  tags: ["Book tickets"],
   summary: "Đặt vé",
   description: `Đặt vé<br /> 
                 - Chức năng này sẽ cho phép người dùng nhập id tuyến đường, id xe khách, id ghế mình chọn và phương thức thanh toán để đặt vé.<br />
@@ -122,7 +122,7 @@ ticketRouter.post("/booking", authenticate, ticketController.bookTicket);
 ticketRegistry.registerPath({
   method: "put",
   path: "/tickets/cancel/{ticketId}",
-  tags: ["Ticket"],
+  tags: ["Book tickets"],
   summary: "Hủy vé",
   description: `Hủy vé<br /> 
                 - Chức năng này sẽ cho phép người dùng nhập id vé xe và lý do hủy, sau đó chuyển sang trạng thái Cancelled(đã hủy)<br />
@@ -133,7 +133,7 @@ ticketRegistry.registerPath({
                 {<br />
                   "reason": "Lý do hủy vé (ví dụ: Hủy do thay đổi lịch trình)"<br />
                 }<br />`,
-  request: { 
+  request: {
     params: CancelTicketSchema.shape.params,
     body: {
       content: {
@@ -155,7 +155,7 @@ ticketRouter.put("/cancel/:ticketId", authenticate, validateRequest(CancelTicket
 ticketRegistry.registerPath({
   method: "get",
   path: "/tickets/history_status/{status}",
-  tags: ["Ticket"],
+  tags: ["Booking history"],
   summary: "Lịch sử đặt vé theo trạng thái",
   description: `Lịch sử đặt vé theo trạng thái<br /> 
                 - Chức năng này sẽ cho phép người dùng lựa chọn trạng thái vé xe và hiển thị danh sách lịch sử đặt vé theo trạng thái đó<br />
@@ -185,7 +185,7 @@ ticketRouter.get("/history_status/:status", authenticate, ticketController.getTi
 ticketRegistry.registerPath({
   method: "get",
   path: "/tickets/history_companyid/{companyId}",
-  tags: ["Ticket"],
+  tags: ["Booking history"],
   summary: "Lịch sử đặt vé theo nhà xe",
   description: `Lịch sử đặt vé theo nhà xe<br /> 
                 - Tương tự, chức năng này sẽ cho phép người dùng nhập id nhà xe mình chọn và hiển thị danh sách lịch sử đặt vé theo nhà xe đó<br />
@@ -215,7 +215,7 @@ ticketRouter.get("/history_companyid/:companyId", authenticate, ticketController
 ticketRegistry.registerPath({
   method: "get",
   path: "/tickets/history",
-  tags: ["Ticket"],
+  tags: ["Booking history"],
   summary: "Xem tất cả lịch sử đặt vé",
   description: `Xem tất cả lịch sử đặt vé<br /> 
                 - Chức năng này chỉ hiển thị danh sách lịch sử đặt vé<br />
@@ -369,7 +369,7 @@ ticketRouter.put("/cancel_ticket/delete/:ticketId", authenticate, permission, ti
 //   path: "tickets/payment/{ticketId}",
 //   tags: ["Ticket"],
 //   summary: "Chọn phương thức thanh toán",
-//   description: `Chọn phương thức thanh toán<br /> 
+//   description: `Chọn phương thức thanh toán<br />
 //                 - Chức năng này sẽ cho phép nhập <br />
 //                 - Chức năng này ta cần nhập body theo dạng sau: <br />
 //                 {<br />
