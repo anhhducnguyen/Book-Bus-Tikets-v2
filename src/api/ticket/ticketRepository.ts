@@ -41,19 +41,19 @@ export class TicketRepository {
       .andWhere("status", "AVAILABLE")
       .select("*");
   }
-  
+
   // Lấy thông tin schedule
   async getSchedule(routeId: number, busId: number): Promise<Schedule | null | undefined> {
     return await db<Schedule>("schedules")
-    .where("route_id", routeId)
-    .andWhere("bus_id", busId)
-    .andWhere("status", "AVAILABLE")
-    .andWhere("departure_time", ">", new Date())
-    .orderBy("departure_time", "asc")
-    .first();
+      .where("route_id", routeId)
+      .andWhere("bus_id", busId)
+      .andWhere("status", "AVAILABLE")
+      .andWhere("departure_time", ">", new Date())
+      .orderBy("departure_time", "asc")
+      .first();
   }
 
-// Đặt vé
+  // Đặt vé
   async bookTicket(ticketData: {
     seat_id: number;
     schedule_id: number;
@@ -63,15 +63,15 @@ export class TicketRepository {
     price: number;
   }): Promise<Ticket> {
     const newTicket = {
-      seat_id: ticketData.seat_id,  
-      schedule_id: ticketData.schedule_id, 
-      departure_time: ticketData.departure_time,  
-      arrival_time: ticketData.arrival_time,  
-      seat_type: ticketData.seat_type,  
+      seat_id: ticketData.seat_id,
+      schedule_id: ticketData.schedule_id,
+      departure_time: ticketData.departure_time,
+      arrival_time: ticketData.arrival_time,
+      seat_type: ticketData.seat_type,
       price: ticketData.price,
-      status: "BOOKED" as "BOOKED",  
-      created_at: new Date(),  
-      updated_at: new Date(),  
+      status: "BOOKED" as "BOOKED",
+      created_at: new Date(),
+      updated_at: new Date(),
     };
 
     // Insert vào cơ sở dữ liệu
@@ -97,11 +97,11 @@ export class TicketRepository {
   async cancelTicket(ticketId: number, reason: string): Promise<void> {
     await db<Ticket>("tickets")
       .where({ id: ticketId })
-      .update({ status: "CANCELLED", reason: reason, updated_at: new Date() });
+      .update({ status: "CANCELED", reason: reason, updated_at: new Date() });
   }
 
   // Hiển thị lịch sử đặt vé theo trạng thái
-  async getTicketsByStatus(status: "BOOKED" | "CANCELLED"): Promise<Ticket[]> {
+  async getTicketsByStatus(status: "BOOKED" | "CANCELED"): Promise<Ticket[]> {
     return await db("tickets")
       .where("status", status)
       .select("*");
@@ -139,7 +139,7 @@ export class TicketRepository {
       .where({ ticket_id: ticketId })
       .first();
   }
-  
+
   async getTicketById(ticketId: number): Promise<Ticket | undefined> {
     return await db("tickets")
       .where({ id: ticketId })
@@ -156,13 +156,13 @@ export class TicketRepository {
         updated_at: new Date(),
       });
   }
-  
+
   // Thêm mới thông tin hủy vé xe dành cho admin
   async createCancelTicket(ticketId: number, reason: string): Promise<void> {
     await db("tickets")
       .where({ id: ticketId })
       .update({
-        status: "CANCELLED",
+        status: "CANCELED",
         reason: reason,
         updated_at: new Date(),
       });
@@ -173,7 +173,7 @@ export class TicketRepository {
     await db("tickets")
       .where({ id: ticketId })
       .update({
-        status: "CANCELLED",
+        status: "CANCELED",
         updated_at: db.fn.now(),
       });
   }

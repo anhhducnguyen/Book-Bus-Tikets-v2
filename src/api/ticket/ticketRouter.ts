@@ -67,7 +67,7 @@ ticketRegistry.registerPath({
   tags: ["Book tickets"],
   summary: "Lựa chọn ghế đi",
   description: `Lựa chọn ghế đi<br /> 
-                - Tương tự, chức năng này sẽ cho phép người dùng nhập id xe khách mình chọn và hiển thị danh sách tất cả các ghế trên tuyến đường đó<br />
+                - Tương tự, chức năng này sẽ cho phép người dùng nhập id xe khách mình chọn và hiển thị danh sách tất cả các ghế còn trống trên tuyến đường đó<br />
                 - Chức năng này ta cần nhập ID của xe khách mình chọn<br />
                 busId: Id xe khách<br />
                 <br />
@@ -160,7 +160,7 @@ ticketRegistry.registerPath({
   description: `Lịch sử đặt vé theo trạng thái<br /> 
                 - Chức năng này sẽ cho phép người dùng lựa chọn trạng thái vé xe và hiển thị danh sách lịch sử đặt vé theo trạng thái đó<br />
                 - Chức năng này ta cần nhập ID của xe khách mình chọn<br />
-                status: Trạng thái vé (BOOKED, CANCELLED)<br />
+                status: Trạng thái vé (BOOKED, CANCELED)<br />
                 <br />
                 <b>id</b>: Id vé<br />
                 <b>schedule_id</b>: Id lịch trình<br />
@@ -169,12 +169,12 @@ ticketRegistry.registerPath({
                 <b>arrival_time</b>: Thời gian đến nơi<br />
                 <b>seat_type</b>: Loại ghế đã lựa chọn ('LUXURY', 'VIP', 'STANDARD')<br />
                 <b>price</b>: Giá tiền vé<br />
-                <b>status</b>: Trạng thái của vé ('BOOKED', 'CANCELLED')<br />
+                <b>status</b>: Trạng thái của vé ('BOOKED', 'CANCELED')<br />
                 <b>created_at</b>: Thời gian tạo vé<br />
                 <b>updated_at</b>: Thời gian cập nhật vé<br />`,
   request: {
     params: z.object({
-      status: z.enum(["BOOKED", "CANCELLED"]),
+      status: z.enum(["BOOKED", "CANCELED"]),
     }),
   },
   responses: createApiResponse(z.array(TicketSchema), "Success"),
@@ -199,7 +199,7 @@ ticketRegistry.registerPath({
                 <b>arrival_time</b>: Thời gian đến nơi<br />
                 <b>seat_type</b>: Loại ghế đã lựa chọn ('LUXURY', 'VIP', 'STANDARD')<br />
                 <b>price</b>: Giá tiền vé<br />
-                <b>status</b>: Trạng thái của vé ('BOOKED', 'CANCELLED')<br />
+                <b>status</b>: Trạng thái của vé ('BOOKED', 'CANCELED')<br />
                 <b>created_at</b>: Thời gian tạo vé<br />
                 <b>updated_at</b>: Thời gian cập nhật vé<br />`,
   request: {
@@ -239,9 +239,9 @@ ticketRegistry.registerPath({
   method: "put",
   path: "/tickets/cancel_ticket/add/{ticketId}",
   tags: ["Ticket"],
-  summary: "Cập nhật trạng thái vé thành CANCELLED cho admin",
-  description: `Cập nhật trạng thái vé thành CANCELLED cho admin<br /> 
-                - Chức năng này sẽ cho phép quản trị viên nhập id vé xe mình muốn hủy, trạng thái của vé đó sẽ chuyển sang CANCELLED(Đã hủy) và giải phóng ghế<br />
+  summary: "Cập nhật trạng thái vé thành CANCELED cho admin",
+  description: `Cập nhật trạng thái vé thành CANCELED cho admin<br /> 
+                - Chức năng này sẽ cho phép quản trị viên nhập id vé xe mình muốn hủy, trạng thái của vé đó sẽ chuyển sang CANCELED(Đã hủy) và giải phóng ghế<br />
                 - Chức năng này ta cần nhập params với ticketId và body có dạng sau:<br />
                 Params: {ticketId: "3"}<br />
                 Body:<br />
@@ -284,7 +284,7 @@ ticketRegistry.registerPath({
                 <b>arrival_time</b>: Thời gian đến nơi<br />
                 <b>seat_type</b>: Loại ghế đã lựa chọn ('LUXURY', 'VIP', 'STANDARD')<br />
                 <b>price</b>: Giá tiền vé<br />
-                <b>status</b>: Trạng thái của vé ('CANCELLED')<br />
+                <b>status</b>: Trạng thái của vé ('CANCELED')<br />
                 <b>created_at</b>: Thời gian tạo vé<br />
                 <b>updated_at</b>: Thời gian cập nhật vé<br />`,
   request: {
@@ -316,7 +316,7 @@ ticketRegistry.registerPath({
                 <b>arrival_time</b>: Thời gian đến nơi<br />
                 <b>seat_type</b>: Loại ghế đã lựa chọn ('LUXURY', 'VIP', 'STANDARD')<br />
                 <b>price</b>: Giá tiền vé<br />
-                <b>status</b>: Trạng thái của vé ('BOOKED', 'CANCELLED')<br />
+                <b>status</b>: Trạng thái của vé ('BOOKED', 'CANCELED')<br />
                 <b>created_at</b>: Thời gian tạo vé<br />
                 <b>updated_at</b>: Thời gian cập nhật vé<br />`,
   request: {
@@ -334,9 +334,9 @@ ticketRegistry.registerPath({
   method: "put",
   path: "/tickets/cancel_ticket/delete/{ticketId}",
   tags: ["Ticket"],
-  summary: "Cập nhật trạng thái vé từ CANCELLED thành BOOKED cho admin",
-  description: `Cập nhật trạng thái vé từ CANCELLED thành BOOKED cho admin<br /> 
-                - Chức năng này sẽ cho phép quản trị viên nhập id vé xe đã hủy và chuyển trạng thái của vé đó từ CANCELLED về BOOKED, kèm theo lý do khôi phục.<br />
+  summary: "Cập nhật trạng thái vé từ CANCELED thành BOOKED cho admin",
+  description: `Cập nhật trạng thái vé từ CANCELED thành BOOKED cho admin<br /> 
+                - Chức năng này sẽ cho phép quản trị viên nhập id vé xe đã hủy và chuyển trạng thái của vé đó từ CANCELED về BOOKED, kèm theo lý do khôi phục.<br />
                 - Chức năng này ta cần nhập params với ticketId và body có dạng sau:<br />
                 Params: {ticketId: "3"}<br />
                 Body:<br />
