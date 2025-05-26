@@ -92,6 +92,41 @@ export class CarService {
 		}
 	}
 
+	// async generateSeatByCarId(
+	// 	carId: number,
+	// 	payload: GenerateSeatsDto
+	// ): Promise<ServiceResponse<any>> {
+	// 	const car = await this.carRepository.findByIdAsync(carId);
+	// 	if (!car) {
+	// 		return ServiceResponse.failure("Car not found", null, StatusCodes.NOT_FOUND);
+	// 	}
+
+	// 	const exists = await this.carRepository.existingSeats(carId);
+	// 	if (exists) {
+	// 		return ServiceResponse.failure("Seats already exist", null, StatusCodes.CONFLICT);
+	// 	}
+
+	// 	let seatNumber = 1;
+	// 	const now = new Date();
+	// 	const seatsToInsert = [];
+
+	// 	for (const config of payload.seat_config) {
+	// 		for (let i = 0; i < config.quantity; i++) {
+	// 			seatsToInsert.push({
+	// 				bus_id: carId,
+	// 				seat_number: `S${seatNumber++}`,
+	// 				seat_type: config.seat_type,
+	// 				price_for_type_seat: config.price,
+	// 				status: "AVAILABLE",
+	// 				created_at: now,
+	// 				updated_at: now
+	// 			});
+	// 		}
+	// 	}
+
+	// 	await this.carRepository.insertSeats(seatsToInsert);
+	// 	return ServiceResponse.success("Seats created successfully", seatsToInsert);
+	// }
 	async generateSeatByCarId(
 		carId: number,
 		payload: GenerateSeatsDto
@@ -104,6 +139,18 @@ export class CarService {
 		const exists = await this.carRepository.existingSeats(carId);
 		if (exists) {
 			return ServiceResponse.failure("Seats already exist", null, StatusCodes.CONFLICT);
+		}
+
+		// 👇 Tính tổng số ghế cấu hình
+		const totalSeats = payload.seat_config.reduce((sum, config) => sum + config.quantity, 0);
+
+		// 👇 So sánh với capacity
+		if (totalSeats !== car.capacity) {
+			return ServiceResponse.failure(
+				`Seat configuration mismatch: expected ${car.capacity} seats but got ${totalSeats}`,
+				null,
+				StatusCodes.BAD_REQUEST
+			);
 		}
 
 		let seatNumber = 1;
@@ -127,6 +174,7 @@ export class CarService {
 		await this.carRepository.insertSeats(seatsToInsert);
 		return ServiceResponse.success("Seats created successfully", seatsToInsert);
 	}
+
 
 	async PopularGarage(): Promise<ServiceResponse<Car[] | null>> {
 		try {
