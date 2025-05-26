@@ -57,18 +57,50 @@ export class CarService {
 		}
 	}
 
+	// async createCar(data: Omit<Car, "id" | "created_at" | "updated_at">): Promise<ServiceResponse<Car | null>> {
+	// 	try {
+	// 		const newCar = await this.carRepository.createCarAsync(data);
+
+	// 		return ServiceResponse.success<Car>("Car created successfully", newCar, StatusCodes.CREATED);
+	// 	} catch (ex) {
+	// 		const errorMessage = `Error creating car: ${(ex as Error).message}`;
+	// 		console.error("Full error object:", ex);
+	// 		logger.error(errorMessage);
+	// 		return ServiceResponse.failure("An error occurred while creating car.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+	// 	}
+	// }
+
 	async createCar(data: Omit<Car, "id" | "created_at" | "updated_at">): Promise<ServiceResponse<Car | null>> {
 		try {
-			const newCar = await this.carRepository.createCarAsync(data);
+			// Kiểm tra xem đã có xe trùng tên chưa
+			const existingCar = await this.carRepository.findByNameAsync(data.name);
+			if (existingCar) {
+				return ServiceResponse.failure(
+					`Car with name ${data.name} already exists.`,
+					null,
+					StatusCodes.CONFLICT
+				);
+			}
 
-			return ServiceResponse.success<Car>("Car created successfully", newCar, StatusCodes.CREATED);
+			// Tạo xe mới nếu không bị trùng tên
+			const newCar = await this.carRepository.createCarAsync(data);
+			return ServiceResponse.success<Car>(
+				"Car created successfully",
+				newCar,
+				StatusCodes.CREATED
+			);
 		} catch (ex) {
 			const errorMessage = `Error creating car: ${(ex as Error).message}`;
 			console.error("Full error object:", ex);
 			logger.error(errorMessage);
-			return ServiceResponse.failure("An error occurred while creating car.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure(
+				"An error occurred while creating car.",
+				null,
+				StatusCodes.INTERNAL_SERVER_ERROR
+			);
 		}
 	}
+
 
 	async updateCar(id: number, data: Partial<Car>): Promise<ServiceResponse<Car | null>> {
 		try {
