@@ -66,7 +66,7 @@ export const TicketSchema = z.object({
   arrival_time: z.date(),
   seat_type: z.enum(["LUXURY", "VIP", "STANDARD"]),
   price: z.number(),
-  status: z.enum(["BOOKED", "CANCELLED"]),
+  status: z.enum(["BOOKED", "CANCELED"]),
   created_at: z.date(),
   updated_at: z.date(),
   reason: z.string().nullable().optional(),
