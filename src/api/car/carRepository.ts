@@ -82,6 +82,19 @@ export class CarRepository {
         }
     }
 
+    async findByNameAsync(name: string): Promise<Car | null> {
+        try {
+            const rows = await db<Car>('buses').select('*').where('name', name);
+            if (rows.length === 0) {
+                return null;
+            }
+            return rows[0] as Car;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
 
     async deleteAsync(id: number): Promise<Car | null> {
         try {
