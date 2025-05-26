@@ -98,7 +98,9 @@ export class VehicleScheduleRepository {
 
     const totalSeats = bus.capacity;
     if (data.available_seats !== undefined && data.available_seats > totalSeats) {
-      throw new Error("Available seats cannot exceed total seats.");
+      throw new Error(
+        `Available seats cannot exceed total seats of the bus (${totalSeats}).`
+      );
     }
 
     const currentTime = new Date();
@@ -131,39 +133,32 @@ export class VehicleScheduleRepository {
       throw new Error("Schedule conflict: Bus already has a schedule in this time range.");
     }
 
-    // Nếu có cập nhật available_seats thì kiểm tra không vượt quá total_seats
-    if (data.available_seats !== undefined) {
-      const totalSeats = updated.total_seats!;
-      if (data.available_seats > totalSeats) {
-        throw new Error("Available seats cannot exceed total seats.");
-      }
-    }
-
     const updatePayload: Partial<VehicleSchedule> = {
       ...data,
       updated_at: new Date(),
     };
 
-    // Nếu có cập nhật bus_id → cập nhật lại total_seats từ bảng buses
+    // Nếu cập nhật bus_id → lấy lại total_seats từ bus mới
+    let totalSeats = updated.total_seats!;
     if (data.bus_id !== undefined) {
       const bus = await db("buses").where("id", data.bus_id).first();
       if (!bus) {
         throw new Error("Bus not found.");
       }
 
-      updatePayload.total_seats = bus.capacity;
+      totalSeats = bus.capacity;
+      updatePayload.total_seats = totalSeats;
+    }
 
-      // Nếu available_seats cũng đang được cập nhật → kiểm tra lại điều kiện
-      if (data.available_seats !== undefined && data.available_seats > bus.capacity) {
-        throw new Error("Available seats cannot exceed total seats.");
-      }
+    // Kiểm tra available_seats sau khi xác định chính xác totalSeats
+    if (data.available_seats !== undefined && data.available_seats > totalSeats) {
+      throw new Error(
+        `Available seats cannot exceed total seats of the bus (${totalSeats}).`
+      );
     }
 
     const affectedRows = await db("schedules").where("id", id).update(updatePayload);
-
-    if (affectedRows === 0) {
-      return null;
-    }
+    if (affectedRows === 0) return null;
 
     const updatedRows = await db("schedules").where("id", id).select("*").first();
     return updatedRows ?? null;
