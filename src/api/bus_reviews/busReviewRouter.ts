@@ -45,7 +45,7 @@ busReviewRegistry.registerPath({
       schema: { type: "integer", minimum: 1 },
       description: "Số lượng bản ghi mỗi trang (mặc định: 10)",
     },
-    
+
     {
       name: "user_id",
       in: "query",
@@ -67,7 +67,7 @@ busReviewRegistry.registerPath({
       schema: { type: "string" },
       description: "Tìm đánh giá theo tên xe",
     },
-     {
+    {
       name: "company_name",
       in: "query",
       required: false,
@@ -80,7 +80,7 @@ busReviewRegistry.registerPath({
       required: false,
       schema: {
         type: "string",
-        enum: ['rating' , 'created_at' , 'updated_at'],
+        enum: ['rating', 'created_at', 'updated_at'],
       },
       description: "Sắp xếp theo trường ('rating' | 'created_at' | 'updated_at')",
     },
@@ -101,99 +101,98 @@ busReviewRegistry.registerPath({
 busReviewRouter.get("/", busReviewController.getAllBusReview);
 //them moi review
 busReviewRegistry.registerPath({
-    method: "post",
-    path: "/bus-reviews",
-     tags: ["Bus reviews"],
-    operationId: "createBusReview",  // Thay 'operation' bằng 'operationId'
-    summary: "Thêm mới đánh giá xe",  // Thêm phần mô tả ngắn gọn về API
-     description: `
+  method: "post",
+  path: "/bus-reviews",
+  tags: ["Bus reviews"],
+  operationId: "createBusReview",  // Thay 'operation' bằng 'operationId'
+  summary: "Thêm mới đánh giá xe",  // Thêm phần mô tả ngắn gọn về API
+  description: `
     API này dùng để thêm 1 đánh giá .
     
     - bus_id : mã xe  
-    - user_id : mã người dùng 
     - rating: mức đánh giá(từ 1->5)
     - review: đánh giá 
-    
+
+    **Lưu ý**: Người dùng phải đăng nhập để sử dụng API này. user_id sẽ được tự động lấy từ thông tin đăng nhập.
   `,
-    requestBody: {
+  requestBody: {
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          properties: {
+
+            bus_id: { type: "number" },
+            rating: { type: "number" },
+            review: { type: "string" },
+          },
+          required: ["bus_id", "user_id", "rating", "review"],
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: "Review created successfully",
       content: {
         "application/json": {
           schema: {
             type: "object",
             properties: {
-              
-              bus_id: {type: "number"},
-              user_id: {type: "number"},
-              rating: {type: "number"},
-              review: {type: "string"},
-            },
-            required: ["bus_id", "user_id", "rating", "review"],
-          },
-        },
-      },
-    },
-    responses: {
-      201: {
-        description: "Review created successfully",
-        content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: {
-                bus_id: {type: "number"},
-                user_id: {type: "number"},
-                rating: {type: "number"},
-                review: {type: "string"},
-                createdAt: { type: "string", format: "date-time" },
-                updatedAt: { type: "string", format: "date-time" },
-              },
+              bus_id: { type: "number" },
+              user_id: { type: "number" },
+              rating: { type: "number" },
+              review: { type: "string" },
+              createdAt: { type: "string", format: "date-time" },
+              updatedAt: { type: "string", format: "date-time" },
             },
           },
         },
       },
-      400: {
-        description: "Invalid input data",
-      },
-      500: {
-        description: "Internal server error",
+    },
+    400: {
+      description: "Invalid input data",
+    },
+    500: {
+      description: "Internal server error",
+    },
+  },
+});
+//update review
+busReviewRouter.post("/", authenticate, validateRequest(CreateBusReviewSchema), busReviewController.createBusReview);
+busReviewRegistry.registerPath({
+  method: "delete",
+  path: "/bus-reviews/{id}",
+  tags: ["Bus reviews"],
+  operationId: "deleteBusReview",
+  summary: "Xóa đánh giá xe theo ID",
+
+
+  parameters: [
+    {
+      name: "id",
+      in: "path",
+      required: true,
+      schema: { type: "integer" },
+      description: "ID của đánh giá cần xóa",
+    },
+  ],
+  responses: {
+    200: {
+      description: "BusReview đã được xóa thành công",
+      content: {
+        "application/json": {
+          schema: BusReviewSchema,
+        },
       },
     },
-  });
-  //update review
- busReviewRouter.post("/", validateRequest(CreateBusReviewSchema), busReviewController.createBusReview);
- busReviewRegistry.registerPath({
-   method: "delete",
-   path: "/bus-reviews/{id}",
-    tags: ["Bus reviews"],
-   operationId: "deleteBusReview",
-   summary: "Xóa đánh giá xe theo ID",
-    
-   
-   parameters: [
-     {
-       name: "id",
-       in: "path",
-       required: true,
-       schema: { type: "integer" },
-       description: "ID của đánh giá cần xóa",
-     },
-   ],
-   responses: {
-     200: {
-       description: "BusReview đã được xóa thành công",
-       content: {
-         "application/json": {
-           schema: BusReviewSchema,
-         },
-       },
-     },
-     404: {
-       description: "Không tìm thấy BusReview",
-     },
-     500: {
-       description: "Lỗi server nội bộ",
-     },
-   },
- });
- //xoa review
- busReviewRouter.delete("/:id", authenticate, permission, busReviewController.deleteBusReview);
+    404: {
+      description: "Không tìm thấy BusReview",
+    },
+    500: {
+      description: "Lỗi server nội bộ",
+    },
+  },
+});
+//xoa review
+busReviewRouter.delete("/:id", authenticate, permission, busReviewController.deleteBusReview);

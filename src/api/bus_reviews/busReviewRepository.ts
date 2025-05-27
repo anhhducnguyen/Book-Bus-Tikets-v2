@@ -1,28 +1,28 @@
 import type { BusReview } from "@/api/bus_reviews/busReviewModel";
-import { db } from "@/common/config/database"; 
+import { db } from "@/common/config/database";
 
 interface GetBusReviewOptions {
-    page?: number;
-    limit?: number;
-    id?:number;
-    bus_id?: number;
-    user_id?: number;
-    rating?: number;
-    bus_name?: string;
-    company_id?: number;
-    company_name?: string;
-    sortBy?: 'rating' | 'created_at' | 'updated_at';
-    order?: 'asc' | 'desc';
-  }
- 
-   interface PaginatedResult<T> {
-      results: T[];
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
+  page?: number;
+  limit?: number;
+  id?: number;
+  bus_id?: number;
+  user_id?: number;
+  rating?: number;
+  bus_name?: string;
+  company_id?: number;
+  company_name?: string;
+  sortBy?: 'rating' | 'created_at' | 'updated_at';
+  order?: 'asc' | 'desc';
 }
-  export class BusReviewRepository {
+
+interface PaginatedResult<T> {
+  results: T[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+export class BusReviewRepository {
   async findAllAsync(options: GetBusReviewOptions): Promise<PaginatedResult<BusReview>> {
     const {
       page = 1,
@@ -46,7 +46,7 @@ interface GetBusReviewOptions {
       .modify(qb => {
         if (bus_id) qb.where('br.bus_id', bus_id);
         if (user_id) qb.where('br.user_id', user_id);
-         if (rating != null) qb.where('br.rating', rating);
+        if (rating != null) qb.where('br.rating', rating);
         if (bus_name) qb.where('b.name', 'like', `%${bus_name}%`);
         if (company_id) qb.where('bc.id', company_id);
         if (company_name) qb.where('bc.company_name', 'like', `%${company_name}%`);
@@ -85,86 +85,51 @@ interface GetBusReviewOptions {
   }
 
 
-    //them moi mot review
-    // async createBusReviewAsync(data: Omit<BusReview, "id" | "created_at" | "updated_at">): Promise<BusReview> {
-    //         try {
-    //             // Tính toán thời gian cho createdAt và updatedAt nếu chưa có
-    //             const currentTime = new Date();
-    
-    //             //them 1 review moi
-    //             const [id] = await db('bus_reviews').insert({
-    //                 ...data,
-    //                 created_at: currentTime,
-    //                 updated_at: currentTime,
-    //               });
-                  
-    //               const [newBusReview] = await db('bus_reviews').where({ id }).select('*');
-                  
-    //               return newBusReview;
-                  
-    //         } catch (error:unknown) {
-    //             throw new Error(`Error creating user: ${error.message}`);
-    //         }
-    
-    //     }
+  //them moi mot review
   async createBusReviewAsync(data: Omit<BusReview, "id" | "created_at" | "updated_at">): Promise<BusReview> {
     try {
-        const currentTime = new Date();
+      // Tính toán thời gian cho createdAt và updatedAt nếu chưa có
+      const currentTime = new Date();
 
-        
-        const completedTicket = await db('payments as p')
-            .join('tickets as t', 'p.ticket_id', 't.id')
-            .join('seats as s', 't.seat_id', 's.id')
-            .join('schedules as sch', 't.schedule_id', 'sch.id')
-            .where('p.user_id', data.user_id)
-            .andWhere('p.status', 'COMPLETED')
-            .andWhere('s.bus_id', data.bus_id)
-            .andWhere('sch.arrival_time', '<', currentTime)
-            .first();
+      //them 1 review moi
+      const [id] = await db('bus_reviews').insert({
+        ...data,
+        created_at: currentTime,
+        updated_at: currentTime,
+      });
 
-        if (!completedTicket) {
-            // throw new Error('Bạn chỉ có thể đánh giá sau khi đã hoàn thành chuyến đi.');
-            
-        }
+      const [newBusReview] = await db('bus_reviews').where({ id }).select('*');
 
-        // Thêm review mới
-        const [id] = await db('bus_reviews').insert({
-            ...data,
-            created_at: currentTime,
-            updated_at: currentTime,
-        });
-
-        const [newBusReview] = await db('bus_reviews').where({ id }).select('*');
-        return newBusReview;
+      return newBusReview;
 
     } catch (error: unknown) {
-        // throw new Error(`Error creating review: ${(error instanceof Error) ? error.message : 'Unknown error'}`);
-        throw error
+      throw new Error(`Error creating user: ${(error as Error).message}`);
     }
-}
-    // //Xoa mot binh luan
-    async deleteBusReviewAsync(id: number): Promise<BusReview | null> {
-            try {
-                // Tìm review cần xóa
-                const BusReviewToDelete = await db('bus_reviews').where({ id }).first();
-        
-                if (!BusReviewToDelete) {
-                    return null; // Nếu không tìm review để xóa
-                }
-        
-                // Thực hiện xóa binh luan
-                await db('bus_reviews').where({ id }).del();
-        
-                // Trả về binh luan đã xóa
-                return BusReviewToDelete;
-            } catch (error: unknown) {
-                throw new Error(`Error deleting review: ${(error instanceof Error) ? error.message : 'Unknown error'}`);
-            }
-        }
-    
-    
-    
+
+  }
+  //Xoa mot binh luan
+  async deleteBusReviewAsync(id: number): Promise<BusReview | null> {
+    try {
+      // Tìm review cần xóa
+      const BusReviewToDelete = await db('bus_reviews').where({ id }).first();
+
+      if (!BusReviewToDelete) {
+        return null; // Nếu không tìm review để xóa
+      }
+
+      // Thực hiện xóa binh luan
+      await db('bus_reviews').where({ id }).del();
+
+      // Trả về binh luan đã xóa
+      return BusReviewToDelete;
+    } catch (error: unknown) {
+      throw new Error(`Error deleting review: ${(error instanceof Error) ? error.message : 'Unknown error'}`);
+    }
+  }
+
+
+
 
 }
-  
+
 
