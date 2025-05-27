@@ -6,25 +6,25 @@ import { logger } from "@/server";
 
 
 interface GetBusReviewOptions {
-    page?: number;
-    limit?: number;
-    id?:number;
-    bus_id?: number;
-    user_id?: number;
-    rating?: number;
-    bus_name?: string;
-    company_id?: number;
-    company_name?: string;
-    sortBy?: 'rating' | 'created_at' | 'updated_at';
-    order?: 'asc' | 'desc';
-  }
-    interface PaginatedResult<T> {
-      results: T[];
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
-    }
+  page?: number;
+  limit?: number;
+  id?: number;
+  bus_id?: number;
+  user_id?: number;
+  rating?: number;
+  bus_name?: string;
+  company_id?: number;
+  company_name?: string;
+  sortBy?: 'rating' | 'created_at' | 'updated_at';
+  order?: 'asc' | 'desc';
+}
+interface PaginatedResult<T> {
+  results: T[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
 export class BusReviewService {
   private busReviewRepository: BusReviewRepository;
 
@@ -33,40 +33,45 @@ export class BusReviewService {
   }
 
   // Lấy danh sách các review với phân trang, tìm kiếm, sắp xếp
-  async getAllBusReview(options: GetBusReviewOptions): Promise<PaginatedResult<BusReview>>{
+  async getAllBusReview(options: GetBusReviewOptions): Promise<PaginatedResult<BusReview>> {
     return await this.busReviewRepository.findAllAsync(options);
   }
   //Tao 1 review moi
-  async createBusReview(data: Omit<BusReview, "id" | "created_at" | "updated_at">): Promise<ServiceResponse<BusReview| null>> {
+  async createBusReview(data: Omit<BusReview, "id" | "created_at" | "updated_at" | "user_id">, userId: number): Promise<ServiceResponse<BusReview | null>> {
     try {
-        const newBusReview = await this.busReviewRepository.createBusReviewAsync(data);
-        return ServiceResponse.success<BusReview>("review created successfully",newBusReview, StatusCodes.CREATED);
+      // Thêm user_id vào dữ liệu trước khi tạo review
+      const reviewData = {
+        ...data,
+        user_id: userId,
+      };
+      const newBusReview = await this.busReviewRepository.createBusReviewAsync(reviewData);
+      return ServiceResponse.success<BusReview>("review created successfully", newBusReview, StatusCodes.CREATED);
     } catch (ex) {
-        const errorMessage = `Error creating Review: ${(ex as Error).message}`;
-        logger.error(errorMessage);
-        return ServiceResponse.failure("An error occurred while creating Route.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+      const errorMessage = `Error creating Review: ${(ex as Error).message}`;
+      logger.error(errorMessage);
+      return ServiceResponse.failure("An error occurred while creating Route.", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
-}
+  }
 
-//xoa review 
-async deleteBusReview(id: number): Promise<ServiceResponse<BusReview | null>> {
+  //xoa review 
+  async deleteBusReview(id: number): Promise<ServiceResponse<BusReview | null>> {
     try {
-        // Gọi phương thức xóa review trong repository
-        const deletedBusReview = await this.busReviewRepository.deleteBusReviewAsync(id);
+      // Gọi phương thức xóa review trong repository
+      const deletedBusReview = await this.busReviewRepository.deleteBusReviewAsync(id);
 
-        if (!deletedBusReview) {
-            
-            return ServiceResponse.failure("Review not found.", null, StatusCodes.NOT_FOUND);
-        }
+      if (!deletedBusReview) {
 
-        // Nếu xóa thành công
-        return ServiceResponse.success<BusReview>("Route deleted successfully", deletedBusReview, StatusCodes.OK);
+        return ServiceResponse.failure("Review not found.", null, StatusCodes.NOT_FOUND);
+      }
+
+      // Nếu xóa thành công
+      return ServiceResponse.success<BusReview>("Route deleted successfully", deletedBusReview, StatusCodes.OK);
     } catch (ex) {
-        const errorMessage = `Error deleting review: ${(ex as Error).message}`;
-        logger.error(errorMessage);
-        return ServiceResponse.failure("An error occurred while deleting review.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+      const errorMessage = `Error deleting review: ${(ex as Error).message}`;
+      logger.error(errorMessage);
+      return ServiceResponse.failure("An error occurred while deleting review.", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
-}
+  }
 
 
 }
