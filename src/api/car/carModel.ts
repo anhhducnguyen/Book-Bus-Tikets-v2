@@ -8,15 +8,26 @@ extendZodWithOpenApi(z);
 
 export type Car = z.infer<typeof CarSchema>;
 
+// export const CarSchema = z.object({
+//   id: z.number().int().optional(),
+//   name: z.string().min(1, 'Name is required').max(255, 'Name must be less than 255 characters'),
+//   description: z.string().max(65535, 'Description must be less than 65535 characters').optional(),
+//   license_plate: z.string().min(1, 'License plate is required').max(20, 'License plate must be less than 20 characters'),
+//   capacity: z.number().int().min(1, 'Capacity must be greater than 0'),
+//   company_id: z.number().int().min(1, 'Company ID must be greater than 0'),
+//   created_at: z.date(),
+//   updated_at: z.date(),
+// });
+
 export const CarSchema = z.object({
-  id: z.number().int().optional(),
-  name: z.string().min(1, 'Name is required').max(255, 'Name must be less than 255 characters'),
-  description: z.string().max(65535, 'Description must be less than 65535 characters').optional(),
-  license_plate: z.string().min(1, 'License plate is required').max(20, 'License plate must be less than 20 characters'),
-  capacity: z.number().int().min(1, 'Capacity must be greater than 0'),
-  company_id: z.number().int().min(1, 'Company ID must be greater than 0'),
-  created_at: z.date(),
-  updated_at: z.date(),
+  id: z.number().int().optional().openapi({ example: 1 }),
+  name: z.string().min(1).max(255).openapi({ example: "Toyota Camry" }),
+  description: z.string().max(65535).optional().openapi({ example: "Một chiếc xe đáng tin cậy để lái trong thành phố." }),
+  license_plate: z.string().min(1).max(20).openapi({ example: "OMG-4953" }),
+  capacity: z.number().int().min(1).openapi({ example: 40 }),
+  company_id: z.number().int().min(1).openapi({ example: 9 }),
+  created_at: z.date().openapi({ example: "2023-01-01T10:00:00.000Z" }),
+  updated_at: z.date().openapi({ example: "2023-05-01T12:30:00.000Z" }),
 });
 
 export const CreateCarBodySchema = CarSchema.omit({ id: true, created_at: true, updated_at: true });
