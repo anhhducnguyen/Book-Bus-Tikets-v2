@@ -43,7 +43,6 @@ vehicleScheduleRegistry.registerPath({
 
 vehicleScheduleRouter.get(
   "/",
-  permission,
   validateRequest(VehicleScheduleQuerySchema),
   vehicleScheduleController.getSchedules
 );
