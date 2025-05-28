@@ -44,31 +44,31 @@ export const BusCompanyQuerySchema = z.object({
       .min(1)
       .default(1)
       .describe("Số trang hiện tại (bắt đầu từ 1), dùng để phân trang"),
-      
+
     limit: z
       .coerce.number()
       .min(1)
       .default(10)
       .describe("Số lượng bản ghi trên mỗi trang, dùng để phân trang"),
-      
+
     search: z
       .string()
       .optional()
-      .describe("Tìm kiếm thông tin nhà xe"),
-      
+      .describe("Tìm kiếm thông tin nhà xe theo tên nhà xe(company_name)"),
+
     sortBy: z
       .enum(["company_name", "created_at"])
       .default("company_name")
       .describe(
         "Sắp xếp kết quả theo các trường :\n" +
         "- name: Tên nhà xe\n" +
-        "- create_at: Thời gian tạo mới nhà xe\n" 
+        "- create_at: Thời gian tạo mới nhà xe\n"
       ),
     order: z
       .enum(["asc", "desc"])
       .default("asc")
       .describe(
-        "thứ tự 'tăng dần' hay 'giảm dần'\n"  
+        "thứ tự 'tăng dần' hay 'giảm dần'\n"
       ),
   }),
 });

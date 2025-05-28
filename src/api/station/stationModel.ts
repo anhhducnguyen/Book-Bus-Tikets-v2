@@ -57,18 +57,18 @@ export const StationQuerySchema = z.object({
       .min(1)
       .default(1)
       .describe("Số trang hiện tại (bắt đầu từ 1), dùng để phân trang"),
-      
+
     limit: z
       .coerce.number()
       .min(1)
       .default(10)
       .describe("Số lượng bản ghi trên mỗi trang, dùng để phân trang"),
-      
+
     search: z
       .string()
       .optional()
-      .describe("Tìm kiếm thông tin bến xe"),
-      
+      .describe("Tìm kiếm thông tin bến xe theo tên bến xe(name), địa chỉ(location)"),
+
     sortBy: z
       .enum(["name", "location", "created_at"])
       .default("name")
@@ -76,13 +76,13 @@ export const StationQuerySchema = z.object({
         "Sắp xếp kết quả theo các trường :\n" +
         "- name: Tên bến xe\n" +
         "- location: Vị trí\n" +
-        "- create_at: Thời gian tạo mới bến xe\n" 
+        "- create_at: Thời gian tạo mới bến xe\n"
       ),
     order: z
       .enum(["asc", "desc"])
       .default("asc")
       .describe(
-        "thứ tự 'tăng dần' hay 'giảm dần'\n"  
+        "thứ tự 'tăng dần' hay 'giảm dần'\n"
       ),
   }),
 });
