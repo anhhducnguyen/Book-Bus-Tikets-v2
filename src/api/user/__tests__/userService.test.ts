@@ -41,7 +41,8 @@ describe("userService", () => {
 			(userRepositoryInstance.findAllAsync as Mock).mockReturnValue(mockUsers);
 
 			// Act
-			const result = await userServiceInstance.findAll();
+			const result = await userServiceInstance.findAll({}, {});
+
 
 			// Assert
 			expect(result.statusCode).toEqual(StatusCodes.OK);
@@ -55,7 +56,8 @@ describe("userService", () => {
 			(userRepositoryInstance.findAllAsync as Mock).mockReturnValue(null);
 
 			// Act
-			const result = await userServiceInstance.findAll();
+			const result = await userServiceInstance.findAll({}, {});
+
 
 			// Assert
 			expect(result.statusCode).toEqual(StatusCodes.NOT_FOUND);
@@ -69,7 +71,8 @@ describe("userService", () => {
 			(userRepositoryInstance.findAllAsync as Mock).mockRejectedValue(new Error("Database error"));
 
 			// Act
-			const result = await userServiceInstance.findAll();
+			const result = await userServiceInstance.findAll({}, {});
+
 
 			// Assert
 			expect(result.statusCode).toEqual(StatusCodes.INTERNAL_SERVER_ERROR);

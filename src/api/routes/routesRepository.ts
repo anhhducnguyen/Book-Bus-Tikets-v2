@@ -95,7 +95,7 @@ export class RouteRepository {
                   return newRoutes;
                   
             } catch (error:unknown) {
-                throw new Error(`Error creating user: ${error.message}`);
+                throw error;
             }
         }
     //cap nhat tuyen duong
@@ -115,7 +115,7 @@ export class RouteRepository {
     
             return newRoutes;
         } catch (error: unknown) {
-            throw new Error(`Error updating route: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            throw error;
         }
     }
     //Xoa mot tuyen duong
@@ -174,7 +174,7 @@ export class RouteRepository {
 
         return routeToDelete;
     } catch (error: unknown) {
-        throw new Error(`Error deleting route: ${(error instanceof Error) ? error.message : 'Unknown error'}`);
+        throw error;
     }
 }
 
