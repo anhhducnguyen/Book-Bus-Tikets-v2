@@ -64,14 +64,18 @@ export class AuthService {
 	}
 
 	async confirmResetPassword(token: string, newPassword: string) {
-		const user = await this.authRepository.findByResetToken(token);
-		if (!user || user.reset_token_expiry! < Date.now()) {
-			return ServiceResponse.failure("Token không hợp lệ hoặc đã hết hạn", null, 400);
-		}
+		try {
+			const user = await this.authRepository.findByResetToken(token);
+			if (!user || user.reset_token_expiry! < Date.now()) {
+				return ServiceResponse.failure("Token không hợp lệ hoặc đã hết hạn", null, 400);
+			}
 
-		const hashed = await bcrypt.hash(newPassword, 10);
-		await this.authRepository.resetPasswordByToken(token, hashed);
-		return ServiceResponse.success("Mật khẩu đã được đặt lại thành công", null, 200);
+			const hashed = await bcrypt.hash(newPassword, 10);
+			await this.authRepository.resetPasswordByToken(token, hashed);
+			return ServiceResponse.success("Mật khẩu đã được đặt lại thành công", null, 200);
+		} catch (error) {
+			throw new Error("Đã xảy ra lỗi khi đặt lại mật khẩu: " + (error as Error).message);
+		}
 	}
 
 	async logout(token: string) {
