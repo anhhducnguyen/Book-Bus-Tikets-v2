@@ -30,7 +30,7 @@ carRegistry.registerPath({
   method: "get",
   path: "/cars/popular-garage",
   tags: ["Car"],
-  summary: "Nhà xe phổ biến",
+  summary: "Khách vãng lai: Nhà xe phổ biến",
   // description: "Trả về top 10 nhà xe phổ biến nhất dựa trên số lượng và điểm đánh giá trung bình.",
   description: `
   Trả về top 10 nhà xe phổ biến nhất dựa trên số lượt đánh giá và điểm trung bình.

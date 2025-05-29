@@ -27,7 +27,7 @@ busCompanyRegistry.registerPath({
   method: "get",
   path: "/bus-companies",
   tags: ["BusCompany"],
-  summary: "Lấy danh sách nhà xe",
+  summary: "(Khách vãng lai) Lấy danh sách nhà xe",
   request: { query: BusCompanyQuerySchema.shape.query },
   responses: createApiResponse(z.array(BusCompanySchema), "Danh sách nhà xe"),
 });
@@ -38,7 +38,7 @@ busCompanyRegistry.registerPath({
   method: "get",
   path: "/bus-companies/{id}",
   tags: ["BusCompany"],
-  summary: "Lấy thông tin chi tiết một nhà xe theo ID",
+  summary: "(Khách vãng lai) Lấy thông tin chi tiết một nhà xe theo ID",
   request: { params: GetBusCompanySchema.shape.params },
   responses: createApiResponse(BusCompanySchema, "Chi tiết nhà xe"),
 });

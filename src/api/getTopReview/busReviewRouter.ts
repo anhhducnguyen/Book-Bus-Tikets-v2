@@ -22,7 +22,7 @@ getTopReviewRegistry.registerPath({
     path: "/top/{arrivalStationId}",
     tags: ["Statistical"],
     operationId: "getTopReviewedRoutesByDestination",
-    summary: "Lấy danh sách tuyến có đánh giá cao nhất theo điểm đến",
+    summary: "(Khách vãng lai) Lấy danh sách tuyến có đánh giá cao nhất theo điểm đến",
     description: `Trường dữ liệu trả về:
 
     - route_id: ID của tuyến đường

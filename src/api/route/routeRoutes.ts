@@ -16,7 +16,7 @@ routeRegistry.registerPath({
   method: "get",
   path: "/routes/{id}",
   tags: ["Routes"],
-  summary: "Hiển thị thông tin chi tiết tuyến đường",
+  summary: "(Khách vãng lai) Hiển thị thông tin chi tiết tuyến đường",
   request: { params: GetRouteByIdSchema.shape.params },
   responses: createApiResponse(RouteDetailSchema, "Success"),
 });

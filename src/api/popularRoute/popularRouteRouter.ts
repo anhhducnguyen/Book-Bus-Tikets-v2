@@ -19,7 +19,7 @@ popularRouteRegistry.registerPath({
   path: "/popular-route",
   tags: ["Statistical"],
   operationId: "getMostPopularRoute",  // Thay 'operation' bằng 'operationId'
-  summary: "Lấy tuyến đường phổ biên",  // Mô tả ngắn gọn về API
+  summary: "(Khách vãng lai) Lấy tuyến đường phổ biên",  // Mô tả ngắn gọn về API
   responses: {
     200: {
       description: "Most popular route found successfully",

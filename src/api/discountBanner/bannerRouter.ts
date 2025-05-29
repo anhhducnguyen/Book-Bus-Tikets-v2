@@ -29,7 +29,7 @@ discountBannerRegistry.registerPath({
     "banner_url: URL ảnh banner",
     "position: Vị trí hiển thị (TOP, BOTTOM, LEFT, RIGHT)"
   ].join("\n"),
-  summary: "Lấy danh sách banner ưu đãi nổi bật theo vị trí",
+  summary: "(Khách vãng lai) Lấy danh sách banner ưu đãi nổi bật theo vị trí",
   parameters: [
     {
       name: "position",
