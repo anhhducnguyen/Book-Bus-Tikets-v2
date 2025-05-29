@@ -21,12 +21,13 @@ export class TicketOrderRepository {
       sortBy = `tickets.status`;
       // sortBy = `users.first_name`;
       sortBy = `users.email`;
-      sortBy = `schedules.departure_time`;
-      sortBy = `routes.price`;
-      sortBy = `buses.license_plate`;
+      // sortBy = `schedules.departure_time`;
+      // sortBy = `routes.price`;
+      // sortBy = `buses.license_plate`;
       sortBy = `bus_companies.company_name`;
       sortBy = `seats.seat_number`;
     }
+
 
     const query = db("tickets")
       .select(
@@ -37,8 +38,13 @@ export class TicketOrderRepository {
         "schedules.departure_time",
         "routes.price as price",
         "buses.license_plate",
+        "seats.seat_number",
+        "buses.name as busName",
         "bus_companies.company_name as busCompanyName",
-        "seats.seat_number"
+        "departure_station.name as departureStation",
+        "arrival_station.name as arrivalStation",
+        // "buses.id as busId",
+        // "routes.id as routeId",
       )
       .join("payments", "tickets.id", "payments.ticket_id")
       .join("users", "payments.user_id", "users.id")
@@ -47,13 +53,16 @@ export class TicketOrderRepository {
       .join("buses", "schedules.bus_id", "buses.id")
       .join("bus_companies", "buses.company_id", "bus_companies.id")
       .join("seats", "tickets.seat_id", "seats.id")
+      .join("stations as departure_station", "routes.departure_station_id", "departure_station.id")
+      .join("stations as arrival_station", "routes.arrival_station_id", "arrival_station.id");
 
     if (search) {
       query.where(function () {
         this
           // .where("users.first_name", "like", `%${search}%`)
           // .orWhere("users.email", "like", `%${search}%`);
-          .where("users.email", "like", `%${search}%`);
+          .where("users.email", "like", `%${search}%`)
+        // .orWhere("buses.id", "like", `${search}`);
       });
     }
     query.orderBy(sortBy, order)

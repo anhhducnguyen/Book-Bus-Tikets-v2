@@ -84,22 +84,33 @@ export class VehicleScheduleRepository {
     return rows[0];
   }
 
+
+  private async getAvailableSeatCount(busId: number): Promise<number> {
+    const [result] = await db("seats")
+      .where("bus_id", busId)
+      .andWhere("status", "AVAILABLE")
+      .count<{ count: string }[]>("id as count");
+
+    return Number(result.count);
+  }
   async createAsync(data: Omit<VehicleSchedule, "id" | "created_at" | "updated_at">): Promise<VehicleSchedule> {
     const isConflict = await this.isScheduleConflict(data.bus_id!, data.departure_time!, data.arrival_time!);
     if (isConflict) {
-      throw new Error("Schedule conflict: Bus already has a schedule in this time range.");
+      throw new Error("Xung đột lịch trình: Xe buýt đã có lịch trình trong khoảng thời gian này.");
     }
 
     // Lấy capacity từ bảng buses dựa trên bus_id
     const bus = await db("buses").where("id", data.bus_id).first();
     if (!bus) {
-      throw new Error("Bus not found.");
+      throw new Error("Không tìm thấy xe buýt.");
     }
 
     const totalSeats = bus.capacity;
+    const availableSeats = await this.getAvailableSeatCount(data.bus_id!);
+
     if (data.available_seats !== undefined && data.available_seats > totalSeats) {
       throw new Error(
-        `Available seats cannot exceed total seats of the bus (${totalSeats}).`
+        `Số ghế có sẵn không được vượt quá tổng số ghế của xe buýt (${totalSeats}).`
       );
     }
 
@@ -107,6 +118,7 @@ export class VehicleScheduleRepository {
 
     const [id] = await db("schedules").insert({
       ...data,
+      available_seats: availableSeats,
       total_seats: totalSeats,
       created_at: currentTime,
       updated_at: currentTime,
@@ -130,7 +142,7 @@ export class VehicleScheduleRepository {
     );
 
     if (isConflict) {
-      throw new Error("Schedule conflict: Bus already has a schedule in this time range.");
+      throw new Error("Xung đột lịch trình: Xe buýt đã có lịch trình trong khoảng thời gian này.");
     }
 
     const updatePayload: Partial<VehicleSchedule> = {
@@ -140,20 +152,25 @@ export class VehicleScheduleRepository {
 
     // Nếu cập nhật bus_id → lấy lại total_seats từ bus mới
     let totalSeats = updated.total_seats!;
+    let availableSeats = updated.available_seats!;
+
     if (data.bus_id !== undefined) {
       const bus = await db("buses").where("id", data.bus_id).first();
       if (!bus) {
-        throw new Error("Bus not found.");
+        throw new Error("Không tìm thấy xe buýt.");
       }
 
       totalSeats = bus.capacity;
       updatePayload.total_seats = totalSeats;
+
+      availableSeats = await this.getAvailableSeatCount(data.bus_id);
+      updatePayload.available_seats = availableSeats;
     }
 
-    // Kiểm tra available_seats sau khi xác định chính xác totalSeats
+    // Kiểm tra available_seats không vượt quá totalSeats
     if (data.available_seats !== undefined && data.available_seats > totalSeats) {
       throw new Error(
-        `Available seats cannot exceed total seats of the bus (${totalSeats}).`
+        `Số ghế có sẵn không được vượt quá tổng số ghế của xe buýt (${totalSeats}).`
       );
     }
 

@@ -25,9 +25,9 @@ ticketOrderRegistry.registerPath({
   path: "/ticket-orders",
   tags: ["Ticket order"],
   summary: "Hiển thị tất cả đơn đặt vé của tất cả người dùng",
-  description: `Phân trang<br />
-                Tìm kiếm theo: email<br />
-                Sắp xếp theo: ticketId, tickets.status, users.email, schedules.departure_time, routes.price, buses.license_plate, bus_companies.company_name, seats.seat_number<br />`,
+  description: `<strong>Phân trang</strong><br />
+                <strong>Tìm kiếm theo:</strong> email của người dùng<br />
+                <strong>Sắp xếp theo:</strong> ticketId, tickets.status, users.email, bus_companies.company_name, seats.seat_number<br />`,
   request: { query: GetAllTicketOrdersSchema.shape.query },
   responses: createApiResponse(z.array(TicketOrderSchema), "Success"),
 });
@@ -54,7 +54,8 @@ ticketOrderRegistry.registerPath({
   method: "get",
   path: "/ticket-orders/status/{status}",
   tags: ["Ticket order"],
-  summary: "Hiển thị tất cả đơn hàng theo trạng thái của vé",
+  summary: "Hiển thị tất cả đơn hàng theo trạng thái của vé.",
+  description: `<strong>Trạng thái:</strong> BOOKED, CANCELLED<br />`,
   request: { params: GetTicketOrdersByStatusSchema.shape.params },
   responses: createApiResponse(z.array(TicketOrderSchema), "Success"),
 });

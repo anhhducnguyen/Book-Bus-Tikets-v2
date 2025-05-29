@@ -9,7 +9,7 @@ export class PaymentProviderRepository {
 
         const query = db<PaymentProvider>("payment_providers");
 
-        // Lọc theo tên nhà cung cấp (nếu có)
+        // // Lọc theo tên nhà cung cấp (nếu có)
         // if (filter.provider_name) {
         //     query.where("provider_name", "like", `%${filter.provider_name}%`);
         // }
@@ -32,7 +32,10 @@ export class PaymentProviderRepository {
 
         return {
             results: data,
+            // page,
+            // limit,
             total: totalCount,
+            // totalPages: Math.ceil(totalCount / limit),
         };
     }
 
