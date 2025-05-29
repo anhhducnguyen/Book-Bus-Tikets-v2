@@ -14,7 +14,11 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    res.status(401).json({ message: 'Chưa đăng nhập' });
+    res.status(401).json({
+      success: false,
+      message: 'Bạn chưa đăng nhập',
+      statusCode: 401,
+    });
     return;
   }
 
@@ -23,25 +27,38 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
     req.user = user;
     next();
   } catch (err) {
-    res.status(403).json({ message: 'Token không hợp lệ hoặc đã hết hạn' });
+    res.status(401).json({
+      success: false,
+      message: 'Token không hợp lệ hoặc đã hết hạn',
+      statusCode: 401
+    });
+
   }
 };
 
 export const authorize = (roles: string[] = []) => {
-    return (req: Request, res: Response, next: NextFunction): void => {
-      const user = req.user as { role: string } | undefined;
-  
-      if (!user) {
-        res.status(401).json({ message: 'Bạn chưa đăng nhập' });
-        return;
-      }
-  
-      if (!roles.includes(user.role)) {
-        res.status(403).json({ message: 'Bạn không có quyền truy cập' });
-        return;
-      }
-  
-      next();
-    };
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const user = req.user as { role: string } | undefined;
+
+    if (!user) {
+      res.status(401).json({
+        success: false,
+        message: 'Bạn chưa đăng nhập',
+        statusCode: 401,
+      });
+      return;
+    }
+
+    if (!roles.includes(user.role)) {
+      res.status(403).json({
+        "success": false,
+        message: 'Bạn không có quyền truy cập',
+        statusCode: 403,
+      });
+      return;
+    }
+
+    next();
+  };
 };
-  
+
