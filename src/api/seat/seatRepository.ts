@@ -70,15 +70,64 @@ export class SeatRepository {
 		}
 	}
 
+	// async deleteSeatsByBusIdAsync(busId: number): Promise<void> {
+	// 	try {
+	// 		await db<Seat>('seats')
+	// 			.where('bus_id', busId)
+	// 			.del();
+
+	// 		console.log(`Deleted seats for bus with id: ${busId}`);
+	// 	} catch (error) {
+	// 		throw error;
+	// 	}
+	// }
 	async deleteSeatsByBusIdAsync(busId: number): Promise<void> {
 		try {
-			await db<Seat>('seats')
+			// Bước 1: Lấy seat IDs theo busId
+			const seatIdsResult = await db('seats')
 				.where('bus_id', busId)
+				.select('id');
+
+			const seatIds = seatIdsResult.map((row: { id: number }) => row.id);
+
+			// Nếu không có seat nào thì thoát
+			if (seatIds.length === 0) {
+				console.log('No seats found for this bus.');
+				return;
+			}
+
+			// Bước 2: Lấy ticket IDs liên quan đến những seat_ids
+			const ticketIdsResult = await db('tickets')
+				.whereIn('seat_id', seatIds)
+				.select('id');
+
+			const ticketIds = ticketIdsResult.map((row: { id: number }) => row.id);
+
+			// Bước 3: Xóa payments liên quan
+			if (ticketIds.length > 0) {
+				await db('payments')
+					.whereIn('ticket_id', ticketIds)
+					.del();
+			}
+
+			// Bước 4: Xóa tickets
+			if (ticketIds.length > 0) {
+				await db('tickets')
+					.whereIn('id', ticketIds)
+					.del();
+			}
+
+			// Bước 5: Xóa seats
+			await db('seats')
+				.whereIn('id', seatIds)
 				.del();
 
-			console.log(`Deleted seats for bus with id: ${busId}`);
+			console.log(`Deleted payments, tickets, and seats for bus with id: ${busId}`);
 		} catch (error) {
+			console.error('Error during cascading delete:', error);
 			throw error;
 		}
 	}
 }
+
+
