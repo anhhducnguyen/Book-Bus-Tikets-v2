@@ -23,7 +23,7 @@ ticketRegistry.registerPath({
   tags: ["Book tickets"],
   summary: "Lựa chọn tuyến đường đi",
   description: `Lựa chọn tuyến đường đi:<br /> 
-                - Chức năng này sẽ hiển thị danh sách tuyến đường để người dùng có thể lựa chọn tại chức năng đặt vé và để hướng tới đường dẫn cho chức năng lựa chọn xe<br />
+                - Chức năng này sẽ hiển thị danh sách tuyến đường để người dùng có thể lựa chọn<br />
                 <br />
                 <b>id</b>: Id tuyến đường<br />
                 <b>departure_station_id</b>: Id bến xuất phát<br />
@@ -44,7 +44,7 @@ ticketRegistry.registerPath({
   tags: ["Book tickets"],
   summary: "Lựa chọn xe đi",
   description: `Lựa chọn xe đi:<br /> 
-                - Chức năng này sẽ cho phép người dùng nhập id tuyến đường mình chọn và hiển thị danh sách tất cả các xe khách trên tuyến đường đó<br />
+                - Chức năng này sẽ cho phép người dùng chọn tuyến đường và hiển thị danh sách tất cả các xe khách trên tuyến đường đó<br />
                 - Chức năng này ta cần nhập ID của tuyến đường mình chọn<br />
                 routeId: Id tuyến đường<br />
                 <br />
@@ -67,7 +67,7 @@ ticketRegistry.registerPath({
   tags: ["Book tickets"],
   summary: "Lựa chọn ghế đi",
   description: `Lựa chọn ghế đi<br /> 
-                - Tương tự, chức năng này sẽ cho phép người dùng nhập id xe khách mình chọn và hiển thị danh sách tất cả các ghế còn trống trên tuyến đường đó<br />
+                - Tương tự, chức năng này sẽ cho phép người dùng chọn xe khách và hiển thị danh sách tất cả các ghế còn trống trên xe đó<br />
                 - Chức năng này ta cần nhập ID của xe khách mình chọn<br />
                 busId: Id xe khách<br />
                 <br />
@@ -91,7 +91,7 @@ ticketRegistry.registerPath({
   tags: ["Book tickets"],
   summary: "Đặt vé",
   description: `Đặt vé<br /> 
-                - Chức năng này sẽ cho phép người dùng nhập id tuyến đường, id xe khách, id ghế mình chọn và phương thức thanh toán để đặt vé.<br />
+                - Chức năng này sẽ cho phép người dùng nhập đặt vé và chọn phương thức thanh toán để đặt vé.<br />
                 - Vé sẽ tự động được đặt cho người dùng hiện tại (dựa trên token xác thực)<br />
                 - Chức năng này ta cần nhập body có dạng sau để đặt vé:<br />
                 {<br />
@@ -125,7 +125,7 @@ ticketRegistry.registerPath({
   tags: ["Book tickets"],
   summary: "Hủy vé",
   description: `Hủy vé<br /> 
-                - Chức năng này sẽ cho phép người dùng nhập id vé xe và lý do hủy, sau đó chuyển sang trạng thái Cancelled(đã hủy)<br />
+                - Chức năng này sẽ cho phép người dùng hủy vé xe và lý do hủy, sau đó chuyển sang trạng thái Cancelled(đã hủy)<br />
                 - Chức năng này ta cần nhập ID của vé xe mình chọn và lý do hủy trong body<br />
                 <b>Note: Người dùng chỉ có thể hủy vé của chính mình. Hãy xem lịch sử đặt vé và tìm vé mình vừa đặt.</b>
                 ticketId: Id vé xe<br />
@@ -188,7 +188,7 @@ ticketRegistry.registerPath({
   tags: ["Booking history"],
   summary: "Lịch sử đặt vé theo nhà xe",
   description: `Lịch sử đặt vé theo nhà xe<br /> 
-                - Tương tự, chức năng này sẽ cho phép người dùng nhập id nhà xe mình chọn và hiển thị danh sách lịch sử đặt vé theo nhà xe đó<br />
+                - Tương tự, chức năng này sẽ hiển thị danh sách lịch sử đặt vé theo nhà xe đó<br />
                 - Chức năng này ta cần nhập ID của xe khách mình chọn<br />
                 companyId: Id nhà xe<br />
                 <br />
@@ -243,7 +243,7 @@ ticketRegistry.registerPath({
   tags: ["Ticket"],
   summary: "Cập nhật trạng thái vé thành CANCELED cho admin",
   description: `Cập nhật trạng thái vé thành CANCELED cho admin<br /> 
-                - Chức năng này sẽ cho phép quản trị viên nhập id vé xe mình muốn hủy, trạng thái của vé đó sẽ chuyển sang CANCELED(Đã hủy) và giải phóng ghế<br />
+                - Chức năng này sẽ cho phép quản trị viên hủy vé xe mình muốn, trạng thái của vé đó sẽ chuyển sang CANCELED(Đã hủy) và giải phóng ghế<br />
                 - Chức năng này ta cần nhập params với ticketId và body có dạng sau:<br />
                 Params: {ticketId: "3"}<br />
                 Body:<br />
@@ -338,7 +338,7 @@ ticketRegistry.registerPath({
   tags: ["Ticket"],
   summary: "Cập nhật trạng thái vé từ CANCELED thành BOOKED cho admin",
   description: `Cập nhật trạng thái vé từ CANCELED thành BOOKED cho admin<br /> 
-                - Chức năng này sẽ cho phép quản trị viên nhập id vé xe đã hủy và chuyển trạng thái của vé đó từ CANCELED về BOOKED, kèm theo lý do khôi phục.<br />
+                - Chức năng này sẽ cho phép quản trị viên khôi phục vé xe đã hủy và chuyển trạng thái của vé đó từ CANCELED về BOOKED, kèm theo lý do khôi phục.<br />
                 - Chức năng này ta cần nhập params với ticketId và body có dạng sau:<br />
                 Params: {ticketId: "3"}<br />
                 Body:<br />
@@ -364,40 +364,3 @@ ticketRegistry.registerPath({
   responses: createApiResponse(z.any(), "Success"),
 });
 ticketRouter.put("/cancel_ticket/delete/:ticketId", authenticate, permission, ticketController.deleteCancelledTicket);
-
-// // Chọn phương thức thanh toán
-// ticketRegistry.registerPath({
-//   method: "post",
-//   path: "tickets/payment/{ticketId}",
-//   tags: ["Ticket"],
-//   summary: "Chọn phương thức thanh toán",
-//   description: `Chọn phương thức thanh toán<br />
-//                 - Chức năng này sẽ cho phép nhập <br />
-//                 - Chức năng này ta cần nhập body theo dạng sau: <br />
-//                 {<br />
-//                   "paymentMethod": "CASH", <br />
-//                   "userId": 1, <br />
-//                   "amount": 50 <br />
-//                 }<br />
-//                 "paymentMethod": Phương thức thanh toán ('CASH', 'ONLINE')<br />
-//                 "userId": Id người dùng<br />
-//                 "amount": Tổng số tiền thanh toán<br />`,
-//   request: {
-//     params: z.object({
-//       ticketId: z.string().regex(/^\d+$/, "Ticket ID must be a numeric string"),
-//     }),
-//     body: {
-//       content: {
-//         "application/json": {
-//           schema: z.object({
-//             paymentMethod: z.enum(["ONLINE", "CASH"]),
-//             userId: z.number(),
-//             amount: z.number().positive(),
-//           }),
-//         },
-//       },
-//     },
-//   },
-//   responses: createApiResponse(PaymentSchema, "Success"),
-// });
-// ticketRouter.post("/payment/:ticketId", authenticate, ticketController.selectPaymentMethod);
