@@ -18,10 +18,10 @@ export class VehicleScheduleService {
   ): Promise<ServiceResponse<any>> {
     try {
       const result = await this.vehicleScheduleRepository.findAll(filter, options);
-      return ServiceResponse.success("Vehicle schedules fetched successfully", result);
+      return ServiceResponse.success("Lấy danh sách lịch trình xe thành công", result);
     } catch (ex) {
-      logger.error(`Error fetching vehicle schedules: ${(ex as Error).message}`);
-      return ServiceResponse.failure("Failed to fetch vehicle schedules", null, StatusCodes.INTERNAL_SERVER_ERROR);
+      logger.error(`Lỗi khi tìm lịch trình xe: ${(ex as Error).message}`);
+      return ServiceResponse.failure("Không thể lấy danh sách lịch trình xe", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -32,20 +32,20 @@ export class VehicleScheduleService {
     try {
       const newSchedule = await this.vehicleScheduleRepository.createAsync(data);
       console.log("DEBUG: newSchedule created", newSchedule);
-      return ServiceResponse.success("Vehicle schedule created successfully", newSchedule, StatusCodes.CREATED);
+      return ServiceResponse.success(" Tạo lịch trình xe thành công", newSchedule, StatusCodes.CREATED);
     } catch (ex) {
       const errorMessage = (ex as Error).message;
-      logger.error(`Error creating vehicle schedule: ${errorMessage}`);
+      logger.error(`Lỗi khi tạo lịch trình xe: ${errorMessage}`);
 
       if (errorMessage.includes("Schedule conflict")) {
         return ServiceResponse.failure(
-          "Schedule conflict: The bus already has a schedule during this time.",
+          "Xung đột lịch trình: Xe buýt đã có lịch trình vào thời gian này.",
           null,
           StatusCodes.CONFLICT
         );
       }
 
-      if (errorMessage.includes("Available seats cannot exceed total seats")) {
+      if (errorMessage.includes("Số ghế có sẵn không được vượt quá tổng số ghế của xe buýt")) {
         return ServiceResponse.failure(
           errorMessage,
           null,
@@ -53,11 +53,11 @@ export class VehicleScheduleService {
         );
       }
 
-      if (errorMessage.includes("Bus not found")) {
-        return ServiceResponse.failure("Bus not found", null, StatusCodes.NOT_FOUND);
+      if (errorMessage.includes("Không tìm thấy xe buýt")) {
+        return ServiceResponse.failure("Không tìm thấy xe buýt", null, StatusCodes.NOT_FOUND);
       }
 
-      return ServiceResponse.failure("Failed to create vehicle schedule", null, StatusCodes.INTERNAL_SERVER_ERROR);
+      return ServiceResponse.failure("Không tạo được lịch trình xe", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -69,28 +69,28 @@ export class VehicleScheduleService {
     try {
       const schedule = await this.vehicleScheduleRepository.findByIdAsync(id);
       if (!schedule) {
-        return ServiceResponse.failure("Vehicle schedule not found", null, StatusCodes.NOT_FOUND);
+        return ServiceResponse.failure("Không tìm thấy lịch trình xe", null, StatusCodes.NOT_FOUND);
       }
 
       const updatedSchedule = await this.vehicleScheduleRepository.updateAsync(id, data);
       if (!updatedSchedule) {
-        return ServiceResponse.failure("Failed to update vehicle schedule", null, StatusCodes.BAD_REQUEST);
+        return ServiceResponse.failure("Không cập nhật được lịch trình xe", null, StatusCodes.BAD_REQUEST);
       }
 
-      return ServiceResponse.success("Vehicle schedule updated successfully", updatedSchedule);
+      return ServiceResponse.success("Lịch trình xe được cập nhật thành công", updatedSchedule);
     } catch (ex) {
       const errorMessage = (ex as Error).message;
-      logger.error(`Error updating vehicle schedule with id ${id}: ${errorMessage}`);
+      logger.error(`Lỗi khi cập nhật lịch trình xe với id ${id}: ${errorMessage}`);
 
       if (errorMessage.includes("Schedule conflict")) {
         return ServiceResponse.failure(
-          "Schedule conflict: The bus already has a schedule during this time.",
+          "Xung đột lịch trình: Xe buýt đã có lịch trình vào thời gian này.",
           null,
           StatusCodes.CONFLICT
         );
       }
 
-      if (errorMessage.includes("Available seats cannot exceed total seats")) {
+      if (errorMessage.includes("Số ghế có sẵn không được vượt quá tổng số ghế của xe buýt")) {
         return ServiceResponse.failure(
           errorMessage,
           null,
@@ -98,11 +98,11 @@ export class VehicleScheduleService {
         );
       }
 
-      if (errorMessage.includes("Bus not found")) {
-        return ServiceResponse.failure("Bus not found", null, StatusCodes.NOT_FOUND);
+      if (errorMessage.includes("Không tìm thấy xe buýt")) {
+        return ServiceResponse.failure("Không tìm thấy xe buýt", null, StatusCodes.NOT_FOUND);
       }
 
-      return ServiceResponse.failure("Failed to update vehicle schedule", null, StatusCodes.INTERNAL_SERVER_ERROR);
+      return ServiceResponse.failure("Không cập nhật được lịch trình xe", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -111,14 +111,14 @@ export class VehicleScheduleService {
     try {
       const schedule = await this.vehicleScheduleRepository.findByIdAsync(id);
       if (!schedule) {
-        return ServiceResponse.failure("Vehicle schedule not found", null, StatusCodes.NOT_FOUND);
+        return ServiceResponse.failure("Không tìm thấy lịch trình xe", null, StatusCodes.NOT_FOUND);
       }
 
       const deletedSchedule = await this.vehicleScheduleRepository.deleteAsync(id);
-      return ServiceResponse.success("Vehicle schedule deleted successfully", deletedSchedule);
+      return ServiceResponse.success("Lịch trình xe xóa thành công", deletedSchedule);
     } catch (ex) {
-      logger.error(`Error deleting vehicle schedule with id ${id}: ${(ex as Error).message}`);
-      return ServiceResponse.failure("Failed to delete vehicle schedule", null, StatusCodes.INTERNAL_SERVER_ERROR);
+      logger.error(`Lỗi khi xóa lịch trình xe có id ${id}: ${(ex as Error).message}`);
+      return ServiceResponse.failure("Không xóa được lịch trình xe", null, StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 }

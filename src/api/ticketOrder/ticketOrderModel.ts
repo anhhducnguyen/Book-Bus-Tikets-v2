@@ -9,9 +9,6 @@ const SortFieldsEnum = z.enum([
   "tickets.id",
   "tickets.status",
   "users.email",
-  "schedules.departure_time",
-  "routes.price",
-  "buses.license_plate",
   "bus_companies.company_name",
   "seats.seat_number",
 ]);
