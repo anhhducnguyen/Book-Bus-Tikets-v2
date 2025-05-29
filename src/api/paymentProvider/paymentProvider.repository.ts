@@ -4,20 +4,20 @@ import { db } from "@/common/config/database";
 export class PaymentProviderRepository {
     // Lấy danh sách tất cả các nhà cung cấp thanh toán, có thể lọc, phân trang và sắp xếp
     async findAllAsync(filter: any, options: { sortBy?: string; limit?: number; page?: number }) {
-        const { sortBy = "id:asc", limit = 10, page = 1 } = options;
-        const [sortField, sortOrder] = sortBy.split(":");
+        // const { sortBy = "id:asc", limit = 10, page = 1 } = options;
+        // const [sortField, sortOrder] = sortBy.split(":");
 
         const query = db<PaymentProvider>("payment_providers");
 
         // Lọc theo tên nhà cung cấp (nếu có)
-        if (filter.provider_name) {
-            query.where("provider_name", "like", `%${filter.provider_name}%`);
-        }
+        // if (filter.provider_name) {
+        //     query.where("provider_name", "like", `%${filter.provider_name}%`);
+        // }
 
-        const offset = (page - 1) * limit;
+        // const offset = (page - 1) * limit;
 
         // Truy vấn dữ liệu với sắp xếp, phân trang
-        const data = await query.orderBy(sortField, sortOrder).limit(limit).offset(offset);
+        const data = await query;
 
         // Truy vấn tổng số bản ghi để tính tổng trang
         const countResult = await db<PaymentProvider>("payment_providers")
@@ -32,10 +32,10 @@ export class PaymentProviderRepository {
 
         return {
             results: data,
-            page,
-            limit,
+            // page,
+            // limit,
             total: totalCount,
-            totalPages: Math.ceil(totalCount / limit),
+            // totalPages: Math.ceil(totalCount / limit),
         };
     }
 
@@ -51,6 +51,20 @@ export class PaymentProviderRepository {
     // Tạo mới một nhà cung cấp thanh toán
     async createPaymentProviderAsync(data: Omit<PaymentProvider, "id" | "created_at" | "updated_at">): Promise<PaymentProvider> {
         const currentTime = new Date();
+
+        // Kiểm tra trùng tên và loại nhà cung cấp
+        const existing = await db<PaymentProvider>("payment_providers")
+            .where({
+                provider_name: data.provider_name,
+                provider_type: data.provider_type,
+            })
+            .first();
+
+        if (existing) {
+            throw new Error(
+                `Nhà cung cấp "${data.provider_name}" đã tồn tại với loại thanh toán "${data.provider_type}".`
+            );
+        }
 
         // Chèn dữ liệu mới và lấy ID được tạo
         const [id] = await db('payment_providers').insert({
@@ -68,7 +82,7 @@ export class PaymentProviderRepository {
     // Xóa nhà cung cấp thanh toán theo ID
     async deletePaymentProviderAsync(id: number): Promise<boolean> {
         try {
-            // Xoá payments trước (nếu không dùng ON DELETE CASCADE)
+            // Xoá các bản ghi thanh toán liên quan trước (nếu không dùng ON DELETE CASCADE)
             await db("payments").where({ payment_provider_id: id }).del();
 
             const affectedRows = await db<PaymentProvider>("payment_providers")
@@ -77,7 +91,7 @@ export class PaymentProviderRepository {
 
             return affectedRows > 0;
         } catch (error) {
-            console.error("Error deleting payment provider:", error);
+            console.error("Lỗi khi xoá nhà cung cấp thanh toán:", error);
             return false;
         }
     }

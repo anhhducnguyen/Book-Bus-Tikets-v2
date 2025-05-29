@@ -1,5 +1,12 @@
 import { db } from "@/common/config/database";
 
+class NotFoundError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "NotFoundError";
+  }
+}
+
 export class TicketOrderRepository {
   async getAllTicketOrders({
     page = 1,
@@ -17,23 +24,14 @@ export class TicketOrderRepository {
     const offset = (page - 1) * limit;
 
     if (!sortBy.includes(".")) {
-      sortBy = `tickets.id`;
-      sortBy = `tickets.status`;
-      // sortBy = `users.first_name`;
-      sortBy = `users.email`;
-      // sortBy = `schedules.departure_time`;
-      // sortBy = `routes.price`;
-      // sortBy = `buses.license_plate`;
+      // Gợi ý các giá trị có thể dùng để sắp xếp (có thể mở rộng tùy frontend)
       sortBy = `bus_companies.company_name`;
-      sortBy = `seats.seat_number`;
     }
-
 
     const query = db("tickets")
       .select(
         "tickets.id as ticketId",
         "tickets.status",
-        // "users.first_name as first_name",
         "users.email as userEmail",
         "schedules.departure_time",
         "routes.price as price",
@@ -42,9 +40,7 @@ export class TicketOrderRepository {
         "buses.name as busName",
         "bus_companies.company_name as busCompanyName",
         "departure_station.name as departureStation",
-        "arrival_station.name as arrivalStation",
-        "buses.id as busId",
-        "routes.id as routeId",
+        "arrival_station.name as arrivalStation"
       )
       .join("payments", "tickets.id", "payments.ticket_id")
       .join("users", "payments.user_id", "users.id")
@@ -58,29 +54,33 @@ export class TicketOrderRepository {
 
     if (search) {
       query.where(function () {
-        this
-          // .where("users.first_name", "like", `%${search}%`)
-          // .orWhere("users.email", "like", `%${search}%`);
-          // .where("users.email", "like", `%${search}%`)
-          .orWhere("buses.id", "like", `${search}`);
+        this.where("users.email", "like", `%${search}%`);
       });
     }
-    query.orderBy(sortBy, order)
-      .limit(limit)
-      .offset(offset);
+
+    query.orderBy(sortBy, order).limit(limit).offset(offset);
+
     console.log("Query:", query.toSQL().sql);
 
-    return await query;
+    const result = await query;
+
+    if (result.length === 0) {
+      if (search) {
+        throw new NotFoundError(`Không tìm thấy vé nào có email chứa từ khóa "${search}".`);
+      } else {
+        throw new NotFoundError(`Không tìm thấy vé nào ở trang số ${page}.`);
+      }
+    }
+
+    return result;
   }
 
   async getTicketOrdersByCompany(companyId: number) {
-
     try {
       const query = db("tickets")
         .select(
           "tickets.id as ticketId",
           "tickets.status",
-          // "users.first_name as first_name",
           "users.email as userEmail",
           "schedules.departure_time",
           "routes.price as price",
@@ -95,22 +95,26 @@ export class TicketOrderRepository {
         .join("buses", "schedules.bus_id", "buses.id")
         .join("bus_companies", "buses.company_id", "bus_companies.id")
         .join("seats", "tickets.seat_id", "seats.id")
-        .where("bus_companies.id", companyId)
+        .where("bus_companies.id", companyId);
 
-      return await query;
+      const result = await query;
+
+      if (result.length === 0) {
+        throw new NotFoundError(`Không tìm thấy đơn đặt vé nào cho nhà xe với ID = ${companyId}.`);
+      }
+
+      return result;
     } catch (error) {
       throw error;
     }
   }
 
   async getTicketOrdersByStatus(status: string) {
-
     try {
       const query = db("tickets")
         .select(
           "tickets.id as ticketId",
           "tickets.status",
-          // "users.first_name as first_name",
           "users.email as userEmail",
           "schedules.departure_time",
           "routes.price as price",
@@ -125,11 +129,17 @@ export class TicketOrderRepository {
         .leftJoin("buses", "schedules.bus_id", "buses.id")
         .leftJoin("bus_companies", "buses.company_id", "bus_companies.id")
         .leftJoin("seats", "tickets.seat_id", "seats.id")
-        .where("tickets.status", status)
+        .where("tickets.status", status);
 
       console.log("Query:", query.toSQL().sql);
 
-      return await query;
+      const result = await query;
+
+      if (result.length === 0) {
+        throw new NotFoundError(`Không tìm thấy đơn đặt vé nào có trạng thái là "${status}".`);
+      }
+
+      return result;
     } catch (error) {
       throw error;
     }

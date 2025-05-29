@@ -1,5 +1,4 @@
 import { StatusCodes } from "http-status-codes";
-
 import { TicketOrderRepository } from "@/api/ticketOrder/ticketOrderRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
@@ -12,7 +11,6 @@ export class TicketOrderService {
     this.ticketOrderRepository = repository;
   }
 
-  // 1. Lấy tất cả đơn đặt vé
   async getAllTicketOrders(params: {
     page: number;
     limit: number;
@@ -21,78 +19,58 @@ export class TicketOrderService {
     search: string;
   }): Promise<ServiceResponse<TicketOrder[] | null>> {
     try {
-      const { page, limit, sortBy, order, search } = params;
-      console.log("page", page);
-      console.log("limit", limit);
-      console.log("sortBy", sortBy);
-      console.log("order", order);
-      console.log("search", search);
-      const ticketOrders = await this.ticketOrderRepository.getAllTicketOrders({
-        page,
-        limit,
-        sortBy,
-        order,
-        search,
-      });
+      const ticketOrders = await this.ticketOrderRepository.getAllTicketOrders(params);
+      return ServiceResponse.success<TicketOrder[]>("Lấy danh sách vé thành công", ticketOrders);
+    } catch (ex) {
+      const error = ex as Error;
+      logger.error(`Lỗi khi lấy danh sách vé: ${error.message}`);
 
-      if (!ticketOrders || ticketOrders.length === 0) {
-        return ServiceResponse.failure("No ticket orders found", null, StatusCodes.NOT_FOUND);
+      if (error.name === "NotFoundError") {
+        return ServiceResponse.failure(error.message, null, StatusCodes.NOT_FOUND);
       }
 
-      return ServiceResponse.success<TicketOrder[]>("Ticket orders found", ticketOrders);
-    } catch (ex) {
-      const errorMessage = `Error finding all ticket orders: ${(ex as Error).message}`;
-      logger.error(errorMessage);
       return ServiceResponse.failure(
-        "An error occurred while retrieving ticket orders."+ errorMessage,
+        "Đã xảy ra lỗi khi lấy danh sách vé. " + error.message,
         null,
         StatusCodes.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  // 2. Lấy đơn đặt vé theo nhà xe
-  async getTicketOrdersByCompany(
-    companyId: number,
-    _params?: any
-  ): Promise<ServiceResponse<TicketOrder[] | null>> {
+  async getTicketOrdersByCompany(companyId: number): Promise<ServiceResponse<TicketOrder[] | null>> {
     try {
       const ticketOrders = await this.ticketOrderRepository.getTicketOrdersByCompany(companyId);
+      return ServiceResponse.success<TicketOrder[]>("Lấy danh sách vé theo nhà xe thành công", ticketOrders);
+    } catch (ex) {
+      const error = ex as Error;
+      logger.error(`Lỗi khi lấy vé cho nhà xe ${companyId}: ${error.message}`);
 
-      if (!ticketOrders || ticketOrders.length === 0) {
-        return ServiceResponse.failure("No ticket orders found for this company", null, StatusCodes.NOT_FOUND);
+      if (error.name === "NotFoundError") {
+        return ServiceResponse.failure(error.message, null, StatusCodes.NOT_FOUND);
       }
 
-      return ServiceResponse.success<TicketOrder[]>("Ticket orders found for the company", ticketOrders);
-    } catch (ex) {
-      const errorMessage = `Error finding ticket orders for company ${companyId}: ${(ex as Error).message}`;
-      logger.error(errorMessage);
       return ServiceResponse.failure(
-        "An error occurred while retrieving ticket orders for the company." + errorMessage,
+        "Đã xảy ra lỗi khi lấy vé theo nhà xe. " + error.message,
         null,
         StatusCodes.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  // 3. Lấy đơn đặt vé theo trạng thái
-  async getTicketOrdersByStatus(
-    status: string,
-    _params?: any
-  ): Promise<ServiceResponse<TicketOrder[] | null>> {
+  async getTicketOrdersByStatus(status: string): Promise<ServiceResponse<TicketOrder[] | null>> {
     try {
       const ticketOrders = await this.ticketOrderRepository.getTicketOrdersByStatus(status);
+      return ServiceResponse.success<TicketOrder[]>("Lấy danh sách vé theo trạng thái thành công", ticketOrders);
+    } catch (ex) {
+      const error = ex as Error;
+      logger.error(`Lỗi khi lấy vé với trạng thái ${status}: ${error.message}`);
 
-      if (!ticketOrders || ticketOrders.length === 0) {
-        return ServiceResponse.failure("No ticket orders found with this status", null, StatusCodes.NOT_FOUND);
+      if (error.name === "NotFoundError") {
+        return ServiceResponse.failure(error.message, null, StatusCodes.NOT_FOUND);
       }
 
-      return ServiceResponse.success<TicketOrder[]>("Ticket orders found with this status", ticketOrders);
-    } catch (ex) {
-      const errorMessage = `Error finding ticket orders with status ${status}: ${(ex as Error).message}`;
-      logger.error(errorMessage);
       return ServiceResponse.failure(
-        "An error occurred while retrieving ticket orders with the specified status." + errorMessage,
+        "Đã xảy ra lỗi khi lấy vé theo trạng thái. " + error.message,
         null,
         StatusCodes.INTERNAL_SERVER_ERROR,
       );
