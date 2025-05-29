@@ -69,6 +69,19 @@ export class UserRepository {
 		try {
 			const user = await db<User>('users')
 				.where({ id })
+				.select(
+					'id',
+					'email',
+					'username',
+					'reset_token',
+					'reset_token_expiry',
+					'role',
+					'google_id',
+					'created_at',
+					'updated_at',
+					'avatar',
+					'phone'
+				)
 				.first();
 
 			return user ?? null;
