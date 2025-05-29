@@ -29,7 +29,7 @@ routesRegistry.registerPath({
   path: "/routes",
   operationId: "getAllRoutes",
   tags: ["Routes"],
-  summary: "Lấy danh sách routes có hỗ trợ phân trang, tìm kiếm và lọc",
+  summary: "(Khách vãng lai) Lấy danh sách routes có hỗ trợ phân trang, tìm kiếm và lọc",
   parameters: [
     {
       name: "page",

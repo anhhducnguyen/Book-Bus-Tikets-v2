@@ -19,7 +19,7 @@ getPopularStationRegistry.registerPath({
     path: "/get-popular-station",
     tags: ["Statistical"],
     operationId: "getMostPopularStations",
-    summary: "Lấy danh sách bến xe phổ biến nhất theo số lượng lịch trình",
+    summary: "(Khách vãng lai) Lấy danh sách bến xe phổ biến nhất theo số lượng lịch trình",
     description: `Trường dữ liệu trả về:
 
     - station_id: ID của bến xe

@@ -21,7 +21,7 @@ ticketRegistry.registerPath({
   method: "get",
   path: "/tickets/routes",
   tags: ["Book tickets"],
-  summary: "Lựa chọn tuyến đường đi",
+  summary: "(Người dùng đăng nhập) Lựa chọn tuyến đường đi",
   description: `Lựa chọn tuyến đường đi:<br /> 
                 - Chức năng này sẽ hiển thị danh sách tuyến đường để người dùng có thể lựa chọn<br />
                 <br />
@@ -42,7 +42,7 @@ ticketRegistry.registerPath({
   method: "get",
   path: "/tickets/routes/{routeId}/buses",
   tags: ["Book tickets"],
-  summary: "Lựa chọn xe đi",
+  summary: "(Người dùng đăng nhập) Lựa chọn xe đi",
   description: `Lựa chọn xe đi:<br /> 
                 - Chức năng này sẽ cho phép người dùng chọn tuyến đường và hiển thị danh sách tất cả các xe khách trên tuyến đường đó<br />
                 - Chức năng này ta cần nhập ID của tuyến đường mình chọn<br />
@@ -65,7 +65,7 @@ ticketRegistry.registerPath({
   method: "get",
   path: "/tickets/buses/{busId}/seats",
   tags: ["Book tickets"],
-  summary: "Lựa chọn ghế đi",
+  summary: "(Người dùng đăng nhập) Lựa chọn ghế đi",
   description: `Lựa chọn ghế đi<br /> 
                 - Tương tự, chức năng này sẽ cho phép người dùng chọn xe khách và hiển thị danh sách tất cả các ghế còn trống trên xe đó<br />
                 - Chức năng này ta cần nhập ID của xe khách mình chọn<br />
@@ -89,7 +89,7 @@ ticketRegistry.registerPath({
   method: "post",
   path: "/tickets/booking",
   tags: ["Book tickets"],
-  summary: "Đặt vé",
+  summary: "(Người dùng đăng nhập) Đặt vé",
   description: `Đặt vé<br /> 
                 - Chức năng này sẽ cho phép người dùng nhập đặt vé và chọn phương thức thanh toán để đặt vé.<br />
                 - Vé sẽ tự động được đặt cho người dùng hiện tại (dựa trên token xác thực)<br />
@@ -123,7 +123,7 @@ ticketRegistry.registerPath({
   method: "put",
   path: "/tickets/cancel/{ticketId}",
   tags: ["Book tickets"],
-  summary: "Hủy vé",
+  summary: "(Người dùng đăng nhập) Hủy vé",
   description: `Hủy vé<br /> 
                 - Chức năng này sẽ cho phép người dùng hủy vé xe và lý do hủy, sau đó chuyển sang trạng thái Cancelled(đã hủy)<br />
                 - Chức năng này ta cần nhập ID của vé xe mình chọn và lý do hủy trong body<br />
@@ -216,7 +216,7 @@ ticketRegistry.registerPath({
   method: "get",
   path: "/tickets/history",
   tags: ["Booking history"],
-  summary: "Xem tất cả lịch sử đặt vé",
+  summary: "(Người dùng đăng nhập) Xem tất cả lịch sử đặt vé",
   description: `Xem tất cả lịch sử đặt vé<br /> 
                 - Chức năng này chỉ hiển thị danh sách lịch sử đặt vé<br />
                 - Admin có thể xem toàn bộ lịch sử đặt vé.<br />
@@ -302,7 +302,7 @@ ticketRegistry.registerPath({
   path: "/tickets/search",
   tags: ["Ticket"],
   operationId: "searchTicket",
-  summary: "Tra cứu vé xe bằng mã vé và số điện thoại",
+  summary: "(Khách vãng lai) Tra cứu vé xe bằng mã vé và số điện thoại",
   description: `Tra cứu vé xe bằng mã vé và số điện thoại<br /> 
                 - Chức năng này sẽ cho phép tất cả mọi người có thể tra cứu vé xe bằng mã vé và số điện thoại của người đặt vé đó.<br />
                 - Chức năng này ta cần nhập ID của vé xe và ID của user đã đặt vé đó<br />

@@ -14,7 +14,7 @@ findArrivalRegistry.registerPath({
     method: "get",
     path: "/search/find-arrival",
     operationId: "searchSchedulesByStationName",
-    summary: "Tìm kiếm lịch trình theo tên điểm đón, điểm đến và ngày khởi hành",
+    summary: "(Khách vãng lai) Tìm kiếm lịch trình theo tên điểm đón, điểm đến và ngày khởi hành",
     description: `Trường dữ liệu trả về:
     - id: ID của lịch trình
 

@@ -31,7 +31,7 @@ stationRegistry.registerPath({
   method: "get",
   path: "/stations",
   tags: ["Station"],
-  summary: "Lấy tất cả các bến xe với phân trang, tìm kiếm và sắp xếp",
+  summary: "(Khách vãng lai) Lấy tất cả các bến xe với phân trang, tìm kiếm và sắp xếp",
 //   description: `
 // Hiển thị thông tin tất cả các bến xe 
 
@@ -60,7 +60,7 @@ stationRegistry.registerPath({
   method: "get",
   path: "/stations/{id}",
   tags: ["Station"],
-  summary: "Lấy thông tin chi tiết một bến xe theo ID",
+  summary: "(Khách vãng lai) Lấy thông tin chi tiết một bến xe theo ID",
   request: {
     params: GetStationSchema.shape.params,
   },
