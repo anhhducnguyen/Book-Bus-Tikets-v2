@@ -9,7 +9,7 @@ export class PaymentProviderRepository {
 
         const query = db<PaymentProvider>("payment_providers");
 
-        // // Lọc theo tên nhà cung cấp (nếu có)
+        // Lọc theo tên nhà cung cấp (nếu có)
         // if (filter.provider_name) {
         //     query.where("provider_name", "like", `%${filter.provider_name}%`);
         // }
@@ -52,6 +52,20 @@ export class PaymentProviderRepository {
     async createPaymentProviderAsync(data: Omit<PaymentProvider, "id" | "created_at" | "updated_at">): Promise<PaymentProvider> {
         const currentTime = new Date();
 
+        // Kiểm tra trùng tên và loại nhà cung cấp
+        const existing = await db<PaymentProvider>("payment_providers")
+            .where({
+                provider_name: data.provider_name,
+                provider_type: data.provider_type,
+            })
+            .first();
+
+        if (existing) {
+            throw new Error(
+                `Nhà cung cấp "${data.provider_name}" đã tồn tại với loại thanh toán "${data.provider_type}".`
+            );
+        }
+
         // Chèn dữ liệu mới và lấy ID được tạo
         const [id] = await db('payment_providers').insert({
             ...data,
@@ -68,7 +82,7 @@ export class PaymentProviderRepository {
     // Xóa nhà cung cấp thanh toán theo ID
     async deletePaymentProviderAsync(id: number): Promise<boolean> {
         try {
-            // Xoá payments trước (nếu không dùng ON DELETE CASCADE)
+            // Xoá các bản ghi thanh toán liên quan trước (nếu không dùng ON DELETE CASCADE)
             await db("payments").where({ payment_provider_id: id }).del();
 
             const affectedRows = await db<PaymentProvider>("payment_providers")
@@ -77,7 +91,7 @@ export class PaymentProviderRepository {
 
             return affectedRows > 0;
         } catch (error) {
-            console.error("Error deleting payment provider:", error);
+            console.error("Lỗi khi xoá nhà cung cấp thanh toán:", error);
             return false;
         }
     }

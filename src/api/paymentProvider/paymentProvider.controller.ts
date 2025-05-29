@@ -1,7 +1,7 @@
 import { Request, Response, RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
 import { paymentProviderService } from "@/api/paymentProvider/paymentProvider.service";
-import { pick } from "@/common/utils/pick";  // Hàm tiện ích để lọc ra các tham số truy vấn cần thiết
+import { pick } from "@/common/utils/pick";
 
 class PaymentProviderController {
 
@@ -27,7 +27,9 @@ class PaymentProviderController {
         const paymentProviderData = req.body;
         try {
             if (!paymentProviderData) {
-                res.status(StatusCodes.BAD_REQUEST).json({ message: "Dữ liệu nhà cung cấp thanh toán là bắt buộc." });
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    message: "Dữ liệu nhà cung cấp thanh toán là bắt buộc.",
+                });
                 return;
             }
 
@@ -36,10 +38,12 @@ class PaymentProviderController {
             if (response.statusCode === StatusCodes.CREATED) {
                 res.status(StatusCodes.CREATED).json({
                     paymentProvider: response.responseObject,
-                    message: response.message,
+                    message: response.message, // "Tạo nhà cung cấp thanh toán thành công"
                 });
             } else {
-                res.status(response.statusCode).json({ message: response.message });
+                res.status(response.statusCode).json({
+                    message: response.message,
+                });
             }
         } catch (ex) {
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -52,7 +56,11 @@ class PaymentProviderController {
     public deletePaymentProvider: RequestHandler = async (req: Request, res: Response) => {
         const id = Number.parseInt(req.params.id as string, 10);
         const response = await paymentProviderService.deletePaymentProvider(id);
-        res.status(response.statusCode).json(response);
+
+        res.status(response.statusCode).json({
+            message: response.message,
+            data: response.responseObject ?? null,
+        });
     };
 
 }

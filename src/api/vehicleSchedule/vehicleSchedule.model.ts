@@ -26,7 +26,6 @@ export const CreateVehicleScheduleBodySchema = VehicleScheduleSchema.omit({
   id: true,
   created_at: true,
   updated_at: true,
-  available_seats: true,
   total_seats: true,
 }).extend({
   route_id: z.number().int(),

@@ -1,9 +1,8 @@
-
 import { StatusCodes } from "http-status-codes";
 import { PaymentProviderRepository } from "@/api/paymentProvider/paymentProvider.repository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
-import { logger } from "@/server"; // Giả sử logger đã được cấu hình để ghi log lỗi
-import { PaymentProvider } from "@/api/paymentProvider/paymentProvider.model"; // Import kiểu dữ liệu PaymentProvider
+import { logger } from "@/server";
+import { PaymentProvider } from "@/api/paymentProvider/paymentProvider.model";
 
 export class PaymentProviderService {
     private paymentProviderRepository: PaymentProviderRepository;
@@ -16,10 +15,10 @@ export class PaymentProviderService {
     async findAll(filter: any, options: any): Promise<ServiceResponse<any>> {
         try {
             const result = await this.paymentProviderRepository.findAllAsync(filter, options);
-            return ServiceResponse.success("Lấy danh sách nhà cung cấp thành công", result);
+            return ServiceResponse.success("Lấy danh sách nhà cung cấp thanh toán thành công", result);
         } catch (error) {
-            logger.error(`Lỗi khi lấy danh sách nhà cung cấp: ${(error as Error).message}`);
-            return ServiceResponse.failure("Không thể lấy danh sách nhà cung cấp", null, StatusCodes.INTERNAL_SERVER_ERROR);
+            logger.error(`Lỗi khi lấy danh sách nhà cung cấp thanh toán: ${(error as Error).message}`);
+            return ServiceResponse.failure("Không thể lấy danh sách nhà cung cấp thanh toán", null, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -30,9 +29,9 @@ export class PaymentProviderService {
             if (!provider) {
                 return ServiceResponse.failure("Không tìm thấy nhà cung cấp thanh toán", null, StatusCodes.NOT_FOUND);
             }
-            return ServiceResponse.success("Tìm thấy nhà cung cấp thanh toán", provider);
+            return ServiceResponse.success("Đã tìm thấy nhà cung cấp thanh toán", provider);
         } catch (ex) {
-            const errorMessage = `Lỗi khi tìm nhà cung cấp với id ${id}: ${(ex as Error).message}`;
+            const errorMessage = `Lỗi khi tìm nhà cung cấp thanh toán với ID ${id}: ${(ex as Error).message}`;
             logger.error(errorMessage);
             return ServiceResponse.failure("Đã xảy ra lỗi khi tìm nhà cung cấp thanh toán", null, StatusCodes.INTERNAL_SERVER_ERROR);
         }
@@ -42,10 +41,13 @@ export class PaymentProviderService {
     async createPaymentProvider(data: Omit<PaymentProvider, "id" | "created_at" | "updated_at">): Promise<ServiceResponse<any>> {
         try {
             const newProvider = await this.paymentProviderRepository.createPaymentProviderAsync(data);
-            return ServiceResponse.success("Tạo nhà cung cấp thành công", newProvider, StatusCodes.CREATED);
+            return ServiceResponse.success("Tạo nhà cung cấp thanh toán thành công", newProvider, StatusCodes.CREATED);
         } catch (ex) {
             const errorMessage = `Lỗi khi tạo nhà cung cấp thanh toán: ${(ex as Error).message}`;
             logger.error(errorMessage);
+            if (errorMessage.includes("đã tồn tại với loại")) {
+                return ServiceResponse.failure(errorMessage, null, StatusCodes.CONFLICT);
+            }
             return ServiceResponse.failure("Đã xảy ra lỗi khi tạo nhà cung cấp thanh toán", null, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
@@ -55,15 +57,14 @@ export class PaymentProviderService {
         try {
             const deleted = await this.paymentProviderRepository.deletePaymentProviderAsync(id);
             if (!deleted) {
-                return ServiceResponse.failure("Payment provider not found", null, StatusCodes.NOT_FOUND);
+                return ServiceResponse.failure("Không tìm thấy nhà cung cấp thanh toán để xoá", null, StatusCodes.NOT_FOUND);
             }
-            return ServiceResponse.success("Payment provider deleted successfully", null);
+            return ServiceResponse.success("Xoá nhà cung cấp thanh toán thành công", null);
         } catch (error) {
-            logger.error(`Error deleting payment provider with id ${id}: ${(error as Error).message}`);
-            return ServiceResponse.failure("An error occurred while deleting payment provider.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+            logger.error(`Lỗi khi xoá nhà cung cấp thanh toán với ID ${id}: ${(error as Error).message}`);
+            return ServiceResponse.failure("Đã xảy ra lỗi khi xoá nhà cung cấp thanh toán", null, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
-
 }
 
 export const paymentProviderService = new PaymentProviderService();

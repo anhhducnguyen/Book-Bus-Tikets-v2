@@ -46,16 +46,17 @@ paymentProviderRegistry.registerPath({
     description: `Tạo mới một nhà cung cấp thanh toán với thông tin chi tiết bao gồm tên, loại và endpoint API.<br /><br />
                 <strong>provider_name</strong>: Tên nhà cung cấp thanh toán.<br />
                 <strong>provider_type</strong>: Loại nhà cung cấp thanh toán (ví dụ: E_WALLET, CARD, BANK_TRANSFER, QR_CODE).<br />
-                <strong>api_endpoint</strong>: Đường dẫn API của nhà cung cấp thanh toán. Phải là ulr  (ví dụ: "https://api.paymentprovider.com/v1, http://example.com/api) <br />`,
+                <strong>api_endpoint</strong>: Đường dẫn API của nhà cung cấp thanh toán. Phải là ulr  (ví dụ: "https://api.paymentprovider.com/v1, http://example.com/api) <br />
+                **Chú ý:** 1 nhà cung cấp thanh toán với mỗi type chỉ có thể tạo 1 lần.`,
     request: {
         body: {
             content: {
                 "application/json": {
                     schema: CreatePaymentProviderSchema.shape.body,
                     example: {  // Thêm ví dụ minh họa cho request
-                        provider_name: "Payment Provider Example",
+                        provider_name: "ACB",
                         provider_type: "E_WALLET",
-                        api_endpoint: "https://example.com/api/payment"
+                        api_endpoint: "https://acb/api/payment"
                     }
                 },
             },
