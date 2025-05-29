@@ -43,8 +43,8 @@ export const SignUpSchema = z.object({
         .openapi({
             example: {
                 email: "user100@gmail.com",
-                phone: "+84987654321",
-                password: "Ducanh12@#",
+                phone: "0762494312",
+                password: "Huy@1234",
             },
         }),
 });
@@ -52,13 +52,13 @@ export const SignUpSchema = z.object({
 export const SignInSchema = z.object({
     body: z
         .object({
-            email: z.string().email().openapi({ example: "anhnguyen2k373@gmail.com" }),
-            password: z.string().min(6).openapi({ example: "Ducanh12@#" }),
+            email: z.string().email().openapi({ example: "nguyenthaiviethuy9423@gmail.com" }),
+            password: z.string().min(6).openapi({ example: "Huy@9423" }),
         })
         .openapi({
             example: {
-                email: "anhnguyen2k373@gmail.com",
-                password: "Ducanh123@#",
+                email: "nguyenthaiviethuy9423@gmail.com",
+                password: "Huy@9423",
             },
         }),
 });
@@ -70,7 +70,7 @@ export const ResetPasswordSchema = z.object({
     })
         .openapi({
             example: {
-                email: "anhnguyen2k373@gmail.com",
+                email: "nguyenthaiviethuy9423@gmail.com",
             },
         }),
 });
@@ -83,11 +83,7 @@ export const ConfirmResetPasswordSchema = z.object({
         .openapi({
             example: {
                 token: "abc123resetTokenXYZ",
-                newPassword: "NewPass12@#",
+                newPassword: "Huy@123456",
             },
         }),
 });
-
-
-
-
