@@ -43,8 +43,8 @@ export class TicketOrderRepository {
         "bus_companies.company_name as busCompanyName",
         "departure_station.name as departureStation",
         "arrival_station.name as arrivalStation",
-        "buses.id as busId",
-        "routes.id as routeId",
+        // "buses.id as busId",
+        // "routes.id as routeId",
       )
       .join("payments", "tickets.id", "payments.ticket_id")
       .join("users", "payments.user_id", "users.id")
@@ -61,8 +61,8 @@ export class TicketOrderRepository {
         this
           // .where("users.first_name", "like", `%${search}%`)
           // .orWhere("users.email", "like", `%${search}%`);
-          // .where("users.email", "like", `%${search}%`)
-          .orWhere("buses.id", "like", `${search}`);
+          .where("users.email", "like", `%${search}%`)
+        // .orWhere("buses.id", "like", `${search}`);
       });
     }
     query.orderBy(sortBy, order)

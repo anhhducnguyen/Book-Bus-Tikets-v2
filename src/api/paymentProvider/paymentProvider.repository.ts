@@ -4,20 +4,20 @@ import { db } from "@/common/config/database";
 export class PaymentProviderRepository {
     // Lấy danh sách tất cả các nhà cung cấp thanh toán, có thể lọc, phân trang và sắp xếp
     async findAllAsync(filter: any, options: { sortBy?: string; limit?: number; page?: number }) {
-        const { sortBy = "id:asc", limit = 10, page = 1 } = options;
-        const [sortField, sortOrder] = sortBy.split(":");
+        // const { sortBy = "id:asc", limit = 10, page = 1 } = options;
+        // const [sortField, sortOrder] = sortBy.split(":");
 
         const query = db<PaymentProvider>("payment_providers");
 
-        // Lọc theo tên nhà cung cấp (nếu có)
-        if (filter.provider_name) {
-            query.where("provider_name", "like", `%${filter.provider_name}%`);
-        }
+        // // Lọc theo tên nhà cung cấp (nếu có)
+        // if (filter.provider_name) {
+        //     query.where("provider_name", "like", `%${filter.provider_name}%`);
+        // }
 
-        const offset = (page - 1) * limit;
+        // const offset = (page - 1) * limit;
 
         // Truy vấn dữ liệu với sắp xếp, phân trang
-        const data = await query.orderBy(sortField, sortOrder).limit(limit).offset(offset);
+        const data = await query;
 
         // Truy vấn tổng số bản ghi để tính tổng trang
         const countResult = await db<PaymentProvider>("payment_providers")
@@ -32,10 +32,10 @@ export class PaymentProviderRepository {
 
         return {
             results: data,
-            page,
-            limit,
+            // page,
+            // limit,
             total: totalCount,
-            totalPages: Math.ceil(totalCount / limit),
+            // totalPages: Math.ceil(totalCount / limit),
         };
     }
 
