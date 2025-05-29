@@ -21,13 +21,13 @@ export class AuthService {
 		try {
 			const user = await this.authRepository.findByIdAsync(id);
 			if (!user) {
-				return ServiceResponse.failure("User not found", null, StatusCodes.NOT_FOUND);
+				return ServiceResponse.failure("Không tìm thấy người dùng", null, StatusCodes.NOT_FOUND);
 			}
-			return ServiceResponse.success<User>("User found", user);
+			return ServiceResponse.success<User>("Người dùng đã tìm thấy", user);
 		} catch (ex) {
-			const errorMessage = `Error finding user with id ${id}:, ${(ex as Error).message}`;
+			const errorMessage = `Lỗi tìm người dùng có id ${id}:, ${(ex as Error).message}`;
 			logger.error(errorMessage);
-			return ServiceResponse.failure("An error occurred while finding user." + errorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure("Đã xảy ra lỗi khi tìm người dùng." + errorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -35,14 +35,14 @@ export class AuthService {
 		try {
 			const existingUser = await this.authRepository.findOne({ email });
 			if (existingUser) {
-				return ServiceResponse.failure("Email already exists", null, StatusCodes.CONFLICT);
+				return ServiceResponse.failure("Email đã tồn tại", null, StatusCodes.CONFLICT);
 			}
 			const hashedPassword = await bcrypt.hash(password, 10);
 			await this.authRepository.createAsync({ email, phone, password: hashedPassword });
 
-			return { statusCode: 201, message: "User registered successfully" };
+			return { statusCode: 201, message: "Người dùng đã đăng ký thành công" };
 		} catch (error) {
-			return ServiceResponse.failure("An error occurred while finding user." + error, null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure("Đã xảy ra lỗi khi tìm người dùng." + error, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 

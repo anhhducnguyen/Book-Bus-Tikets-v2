@@ -16,9 +16,9 @@ export class UserService {
 	async findAll(filter: any, options: any) {
 		try {
 			const result = await this.userRepository.findAllAsync(filter, options);
-			return ServiceResponse.success("Users fetched successfully", result);
+			return ServiceResponse.success("Người dùng đã được tải thành công", result);
 		} catch (error) {
-			return ServiceResponse.failure(`Failed to fetch users ${error}`, null);
+			return ServiceResponse.failure(`Không thể tìm nạp người dùng${error}`, null);
 		}
 	}
 
@@ -27,24 +27,24 @@ export class UserService {
 		try {
 			const user = await this.userRepository.findByIdAsync(id);
 			if (!user) {
-				return ServiceResponse.failure("User not found", null, StatusCodes.NOT_FOUND);
+				return ServiceResponse.failure("Không tìm thấy người dùng", null, StatusCodes.NOT_FOUND);
 			}
-			return ServiceResponse.success<User>("User found", user);
+			return ServiceResponse.success<User>("Người dùng đã tìm thấy", user);
 		} catch (ex) {
-			const errorMessage = `Error finding user with id ${id}:, ${(ex as Error).message}`;
+			const errorMessage = `Lỗi tìm người dùng có id ${id}:, ${(ex as Error).message}`;
 			logger.error(errorMessage);
-			return ServiceResponse.failure(`An error occurred while finding user: ${errorMessage}`, null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure(`Đã xảy ra lỗi khi tìm kiếm người dùng: ${errorMessage}`, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	async createUser(data: Omit<User, "id" | "createdAt" | "updatedAt">): Promise<ServiceResponse<User | null>> {
 		try {
 			const newUser = await this.userRepository.createUserAsync(data);
-			return ServiceResponse.success<User>("User created successfully", newUser, StatusCodes.CREATED);
+			return ServiceResponse.success<User>("Người dùng đã được tạo thành công", newUser, StatusCodes.CREATED);
 		} catch (ex) {
-			const errorMessage = `Error creating user: ${(ex as Error).message}`;
+			const errorMessage = `Lỗi khi tạo người dùng: ${(ex as Error).message}`;
 			logger.error(errorMessage);
-			return ServiceResponse.failure(`An error occurred while creating user: ${errorMessage}`, null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure(`Đã xảy ra lỗi khi tạo người dùng: ${errorMessage}`, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -53,12 +53,12 @@ export class UserService {
 			const isDeleted = await this.userRepository.deleteAsync(id);
 
 			if (!isDeleted) {
-				return ServiceResponse.failure("User does not exist or cannot be deleted", false, StatusCodes.NOT_FOUND);
+				return ServiceResponse.failure("Người dùng không tồn tại hoặc không thể xóa", false, StatusCodes.NOT_FOUND);
 			}
 
-			return ServiceResponse.success<boolean>("User deleted successfully", true);
+			return ServiceResponse.success<boolean>("Người dùng đã bị xóa thành công", true);
 		} catch (error: any) {
-			const errorMessage = `Error deleting user ${id}: ${error.message}`;
+			const errorMessage = `Lỗi khi xóa người dùng ${id}: ${error.message}`;
 			logger.error(errorMessage);
 			return ServiceResponse.failure(errorMessage, false);
 		}
