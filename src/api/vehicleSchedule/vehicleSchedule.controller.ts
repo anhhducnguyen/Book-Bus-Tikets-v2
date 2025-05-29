@@ -22,8 +22,8 @@ class VehicleScheduleController {
       const serviceResponse = await vehicleScheduleService.findAll(filter, options);
       res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error) {
-      console.error("Error in getSchedules:", error);
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+      console.error("Lỗi trong getSchedules:", error);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Lỗi máy chủ nội bộ." });
     }
   };
 
@@ -32,14 +32,15 @@ class VehicleScheduleController {
       const scheduleData = req.body;
 
       if (!scheduleData) {
-        res.status(StatusCodes.BAD_REQUEST).json({ message: "Schedule data is required." });
+        res.status(StatusCodes.BAD_REQUEST).json({ message: "Dữ liệu lịch trình là bắt buộc." });
         return;
       }
+
       const serviceResponse = await vehicleScheduleService.createSchedule(scheduleData);
       res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error) {
-      console.error("Error in createSchedule:", error);
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+      console.error("Lỗi trong createSchedule:", error);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Lỗi máy chủ nội bộ." });
     }
   };
 
@@ -51,8 +52,8 @@ class VehicleScheduleController {
       const serviceResponse = await vehicleScheduleService.updateSchedule(id, scheduleData);
       res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error) {
-      console.error("Error in updateSchedule:", error);
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+      console.error("Lỗi trong updateSchedule:", error);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Lỗi máy chủ nội bộ." });
     }
   };
 
@@ -63,8 +64,8 @@ class VehicleScheduleController {
       const serviceResponse = await vehicleScheduleService.deleteSchedule(id);
       res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error) {
-      console.error("Error in deleteSchedule:", error);
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+      console.error("Lỗi trong deleteSchedule:", error);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Lỗi máy chủ nội bộ." });
     }
   };
 }

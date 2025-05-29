@@ -30,14 +30,35 @@ export const SignUpSchema = z.object({
     body: z
         .object({
             email: z.string().email().openapi({ example: "anhnguyen2k373@gmail.com" }),
-            password: z.string().min(6).openapi({ example: "Ducanh12@#" }),
+            password: z
+                .string()
+                .min(8, "Mật khẩu phải có ít nhất 8 ký tự")
+                .regex(/[A-Z]/, "Phải có ít nhất một chữ hoa")
+                .regex(/[a-z]/, "Phải có ít nhất một chữ thường")
+                .regex(/[0-9]/, "Phải có ít nhất một số")
+                .regex(/[^A-Za-z0-9]/, "Phải có ít nhất một ký tự đặc biệt")
+                .openapi({ example: "Ducanh12@#" }),
             phone: z.string().min(9).max(15).regex(/^\+?[0-9]{9,15}$/, "Invalid phone number").openapi({ example: "+84987654321" }),
         })
         .openapi({
             example: {
-                email: "anhnguyen2k373@gmail.com",
+                email: "user100@gmail.com",
                 phone: "+84987654321",
                 password: "Ducanh12@#",
+            },
+        }),
+});
+
+export const SignInSchema = z.object({
+    body: z
+        .object({
+            email: z.string().email().openapi({ example: "anhnguyen2k373@gmail.com" }),
+            password: z.string().min(6).openapi({ example: "Ducanh12@#" }),
+        })
+        .openapi({
+            example: {
+                email: "anhnguyen2k373@gmail.com",
+                password: "Ducanh123@#",
             },
         }),
 });
@@ -47,11 +68,11 @@ export const ResetPasswordSchema = z.object({
     body: z.object({
         email: z.string().email(),
     })
-    .openapi({
-        example: {
-            email: "anhnguyen2k373@gmail.com",
-        },
-    }),
+        .openapi({
+            example: {
+                email: "anhnguyen2k373@gmail.com",
+            },
+        }),
 });
 
 export const ConfirmResetPasswordSchema = z.object({
@@ -59,12 +80,12 @@ export const ConfirmResetPasswordSchema = z.object({
         token: z.string().min(10, "Token không hợp lệ"),
         newPassword: z.string().min(6, "Mật khẩu phải từ 6 ký tự trở lên"),
     })
-    .openapi({
-      example: {
-        token: "abc123resetTokenXYZ",
-        newPassword: "NewPass12@#",
-      },
-    }),
+        .openapi({
+            example: {
+                token: "abc123resetTokenXYZ",
+                newPassword: "NewPass12@#",
+            },
+        }),
 });
 
 

@@ -38,13 +38,14 @@ export function generateOpenAPIDocument(): OpenAPIDocument {
 		userRegistry,
 		carRegistry,
 		seatRegistry,
-		routesRegistry,
 		bannerRegistry,
+		vehicleScheduleRegistry,
+		paymentProviderRegistry,
+		routesRegistry,
 		busReviewRegistry,
 		ticketOrderRegistry,
 		ticketRegistry,
 		ticketOrderRegistry,
-		paymentProviderRegistry,
 		routeRegistry,
 		stationRegistry,
 		busCompanyRegistry,
@@ -61,7 +62,6 @@ export function generateOpenAPIDocument(): OpenAPIDocument {
 		popularRouteRegistry,
 		getTopReviewRegistry,
 		discountBannerRegistry,
-		vehicleScheduleRegistry
 	]);
 
 	const generator = new OpenApiGeneratorV3(registry.definitions);

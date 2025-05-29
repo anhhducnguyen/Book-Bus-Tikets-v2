@@ -2,7 +2,7 @@ import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import express, { type Router } from "express";
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { AuthSchema, SignUpSchema, ResetPasswordSchema, ConfirmResetPasswordSchema } from "@/api/auth/authModel";
+import { AuthSchema, SignUpSchema, ResetPasswordSchema, ConfirmResetPasswordSchema, SignInSchema } from "@/api/auth/authModel";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { authController } from "./authController";
 import passport from "passport";
@@ -117,7 +117,22 @@ authRegistry.registerPath({
 	path: "/auth/register",
 	tags: ["Auth"],
 	summary: "Đăng ký tài khoản",
-    description: "Create a new account",
+    description: `
+  
+- Yêu cầu cung cấp đầy đủ các thông tin: email, số điện thoại và mật khẩu.
+
+- Email phải đúng định dạng email hợp lệ (ví dụ: user@example.com).
+
+- Số điện thoại phải có độ dài từ 9 đến 15 ký tự, có thể bắt đầu bằng dấu '+' và chỉ chứa các chữ số.
+
+- Mật khẩu phải thỏa mãn các điều kiện sau:
+  - Có ít nhất 8 ký tự.
+  - Có ít nhất một chữ cái viết hoa (A-Z).
+  - Có ít nhất một chữ cái viết thường (a-z).
+  - Có ít nhất một số (0-9).
+  - Có ít nhất một ký tự đặc biệt (ví dụ: @, #, $, %, &,...).
+
+`,
         request: {
         body: {
             content: {
@@ -146,7 +161,7 @@ authRegistry.registerPath({
         body: {
             content: {
             "application/json": {
-                schema: SignUpSchema.shape.body, 
+                schema: SignInSchema.shape.body, 
             },
             },
         },
