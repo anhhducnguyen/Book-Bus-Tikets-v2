@@ -85,7 +85,7 @@ seatRegistry.registerPath({
 	path: "/seats/{id}",
 	tags: ["Seat"],
 	summary: "Xóa ghế theo xe",
-	description: "Xóa ghế theo ID của xe",
+	description: "Thực hiện xóa tất cả ghế (seats) thuộc về một xe bus cụ thể dựa trên busId, và đồng thời xóa các vé (tickets) và thanh toán (payments) liên quan đến những ghế đó",
 	request: { params: GetSeatSchema.shape.params },
 	responses: createApiResponse(SeatSchema, "Success"),
 });
