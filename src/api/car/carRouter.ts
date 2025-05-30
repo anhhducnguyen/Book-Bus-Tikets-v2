@@ -112,7 +112,19 @@ carRegistry.registerPath({
   tags: ["Car"],
   operationId: "deleteCar",
   summary: "Xóa xe",
-  description: "Xóa xe theo id của xe",
+  description: `
+  Thực hiện xóa toàn bộ dữ liệu liên quan đến một xe bus cụ thể theo id, bao gồm:
+
+- Xóa tất cả lịch trình (schedules) của xe.
+
+- Xóa vé (tickets) và thanh toán (payments) liên quan đến các lịch trình đó.
+
+- Xóa tất cả ghế (seats) thuộc xe, cùng với vé và thanh toán liên quan đến các ghế này.
+
+- Xóa dữ liệu phụ liên quan như: hình ảnh xe (bus_image), bến xe (station_bus), đánh giá (bus_reviews).
+
+- Cuối cùng, xóa bản ghi xe (buses) khỏi cơ sở dữ liệu.
+  `,
   request: { params: GetCarSchema.shape.params },
   responses: createApiResponse(GetCarSchema, "Success"),
 });
