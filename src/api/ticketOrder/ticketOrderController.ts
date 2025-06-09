@@ -32,18 +32,18 @@ class TicketOrderController {
 
   public getTicketOrdersByCompany: RequestHandler = async (req: Request, res: Response) => {
     try {
-      const companyId = Number(req.params.companyId);
-      console.log("companyId", companyId);
+      // const companyId = Number(req.params.companyId);
+      // console.log("companyId", companyId);
       
-      const { page = 1, limit = 10, sortBy = "ticketNumber", order = "asc", search = "" } = req.query;
-      const serviceResponse = await ticketOrderService.getTicketOrdersByCompany(companyId, {
-        page: Number(page),
-        limit: Number(limit),
-        sortBy: String(sortBy),
-        order: String(order) as "asc" | "desc",
-        search: String(search),
-      });
-      res.status(serviceResponse.statusCode).send(serviceResponse);
+      // const { page = 1, limit = 10, sortBy = "ticketNumber", order = "asc", search = "" } = req.query;
+      // const serviceResponse = await ticketOrderService.getTicketOrdersByCompany(companyId, {
+      //   page: Number(page),
+      //   limit: Number(limit),
+      //   sortBy: String(sortBy),
+      //   order: String(order) as "asc" | "desc",
+      //   search: String(search),
+      // });
+      // res.status(serviceResponse.statusCode).send(serviceResponse);
     } catch (error) {
       if (error instanceof Error) {
         res.status(500).send({
@@ -62,18 +62,18 @@ class TicketOrderController {
 
   public getTicketOrdersByStatus: RequestHandler = async (req: Request, res: Response) => {
     try {
-      const status = String(req.params.status);
-      console.log("status", status);
+      // const status = String(req.params.status);
+      // console.log("status", status);
       
-      const { page = 1, limit = 10, sortBy = "ticketNumber", order = "asc", search = "" } = req.query;
-      const serviceResponse = await ticketOrderService.getTicketOrdersByStatus(status, {
-        page: Number(page),
-        limit: Number(limit),
-        sortBy: String(sortBy),
-        order: String(order) as "asc" | "desc",
-        search: String(search),
-      });
-      res.status(serviceResponse.statusCode).send(serviceResponse);
+      // const { page = 1, limit = 10, sortBy = "ticketNumber", order = "asc", search = "" } = req.query;
+      // const serviceResponse = await ticketOrderService.getTicketOrdersByStatus(status, {
+      //   page: Number(page),
+      //   limit: Number(limit),
+      //   sortBy: String(sortBy),
+      //   order: String(order) as "asc" | "desc",
+      //   search: String(search),
+      // });
+      // res.status(serviceResponse.statusCode).send(serviceResponse);
     } catch (error) {
       if (error instanceof Error) {
         res.status(500).send({

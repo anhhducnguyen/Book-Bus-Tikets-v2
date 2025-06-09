@@ -22,8 +22,8 @@ export const uploadImage = async (filePath: string): Promise<string | null> => {
 };
 
 // (Tuỳ chọn) test trực tiếp khi chạy file này
-if (require.main === module) {
-  const uploadDir = path.join(__dirname, '../../public/uploads');
-  const imagePath = path.join(uploadDir, "../uploads/1747580637646-employee-1 - Copy.png");
-  uploadImage(imagePath);
-}
+// if (require.main === module) {
+//   const uploadDir = path.join(__dirname, '../../public/uploads');
+//   const imagePath = path.join(uploadDir, "../uploads/1747580637646-employee-1 - Copy.png");
+//   uploadImage(imagePath);
+// }
